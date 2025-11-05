@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>AI 大模型日报 · 科技风看板（离线趋势）</title>
+
+<!-- 可按需修改为仓库相对路径，例如 /news-kanban-site/assets/trends/trends.json -->
+<meta name="trends-json-path" content="./assets/trends/trends.json" />
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial;background:#f6f9fc;color:#1a1a1a;line-height:1.65;-webkit-font-smoothing:antialiased;}
+::-webkit-scrollbar{width:8px;} ::-webkit-scrollbar-thumb{background:rgba(0,0,0,.18);border-radius:4px;}
+.topbar{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.66);backdrop-filter:blur(14px);border-bottom:1px solid rgba(255,255,255,.45);box-shadow:0 4px 16px rgba(0,0,0,.05);padding:14px 20px;display:flex;justify-content:space-between;align-items:center;}
+.top-title{font-size:20px;font-weight:600;background:linear-gradient(92deg,#3a6cf4,#7a5cff,#00b7ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:.4px;}
+.tabs{display:flex;gap:10px;}
+.tab{padding:8px 16px;border-radius:10px;font-size:14px;cursor:pointer;transition:.25s;border:1px solid rgba(255,255,255,.5);background:rgba(255,255,255,.55);backdrop-filter:blur(10px);}
+.tab.active{background:linear-gradient(135deg,#5b7cfa,#8a5cff,#1ecbff);color:#fff;border:none;box-shadow:0 0 12px rgba(72,129,255,.45);}
+.container{max-width:960px;margin:70px auto 40px;padding:0 16px;}
+.trend-panel{margin-bottom:20px;}
+.trend-tools{display:flex;gap:10px;align-items:center;justify-content:flex-end;margin:8px 2px 10px;}
+.trend-tools select{padding:6px 10px;border-radius:8px;border:1px solid #e5e7eb;background:#fff;}
+.trend-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;}
+@media(max-width:860px){ .trend-grid{ grid-template-columns:1fr; } }
+.tcard{background:rgba(255,255,255,.75);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.7);border-radius:14px;overflow:hidden;box-shadow:0 6px 18px rgba(0,0,0,.06);}
+.thead{padding:10px 12px;font-weight:600;font-size:14px;border-bottom:1px solid #eef2f7;background:#fafcff;}
+.twrap{position:relative;height:300px;padding:10px 12px;} .twrap canvas{width:100%;height:100%;}
+.card{background:rgba(255,255,255,.75);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.7);border-radius:14px;padding:20px 22px;margin-bottom:16px;box-shadow:0 6px 20px rgba(0,0,0,.06);transition:all .25s ease;}
+.card:hover{transform:translateY(-3px);box-shadow:0 10px 26px rgba(0,0,0,.08);} .card h3{font-size:17px;margin-bottom:8px;font-weight:600;} .card .meta{font-size:13px;color:#666;margin-bottom:8px;} .card p{color:#2d2d2d;font-size:15px;}
+.accordion{margin-top:10px;} .accordion-header{cursor:pointer;padding:14px 16px;background:rgba(255,255,255,.65);backdrop-filter:blur(10px);border-radius:12px;border:1px solid rgba(255,255,255,.7);box-shadow:0 4px 14px rgba(0,0,0,.05);font-weight:600;display:flex;justify-content:space-between;align-items:center;transition:.25s;margin-bottom:8px;}
+.accordion-header:hover{background:rgba(255,255,255,.9);} .accordion-content{display:none;padding:12px 0 4px 0;animation:fadeIn .3s ease;}
+@keyframes fadeIn{from{opacity:0;}to{opacity:1;}} .section{display:none;} .section.active{display:block;animation:fadeIn .35s ease;}
+.fallback{color:#9aa0a6;font-size:12px;padding:12px;text-align:center;}
+</style>
+</head>
+
+<body>
+<noscript style="display:block;padding:12px 16px;margin:16px;background:#fff0f0;border:1px solid #ffd0d0;color:#a00;border-radius:10px;">
+  本页需要启用 JavaScript 才能显示内容。
+</noscript>
+
+<!-- 安全内联新闻 JSON（避免模板字符串/引号问题） -->
+<script id="page-data" type="application/json">{"today":[],"yesterday":[{"title":"OpenAI 推出新式检索工具，支持企业级私有向量库直连","recap":"面向企业工作负载的检索与权限控制能力升级，提升跨团队知识库的覆盖与实时性。","section":"二、产品/技术动态","source":"OpenAI","date":"2025-11-05 18:20","link":"https://news.example.com/openai-retrieval","dedup_key":"demo-today-1"},{"title":"百度智能云发布大模型行业套件 v2.1","recap":"新增制造、金融两套行业 Prompt Pack，支持企业知识蒸馏与灰度评估。","section":"二、产品/技术动态","source":"Baidu AI Cloud","date":"2025-11-05 19:05","link":"https://news.example.com/baidu-suite","dedup_key":"demo-today-2"},{"title":"麦肯锡发布 2026 企业级 Agent 采用率展望","recap":"预计头部行业将率先进入规模化落地阶段，ROI 主要来自流程自动化与知识协作。","section":"一、权威观点/报告","source":"McKinsey","date":"2025-11-05 20:10","link":"https://news.example.com/mck-agent-outlook","dedup_key":"demo-today-3"},{"title":"华为云宣布与生态伙伴成立联合创新基金","recap":"聚焦算力-模型-应用一体化，加速重点行业的原型验证与规模复制。","section":"三、资本市场动态及企业战略布局","source":"Huawei Cloud","date":"2025-11-05 21:40","link":"https://news.example.com/huawei-fund","dedup_key":"demo-today-4"},{"title":"Anthropic：安全对齐最佳实践 2025 年度更新","recap":"提出可操作的红队流程与评估指标，涵盖多角色对话与工具调用场景。","section":"一、权威观点/报告","source":"Anthropic","date":"2025-11-05 00:15","link":"https://news.example.com/anthropic-safety","dedup_key":"demo-yest-1"},{"title":"腾讯云升级 AI 原生应用生态计划","recap":"面向 ISV 与初创企业提供流量扶持与行业 PoC 基金。","section":"四、品牌与市场动作","source":"Tencent Cloud","date":"2025-11-05 02:05","link":"https://news.example.com/tencent-eco","dedup_key":"demo-yest-3"}],"before":[{"title":"阿里云 Qwen 推出企业知识助手方案","recap":"与 DingTalk、企业盘深度集成，支持多语种与合规留痕。","section":"二、产品/技术动态","source":"Alibaba Cloud","date":"2025-11-04 17:30","link":"https://news.example.com/qwen-assistant","dedup_key":"demo-yest-2"}]}</script>
+
+<div class="topbar">
+  <div class="top-title">AI 大模型日报</div>
+  <div class="tabs">
+    <div class="tab active" data-target="today">今日</div>
+    <div class="tab" data-target="yesterday">昨日</div>
+    <div class="tab" data-target="before">前日</div>
+  </div>
+</div>
+
+<div class="container">
+  <!-- 趋势看板（离线 JSON + Chart.js） -->
+  <section id="trends" class="trend-panel">
+    <div class="accordion">
+      <div class="accordion-header" data-acc="trends-acc">📈 趋势看板（离线 JSON 渲染 · 稳定）</div>
+      <div class="accordion-content" id="trends-acc">
+        <div class="trend-tools">
+          <label style="font-size:12px;color:#666">时间范围</label>
+          <select id="trend-time">
+            <option value="now 7-d" selected>近 7 天</option>
+            <option value="today 3-m">近 90 天</option>
+            <option value="today 12-m">近 12 个月</option>
+          </select>
+        </div>
+        <div class="trend-grid">
+          <div class="tcard"><div class="thead">🌍 国外大模型</div><div class="twrap"><canvas id="c-foreign"></canvas></div></div>
+          <div class="tcard"><div class="thead">🇨🇳 国内大模型</div><div class="twrap"><canvas id="c-domestic"></canvas></div></div>
+          <div class="tcard"><div class="thead">☁️ 国内云厂商</div><div class="twrap"><canvas id="c-vendors"></canvas></div></div>
+          <div class="tcard"><div class="thead">🔑 AI 市场关键词</div><div class="twrap"><canvas id="c-market"></canvas></div></div>
+        </div>
+        <div id="trend-fallback" class="fallback" style="display:none;">无法加载趋势数据（trends.json 不存在或网络异常）。</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 今日 -->
+  <div id="today" class="section active">
+    <h2 style="margin:6px 0 14px;">📌 今日重点资讯</h2>
+    <div id="today-content"></div>
+  </div>
+
+  <!-- 昨日 -->
+  <div id="yesterday" class="section">
+    <div class="accordion">
+      <div class="accordion-header" data-acc="yest-acc">🗓️ 昨日资讯（点击展开）</div>
+      <div class="accordion-content" id="yest-acc"><div id="yesterday-content"></div></div>
+    </div>
+  </div>
+
+  <!-- 前日 -->
+  <div id="before" class="section">
+    <div class="accordion">
+      <div class="accordion-header" data-acc="before-acc">📅 前日资讯（点击展开）</div>
+      <div class="accordion-content" id="before-acc"><div id="before-content"></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- Chart.js（可改为本地：./assets/libs/chart.umd.min.js） -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+// 读取新闻 JSON
+let pageData = { today:[], yesterday:[], before:[] };
+try{
+  const raw = document.getElementById('page-data')?.textContent || '{}';
+  pageData = JSON.parse(raw);
+}catch(e){ console.error('parse page-data failed', e); }
+
+// Tabs
+document.querySelectorAll(".tab").forEach(tab=>{
+  tab.addEventListener("click",()=>{
+    document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
+    tab.classList.add("active");
+    const target=tab.dataset.target;
+    document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
+    document.getElementById(target).classList.add("active");
+  });
+});
+
+// 折叠
+document.querySelectorAll(".accordion-header").forEach(header=>{
+  header.addEventListener("click",()=>{
+    const id=header.getAttribute("data-acc");
+    const content=document.getElementById(id);
+    content.style.display = content.style.display==="block" ? "none" : "block";
+  });
+});
+
+// 渲染新闻卡片（失败也只影响趋势，不影响新闻）
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
+function renderCards(data, containerId){
+  const el=document.getElementById(containerId);
+  if(!el) return;
+  el.innerHTML = (data||[]).map(item=>{
+    const title = esc(item.title||'');
+    const src   = esc(item.source||'');
+    const when  = esc(item.date||'');
+    const recap = esc(item.recap||'');
+    const link  = item.link ? '<a href="'+esc(item.link)+'" target="_blank" rel="noopener">'+title+'</a>' : title;
+    return '<div class="card"><h3>'+link+'</h3><div class="meta">来源：'+src+' · '+when+'</div>'+(recap?'<p>'+recap+'</p>':'')+'</div>';
+  }).join("");
+}
+renderCards(pageData.today,"today-content");
+renderCards(pageData.yesterday,"yesterday-content");
+renderCards(pageData.before,"before-content");
+
+// Chart.js 趋势（离线 JSON）
+(function mountTrends(){
+  const FBF = document.getElementById('trend-fallback');
+  function trendsPath(){
+    const meta = document.querySelector('meta[name="trends-json-path"]');
+    if (meta && meta.content) return meta.content;
+    // —— 修正：使用正确的正则去掉最后一个“文件名” —— //
+    const base = location.pathname.replace(//[^/]*$/, '/');
+    return base + 'assets/trends/trends.json';
+  }
+  function buildCfg(labels, series){
+    return {
+      type:'line',
+      data:{ labels, datasets:(series||[]).map(s=>({label:s.name,data:s.data,tension:.25,pointRadius:0,borderWidth:2})) },
+      options:{
+        responsive:true, maintainAspectRatio:false,
+        plugins:{ legend:{ position:'bottom' } },
+        scales:{ x:{ ticks:{ maxTicksLimit:6 } }, y:{ beginAtZero:true } }
+      }
+    };
+  }
+  let charts = {};
+  async function loadAndRender(range){
+    try{
+      if (!window.Chart){ FBF.style.display='block'; FBF.textContent='Chart.js 未加载'; return; }
+      const url = trendsPath() + '?ts=' + Date.now();
+      const res = await fetch(url);
+      if (!res.ok) throw new Error('fetch trends.json failed: '+res.status);
+      const data = await res.json(); // {panels:{foreign:{'now 7-d':{labels,series},...},...}}
+      const panels = data.panels || {};
+      const ctx = {
+        foreign : document.getElementById('c-foreign')?.getContext('2d'),
+        domestic: document.getElementById('c-domestic')?.getContext('2d'),
+        vendors : document.getElementById('c-vendors')?.getContext('2d'),
+        market  : document.getElementById('c-market')?.getContext('2d'),
+      };
+      ['foreign','domestic','vendors','market'].forEach(k=>{
+        const pack = panels[k]?.[range];
+        if (!pack || !ctx[k]) return;
+        if (charts[k]) charts[k].destroy();
+        charts[k] = new Chart(ctx[k], buildCfg(pack.labels, pack.series));
+      });
+      FBF.style.display='none';
+    }catch(e){
+      console.error(e);
+      FBF.style.display='block';
+      FBF.textContent='无法加载趋势数据（trends.json 不存在或网络异常）。';
+    }
+  }
+  const sel = document.getElementById('trend-time');
+  const initRange = sel?.value || 'now 7-d';
+  loadAndRender(initRange);
+  sel?.addEventListener('change',()=> loadAndRender(sel.value||'now 7-d'));
+})();
+</script>
+</body>
+</html>
