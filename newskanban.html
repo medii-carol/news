@@ -1,208 +1,625 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>AI 大模型日报 · 科技风看板（离线趋势）</title>
-
-<!-- 可按需修改为仓库相对路径，例如 /news-kanban-site/assets/trends/trends.json -->
-<meta name="trends-json-path" content="./assets/trends/trends.json" />
-
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AI 大模型新闻看板（2025-11-06）</title>
 <style>
-*{margin:0;padding:0;box-sizing:border-box;}
-body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial;background:#f6f9fc;color:#1a1a1a;line-height:1.65;-webkit-font-smoothing:antialiased;}
-::-webkit-scrollbar{width:8px;} ::-webkit-scrollbar-thumb{background:rgba(0,0,0,.18);border-radius:4px;}
-.topbar{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.66);backdrop-filter:blur(14px);border-bottom:1px solid rgba(255,255,255,.45);box-shadow:0 4px 16px rgba(0,0,0,.05);padding:14px 20px;display:flex;justify-content:space-between;align-items:center;}
-.top-title{font-size:20px;font-weight:600;background:linear-gradient(92deg,#3a6cf4,#7a5cff,#00b7ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:.4px;}
-.tabs{display:flex;gap:10px;}
-.tab{padding:8px 16px;border-radius:10px;font-size:14px;cursor:pointer;transition:.25s;border:1px solid rgba(255,255,255,.5);background:rgba(255,255,255,.55);backdrop-filter:blur(10px);}
-.tab.active{background:linear-gradient(135deg,#5b7cfa,#8a5cff,#1ecbff);color:#fff;border:none;box-shadow:0 0 12px rgba(72,129,255,.45);}
-.container{max-width:960px;margin:70px auto 40px;padding:0 16px;}
-.trend-panel{margin-bottom:20px;}
-.trend-tools{display:flex;gap:10px;align-items:center;justify-content:flex-end;margin:8px 2px 10px;}
-.trend-tools select{padding:6px 10px;border-radius:8px;border:1px solid #e5e7eb;background:#fff;}
-.trend-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;}
-@media(max-width:860px){ .trend-grid{ grid-template-columns:1fr; } }
-.tcard{background:rgba(255,255,255,.75);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.7);border-radius:14px;overflow:hidden;box-shadow:0 6px 18px rgba(0,0,0,.06);}
-.thead{padding:10px 12px;font-weight:600;font-size:14px;border-bottom:1px solid #eef2f7;background:#fafcff;}
-.twrap{position:relative;height:300px;padding:10px 12px;} .twrap canvas{width:100%;height:100%;}
-.card{background:rgba(255,255,255,.75);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.7);border-radius:14px;padding:20px 22px;margin-bottom:16px;box-shadow:0 6px 20px rgba(0,0,0,.06);transition:all .25s ease;}
-.card:hover{transform:translateY(-3px);box-shadow:0 10px 26px rgba(0,0,0,.08);} .card h3{font-size:17px;margin-bottom:8px;font-weight:600;} .card .meta{font-size:13px;color:#666;margin-bottom:8px;} .card p{color:#2d2d2d;font-size:15px;}
-.accordion{margin-top:10px;} .accordion-header{cursor:pointer;padding:14px 16px;background:rgba(255,255,255,.65);backdrop-filter:blur(10px);border-radius:12px;border:1px solid rgba(255,255,255,.7);box-shadow:0 4px 14px rgba(0,0,0,.05);font-weight:600;display:flex;justify-content:space-between;align-items:center;transition:.25s;margin-bottom:8px;}
-.accordion-header:hover{background:rgba(255,255,255,.9);} .accordion-content{display:none;padding:12px 0 4px 0;animation:fadeIn .3s ease;}
-@keyframes fadeIn{from{opacity:0;}to{opacity:1;}} .section{display:none;} .section.active{display:block;animation:fadeIn .35s ease;}
-.fallback{color:#9aa0a6;font-size:12px;padding:12px;text-align:center;}
+:root{
+  --bg:#f7f8fb;
+  --fg:#0f172a;
+  --sub:#64748b;
+  --line:#e5e7eb;
+  --card:#ffffff;
+  --accent:#4f46e5;
+  --radius:16px;
+  --shadow:0 1px 2px rgba(15,23,42,.04),0 10px 24px rgba(15,23,42,.06);
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#0b0f14; --fg:#e5e7eb; --sub:#9aa7b4; --line:#1f2937; --card:#0f1520; --accent:#7c83ff;
+    --shadow:0 1px 2px rgba(0,0,0,.5),0 10px 28px rgba(0,0,0,.55);
+  }
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0; background:var(--bg); color:var(--fg);
+  font:16px/1.7 system-ui,-apple-system,Segoe UI,Roboto,Inter,"PingFang SC","Hiragino Sans GB","Microsoft Yahei",Arial;
+  -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
+}
+
+/* 顶部与筛选条 */
+.header-wrap{max-width:1180px;margin:28px auto 8px;padding:0 18px}
+h1{margin:6px 0 2px;font-size:28px;letter-spacing:.3px;font-weight:700}
+.time{color:var(--sub);font-size:13px}
+
+.controls{
+  position:sticky; top:0; z-index:30;
+  max-width:1180px; margin:8px auto 18px; padding:10px 18px;
+  display:flex; gap:12px; flex-wrap:wrap; align-items:center;
+  backdrop-filter:saturate(1.2) blur(6px);
+  background:linear-gradient(180deg, rgba(255,255,255,.75), rgba(255,255,255,.55));
+  border-bottom:1px solid var(--line);
+  box-shadow:0 6px 14px rgba(15,23,42,.05);
+}
+@media (prefers-color-scheme: dark){
+  .controls{
+    background:linear-gradient(180deg, rgba(8,12,18,.75), rgba(8,12,18,.55));
+    box-shadow:0 10px 24px rgba(0,0,0,.45);
+  }
+}
+select,input[type="search"]{
+  padding:10px 12px;border-radius:12px;border:1px solid var(--line);outline:none;min-width:200px;background:var(--card);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.4);
+}
+input[type="search"]{flex:1 1 320px}
+select:focus-visible,input[type="search"]:focus-visible{
+  border-color:var(--accent);
+  box-shadow:0 0 0 3px rgba(79,70,229,.18);
+}
+
+/* 主容器 */
+.wrap{max-width:1180px;margin:0 auto;padding:0 14px 42px}
+
+/* 板块与卡片 */
+.sec{scroll-margin-top:84px; margin-top:26px}
+.sec-hd{
+  margin:22px 0 14px; font-size:20px; font-weight:700;
+  display:flex; align-items:center; gap:10px;
+}
+.sec-hd span{
+  padding-left:10px;
+  border-left:5px solid var(--accent);
+  background:linear-gradient(90deg,rgba(79,70,229,.12),transparent);
+  border-radius:6px 999px 999px 6px;
+}
+
+.grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:16px }
+
+/* 卡片 */
+.card{
+  background:var(--card); border-radius:var(--radius); padding:16px 16px 12px;
+  border:1px solid rgba(0,0,0,.04);
+  box-shadow:var(--shadow);
+  transition:transform .14s ease, box-shadow .14s ease, border-color .14s ease;
+}
+.card:hover{ transform:translateY(-3px); box-shadow:0 2px 6px rgba(15,23,42,.08),0 16px 34px rgba(15,23,42,.10) }
+.title{ margin:0 0 8px; font-size:17px; line-height:1.45 }
+.title a{ color:var(--fg); text-decoration:none; }
+.title a:hover{ color:var(--accent); text-decoration:underline }
+.title a:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; border-radius:6px }
+/* 两行收敛，防止高度跳变 */
+.title a{ display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+
+.meta{ color:var(--sub); font-size:12px; margin-bottom:6px }
+.recap{ margin:.45em 0 .25em; line-height:1.7 }
+.recap{ display:-webkit-box; -webkit-line-clamp:4; -webkit-box-orient:vertical; overflow:hidden; }
+
+.more{ margin-top:6px }
+.more a{ color:var(--accent); text-decoration:none; font-weight:600; }
+.more a:hover{ text-decoration:underline }
+
+/* 空态 */
+#emptyHint{
+  color:var(--sub); text-align:center; margin:22px 0 26px; font-size:14px;
+  background:rgba(79,70,229,.06); border:1px dashed rgba(79,70,229,.28);
+  padding:10px 12px; border-radius:12px;
+}
+.hidden{display:none!important}
+
+footer{ max-width:1180px; margin:22px auto 44px; padding:0 18px; color:var(--sub); font-size:12px }
+
+/* 趋势图区域（微调留白与阴影） */
+.trends-top{
+  max-width:1180px; margin:6px auto 16px; padding:0 14px;
+  display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px;
+}
+@media (max-width:1024px){ .trends-top{ grid-template-columns:1fr; } }
+
+.t-card{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:20px;
+  box-shadow:var(--shadow);
+  overflow:hidden;
+  transition:transform .22s ease, box-shadow .22s ease;
+}
+.t-card:hover{ transform:translateY(-4px); box-shadow:0 12px 28px rgba(16,18,19,.10); }
+
+.t-hd{
+  display:flex; align-items:center; justify-content:space-between;
+  padding:12px 14px; font-weight:650; font-size:15px;
+  background:linear-gradient(90deg,#fff, #fafbff);
+  border-bottom:1px solid var(--line);
+}
+@media (prefers-color-scheme: dark){
+  .t-hd{ background:linear-gradient(90deg,#0f1520,#0c121b) }
+}
+.t-title{display:flex; gap:8px; align-items:center}
+.t-dot{width:8px;height:8px;border-radius:999px;background:var(--accent);box-shadow:0 0 0 3px rgba(79,70,229,.12)}
+.t-tools{display:flex;align-items:center;gap:8px}
+.t-sel{
+  border:1px solid var(--line); border-radius:10px; padding:6px 10px; background:var(--card);
+  color:inherit; font-size:12px; outline:none;
+}
+.t-body{ height:340px; position:relative; }
+.t-embed{
+  position:absolute; inset:10px 12px;
+  border-radius:14px; background:#fff; overflow:hidden;
+}
+.t-embed iframe{ width:100%; height:100%; border:0; border-radius:12px; filter:saturate(1.06) contrast(1.04); clip-path: inset(0px 0px 20px 0px) }
+.t-fallback{
+  position:absolute; inset:10px 12px; border-radius:14px; overflow:hidden;
+  background:linear-gradient(90deg,#f6f7f9 25%,#eef1f6 37%,#f6f7f9 63%); background-size:400% 100%; animation:t-shimmer 1.4s ease infinite;
+  color:#9aa0a6; display:flex; align-items:center; justify-content:center; font-size:12px;
+}
+@keyframes t-shimmer{ 0%{background-position:100% 0} 100%{background-position:-100% 0} }
+
+@media (max-width:480px){
+  h1{font-size:22px}
+  .sec-hd{font-size:18px}
+  .t-body{height:300px}
+}
 </style>
-</head>
 
-<body>
-<noscript style="display:block;padding:12px 16px;margin:16px;background:#fff0f0;border:1px solid #ffd0d0;color:#a00;border-radius:10px;">
-  本页需要启用 JavaScript 才能显示内容。
-</noscript>
-
-<!-- 安全内联新闻 JSON（避免模板字符串/引号问题） -->
-<script id="page-data" type="application/json">{"today":[],"yesterday":[{"title":"OpenAI 推出新式检索工具，支持企业级私有向量库直连","recap":"面向企业工作负载的检索与权限控制能力升级，提升跨团队知识库的覆盖与实时性。","section":"二、产品/技术动态","source":"OpenAI","date":"2025-11-05 18:20","link":"https://news.example.com/openai-retrieval","dedup_key":"demo-today-1"},{"title":"百度智能云发布大模型行业套件 v2.1","recap":"新增制造、金融两套行业 Prompt Pack，支持企业知识蒸馏与灰度评估。","section":"二、产品/技术动态","source":"Baidu AI Cloud","date":"2025-11-05 19:05","link":"https://news.example.com/baidu-suite","dedup_key":"demo-today-2"},{"title":"麦肯锡发布 2026 企业级 Agent 采用率展望","recap":"预计头部行业将率先进入规模化落地阶段，ROI 主要来自流程自动化与知识协作。","section":"一、权威观点/报告","source":"McKinsey","date":"2025-11-05 20:10","link":"https://news.example.com/mck-agent-outlook","dedup_key":"demo-today-3"},{"title":"华为云宣布与生态伙伴成立联合创新基金","recap":"聚焦算力-模型-应用一体化，加速重点行业的原型验证与规模复制。","section":"三、资本市场动态及企业战略布局","source":"Huawei Cloud","date":"2025-11-05 21:40","link":"https://news.example.com/huawei-fund","dedup_key":"demo-today-4"},{"title":"Anthropic：安全对齐最佳实践 2025 年度更新","recap":"提出可操作的红队流程与评估指标，涵盖多角色对话与工具调用场景。","section":"一、权威观点/报告","source":"Anthropic","date":"2025-11-05 00:15","link":"https://news.example.com/anthropic-safety","dedup_key":"demo-yest-1"},{"title":"腾讯云升级 AI 原生应用生态计划","recap":"面向 ISV 与初创企业提供流量扶持与行业 PoC 基金。","section":"四、品牌与市场动作","source":"Tencent Cloud","date":"2025-11-05 02:05","link":"https://news.example.com/tencent-eco","dedup_key":"demo-yest-3"}],"before":[{"title":"阿里云 Qwen 推出企业知识助手方案","recap":"与 DingTalk、企业盘深度集成，支持多语种与合规留痕。","section":"二、产品/技术动态","source":"Alibaba Cloud","date":"2025-11-04 17:30","link":"https://news.example.com/qwen-assistant","dedup_key":"demo-yest-2"}]}</script>
-
-<div class="topbar">
-  <div class="top-title">AI 大模型日报</div>
-  <div class="tabs">
-    <div class="tab active" data-target="today">今日</div>
-    <div class="tab" data-target="yesterday">昨日</div>
-    <div class="tab" data-target="before">前日</div>
-  </div>
+<div class="header-wrap">
+  <h1>AI 大模型新闻看板</h1>
+  <div class="time">2025-11-06</div>
 </div>
 
-<div class="container">
-  <!-- 趋势看板（离线 JSON + Chart.js） -->
-  <section id="trends" class="trend-panel">
-    <div class="accordion">
-      <div class="accordion-header" data-acc="trends-acc">📈 趋势看板（离线 JSON 渲染 · 稳定）</div>
-      <div class="accordion-content" id="trends-acc">
-        <div class="trend-tools">
-          <label style="font-size:12px;color:#666">时间范围</label>
-          <select id="trend-time">
-            <option value="now 7-d" selected>近 7 天</option>
-            <option value="today 3-m">近 90 天</option>
-            <option value="today 12-m">近 12 个月</option>
-          </select>
-        </div>
-        <div class="trend-grid">
-          <div class="tcard"><div class="thead">🌍 国外大模型</div><div class="twrap"><canvas id="c-foreign"></canvas></div></div>
-          <div class="tcard"><div class="thead">🇨🇳 国内大模型</div><div class="twrap"><canvas id="c-domestic"></canvas></div></div>
-          <div class="tcard"><div class="thead">☁️ 国内云厂商</div><div class="twrap"><canvas id="c-vendors"></canvas></div></div>
-          <div class="tcard"><div class="thead">🔑 AI 市场关键词</div><div class="twrap"><canvas id="c-market"></canvas></div></div>
-        </div>
-        <div id="trend-fallback" class="fallback" style="display:none;">无法加载趋势数据（trends.json 不存在或网络异常）。</div>
-      </div>
+<div class="controls">
+  <select id="secSel" aria-label="板块筛选">
+    <option value="">全部板块</option>
+    <option value="一、权威观点/报告">一、权威观点/报告</option><option value="二、产品/技术动态">二、产品/技术动态</option><option value="三、资本市场动态及企业战略布局">三、资本市场动态及企业战略布局</option><option value="四、品牌与市场动作">四、品牌与市场动作</option>
+  </select>
+  <input id="search" type="search" placeholder="搜索标题 / 概要 / 标签…" aria-label="搜索">
+</div>
+
+<section class="trends-top" aria-label="Google 趋势">
+  <div class="t-card">
+    <div class="t-hd">
+      <div class="t-title"><span class="t-dot"></span><span>🌍 国外大模型 · 趋势</span></div>
+      <div class="t-tools"><select class="t-sel" data-target="gt-foreign" aria-label="时间范围">
+        <option value="now 7-d" selected>近 7 天</option>
+        <option value="today 3-m">近 90 天</option>
+        <option value="today 12-m">近 12 个月</option>
+      </select></div>
+    </div>
+    <div class="t-body">
+      <div id="gt-foreign" class="t-embed"></div>
+      <div class="t-fallback">加载趋势图…</div>
+    </div>
+  </div>
+
+  <div class="t-card">
+    <div class="t-hd">
+      <div class="t-title"><span class="t-dot"></span><span>🇨🇳 国内大模型 · 趋势</span></div>
+      <div class="t-tools"><select class="t-sel" data-target="gt-domestic" aria-label="时间范围">
+        <option value="now 7-d" selected>近 7 天</option>
+        <option value="today 3-m">近 90 天</option>
+        <option value="today 12-m">近 12 个月</option>
+      </select></div>
+    </div>
+    <div class="t-body">
+      <div id="gt-domestic" class="t-embed"></div>
+      <div class="t-fallback">加载趋势图…</div>
+    </div>
+  </div>
+
+  <div class="t-card">
+    <div class="t-hd">
+      <div class="t-title"><span class="t-dot"></span><span>☁️ 国内云厂商 · 趋势</span></div>
+      <div class="t-tools"><select class="t-sel" data-target="gt-vendors" aria-label="时间范围">
+        <option value="now 7-d" selected>近 7 天</option>
+        <option value="today 3-m">近 90 天</option>
+        <option value="today 12-m">近 12 个月</option>
+      </select></div>
+    </div>
+    <div class="t-body">
+      <div id="gt-vendors" class="t-embed"></div>
+      <div class="t-fallback">加载趋势图…</div>
+    </div>
+  </div>
+
+  <div class="t-card">
+    <div class="t-hd">
+      <div class="t-title"><span class="t-dot"></span><span>🔑 AI 市场关键词 · 趋势</span></div>
+      <div class="t-tools"><select class="t-sel" data-target="gt-market" aria-label="时间范围">
+        <option value="now 7-d" selected>近 7 天</option>
+        <option value="today 3-m">近 90 天</option>
+        <option value="today 12-m">近 12 个月</option>
+      </select></div>
+    </div>
+    <div class="t-body">
+      <div id="gt-market" class="t-embed"></div>
+      <div class="t-fallback">加载趋势图…</div>
+    </div>
+  </div>
+</section>
+
+<div class="wrap">
+  <main id="main">
+    <p id="emptyHint" class="hidden">当前筛选无结果，换个关键词试试～</p>
+    <section id="一、权威观点/报告" class="sec">
+    <h2 class="sec-hd"><span>一、权威观点/报告</span></h2>
+    <div class="grid">
+      <article class="card" data-sec="一、权威观点/报告">
+    <h3 class="title"><a href="http://mp.weixin.qq.com/s?__biz=MzI3MTA0MTk1MA==&mid=2652642082&idx=2&sn=e809d90b65a235d45e914da0e6ba9c21&chksm=f0faa8b81e4050f5a646e6d9551dec913a65e0cf7fe928297f7a44f886d83252802e74facae8&scene=0#rd" target="_blank" rel="noopener">AI模型价格大幅下跌，部分模型成本下降900倍</a></h3>
+    <div class="meta">新智元（2025-11-06 03:00 北京时间）</div>
+    <p class="recap" title="分析师Rohan Paul指出，过去一年AI模型价格暴跌，最高端模型成本下降达900倍。a16z研究员Alex Danco表示，技术成本下降使人类劳动更昂贵。">分析师Rohan Paul指出，过去一年AI模型价格暴跌，最高端模型成本下降达900倍。a16z研究员Alex Danco表示，技术成本下降使人类劳动更昂贵。</p>
+    <div class="more"><a href="http://mp.weixin.qq.com/s?__biz=MzI3MTA0MTk1MA==&mid=2652642082&idx=2&sn=e809d90b65a235d45e914da0e6ba9c21&chksm=f0faa8b81e4050f5a646e6d9551dec913a65e0cf7fe928297f7a44f886d83252802e74facae8&scene=0#rd" target="_blank" rel="noopener" aria-label="阅读原文">阅读原文 →</a></div>
+  </article>
+<article class="card" data-sec="一、权威观点/报告">
+    <h3 class="title"><a href="http://mp.weixin.qq.com/s?__biz=MzI1Mzc1MzMyOQ==&mid=2247835351&idx=2&sn=2ff7ee383c48fc95e35837178851e75a&chksm=e8dd7aee8b5b0c1a319b94c36754bd04324a1d6c95c1f850245e5119f173ec32866321113807&scene=0#rd" target="_blank" rel="noopener">IDC报告显示华为位居中国混合云AI智算平台领导者</a></h3>
+    <div class="meta">（2025-11-06 02:30 北京时间）</div>
+    <p class="recap" title="IDC发布《IDC MarketScape：中国混合云AI智算平台2025年厂商评估》报告，华为在混合云AI智算平台领域位居领导者类别。报告指出混合云AI智算平台已成为企业核心AI基础设施，华为云Stack通过多项技术优化打造高性能、高利用率、高可靠的智算平台。">IDC发布《IDC MarketScape：中国混合云AI智算平台2025年厂商评估》报告，华为在混合云AI智算平台领域位居领导者类别。报告指出混合云AI智算平台已成为企业核心AI基础设施，华为云Stack通过多项技术优化打造高性能、高利用率、高可靠的智算平台。</p>
+    <div class="more"><a href="http://mp.weixin.qq.com/s?__biz=MzI1Mzc1MzMyOQ==&mid=2247835351&idx=2&sn=2ff7ee383c48fc95e35837178851e75a&chksm=e8dd7aee8b5b0c1a319b94c36754bd04324a1d6c95c1f850245e5119f173ec32866321113807&scene=0#rd" target="_blank" rel="noopener" aria-label="阅读原文">阅读原文 →</a></div>
+  </article>
+    </div>
+  </section><section id="二、产品/技术动态" class="sec">
+    <h2 class="sec-hd"><span>二、产品/技术动态</span></h2>
+    <div class="grid">
+      <article class="card" data-sec="二、产品/技术动态">
+    <h3 class="title"><a href="https://www.cnet.com/tech/services-and-software/this-ai-chatbot-is-built-to-disagree-with-you-and-its-better-than-chatgpt/#ftag=CAD590a51e" target="_blank" rel="noopener">人工智能聊天机器人Disagree Bot被设计为与用户争论</a></h3>
+    <div class="meta">Katelyn Chedraoui（2025-11-06 08:16 北京时间）</div>
+    <p class="recap" title="Disagree Bot是一款专为与用户争论而设计的AI聊天机器人。其表现突显了其他AI聊天机器人过度迎合用户的问题。">Disagree Bot是一款专为与用户争论而设计的AI聊天机器人。其表现突显了其他AI聊天机器人过度迎合用户的问题。</p>
+    <div class="more"><a href="https://www.cnet.com/tech/services-and-software/this-ai-chatbot-is-built-to-disagree-with-you-and-its-better-than-chatgpt/#ftag=CAD590a51e" target="_blank" rel="noopener" aria-label="阅读原文">阅读原文 →</a></div>
+  </article>
+<article class="card" data-sec="二、产品/技术动态">
+    <h3 class="title"><a href="https://www.engadget.com/ai/sony-has-a-new-benchmark-for-ethical-ai-160045574.html?src=rss" target="_blank" rel="noopener">索尼发布人工智能公平性基准数据集</a></h3>
+    <div class="meta">Will Shanklin（2025-11-06 08:00 北京时间）</div>
+    <p class="recap" title="索尼AI发布名为FHIBE的全球多样化、基于同意的人类图像数据集，用于评估AI模型偏见。该数据集包含来自80多个国家近2000名志愿者的图像，并已在《自然》杂志发表相关论文。">索尼AI发布名为FHIBE的全球多样化、基于同意的人类图像数据集，用于评估AI模型偏见。该数据集包含来自80多个国家近2000名志愿者的图像，并已在《自然》杂志发表相关论文。</p>
+    <div class="more"><a href="https://www.engadget.com/ai/sony-has-a-new-benchmark-for-ethical-ai-160045574.html?src=rss" target="_blank" rel="noopener" aria-label="阅读原文">阅读原文 →</a></div>
+  </article>
+<article class="card" data-sec="二、产品/技术动态">
+    <h3 class="title"><a href="https://www.ithome.com/0/895/146.htm" target="_blank" rel="noopener">奔驰纯电CLA上市售价24.9万元起，搭载Momenta辅助驾驶系统</a></h3>
+    <div class="meta">（2025-11-06 04:04 北京时间）</div>
+    <p class="recap" title="全新梅赛德斯-奔驰纯电CLA正式上市，共推出两款配置，售价分别为24.9万和28.56万元。该车基于MMA平台打造，轴距加长至2830毫米，配备两挡变速箱和800伏电气架构，CLTC续航达866公里。搭载MB.OS操作系统和高通骁龙8295芯片，并配备Momenta辅助驾驶系统。">全新梅赛德斯-奔驰纯电CLA正式上市，共推出两款配置，售价分别为24.9万和28.56万元。该车基于MMA平台打造，轴距加长至2830毫米，配备两挡变速箱和800伏电气架构，CLTC续航达866公里。搭载MB.OS操作系统和高通骁龙8295芯片，并配备Momenta辅助驾驶系统。</p>
+    <div class="more"><a href="https://www.ithome.com/0/895/146.htm" target="_blank" rel="noopener" aria-label="阅读原文">阅读原文 →</a></div>
+  </article>
+<article class="card" data-sec="二、产品/技术动态">
+    <h3 class="title"><a href="http://www.geekpark.net/news/356004" target="_blank" rel="noopener">计算能力推动影像设备发展，AI Native公司迎来新机遇</a></h3>
+    <div class="meta">（2025-11-06 03:26 北京时间）</div>
+    <p class="recap" title="文章分析了影像设备行业从光学主导到计算主导的演变历程，指出大模型等AI技术正推动影像设备向理解、增强和生成现实三个新方向发展。文中提及大疆、影石等公司案例，强调AI Native影像公司需以场景化为核心，通过高计算能力创造新价值。">文章分析了影像设备行业从光学主导到计算主导的演变历程，指出大模型等AI技术正推动影像设备向理解、增强和生成现实三个新方向发展。文中提及大疆、影石等公司案例，强调AI Native影像公司需以场景化为核心，通过高计算能力创造新价值。</p>
+    <div class="more"><a href="http://www.geekpark.net/news/356004" target="_blank" rel="noopener" aria-label="阅读原文">阅读原文 →</a></div>
+  </article>
+<article class="card" data-sec="二、产品/技术动态">
+    <h3 class="title"><a href="http://mp.weixin.qq.com/s?__biz=MzI3MTA0MTk1MA==&mid=2652642082&idx=3&sn=a8d1b00804d2a79250e74914dd30fe0b&chksm=f0baea666bfdad8b6c85fa725ee5f3b363117c54452bb20565f418ae847b138cb36a3cdd3fad&scene=0#rd" target="_blank" rel="noopener">谷歌发布Earth AI升级版，实现地球尺度地理空间推理</a></h3>
+    <div class="meta">新智元（2025-11-06 03:00 北京时间）</div>
+    <p class="recap" title="谷歌推出Earth AI系列地理空间AI模型，包括由Gemini驱动的地理空间推理模型，可自动连接天气预报、人口地图和卫星图像等数据。该模型将洪水预警覆盖范围扩展至20亿人口，并发布了遥感基础模型和人口动力学基础模型的技术细节。">谷歌推出Earth AI系列地理空间AI模型，包括由Gemini驱动的地理空间推理模型，可自动连接天气预报、人口地图和卫星图像等数据。该模型将洪水预警覆盖范围扩展至20亿人口，并发布了遥感基础模型和人口动力学基础模型的技术细节。</p>
+    <div class="more"><a href="http://mp.weixin.qq.com/s?__biz=MzI3MTA0MTk1MA==&mid=2652642082&idx=3&sn=a8d1b00804d2a79250e74914dd30fe0b&chksm=f0baea666bfdad8b6c85fa725ee5f3b363117c54452bb20565f418ae847b138cb36a3cdd3fad&scene=0#rd" target="_blank" rel="noopener" aria-label="阅读原文">阅读原文 →</a></div>
+  </article>
+<article class="card" data-sec="二、产品/技术动态">
+    <h3 class="title"><a href="https://www.ithome.com/0/895/127.htm" target="_blank" rel="noopener">小鹏汽车发布四大AI应用并宣布12月开放新总部和工厂</a></h3>
+    <div class="meta">（2025-11-06 02:15 北京时间）</div>
+    <p class="recap" title="小鹏汽车在2025科技日发布基于物理AI体系的四大应用：第二代VLA大模型、Robotaxi、新一代IRON机器人和汇天飞行汽车。公司宣布全新总部和智能制造工厂将于12月正式开放。小鹏汽车目标成为面向全球的具身智能公司。">小鹏汽车在2025科技日发布基于物理AI体系的四大应用：第二代VLA大模型、Robotaxi、新一代IRON机器人和汇天飞行汽车。公司宣布全新总部和智能制造工厂将于12月正式开放。小鹏汽车目标成为面向全球的具身智能公司。</p>
+    <div class="more"><a href="https://www.ithome.com/0/895/127.htm" target="_blank" rel="noopener" aria-label="阅读原文">阅读原文 →</a></div>
+  </article>
+<article class="card" data-sec="二、产品/技术动态">
+    <h3 class="title"><a href="http://www.geekpark.net/news/355998" target="_blank" rel="noopener">声网年度服务分钟数突破1万亿分钟，对话式AI用量环比增长151%</a></h3>
+    <div class="meta">极客公园（2025-11-06 01:37 北京时间）</div>
+    <p class="recap" title="声网在实时互联网大会上宣布年度服务分钟数首次突破1万亿分钟，其对话式AI相关用量在2025年第三季度实现151%环比增长。声网发布对话式AI引擎2.0，新增声纹识别、数字人与视觉理解功能。大会探讨了对话式AI在情感陪伴、智能硬件、在线教育三大场景的应用前景。">声网在实时互联网大会上宣布年度服务分钟数首次突破1万亿分钟，其对话式AI相关用量在2025年第三季度实现151%环比增长。声网发布对话式AI引擎2.0，新增声纹识别、数字人与视觉理解功能。大会探讨了对话式AI在情感陪伴、智能硬件、在线教育三大场景的应用前景。</p>
+    <div class="more"><a href="http://www.geekpark.net/news/355998" target="_blank" rel="noopener" aria-label="阅读原文">阅读原文 →</a></div>
+  </article>
+<article class="card" data-sec="二、产品/技术动态">
+    <h3 class="title"><a href="http://mp.weixin.qq.com/s?__biz=MzIzNjc1NzUzMw==&mid=2247839667&idx=2&sn=089de9318a608481dad4f05f2cda1d79&chksm=e93ae92d182e720e8edd991e99f6845e2c089ec4d694f307f950b61866e102f55df8fea7ea42&scene=0#rd" target="_blank" rel="noopener">家用机器人自主性不足引发用户不满</a></h3>
+    <div class="meta">量子位（2025-11-06 01:30 北京时间）</div>
+    <p class="recap" title="传奇程序员卡马克认为自主家用人形机器人实用性差，建议转向远程家政服务。1X Technologies推出远程操控机器人NEO，售价2万美元，预计2026年交付。用户反映家用机器人存在避障失败、操作混乱等问题。">传奇程序员卡马克认为自主家用人形机器人实用性差，建议转向远程家政服务。1X Technologies推出远程操控机器人NEO，售价2万美元，预计2026年交付。用户反映家用机器人存在避障失败、操作混乱等问题。</p>
+    <div class="more"><a href="http://mp.weixin.qq.com/s?__biz=MzIzNjc1NzUzMw==&mid=2247839667&idx=2&sn=089de9318a608481dad4f05f2cda1d79&chksm=e93ae92d182e720e8edd991e99f6845e2c089ec4d694f307f950b61866e102f55df8fea7ea42&scene=0#rd" target="_blank" rel="noopener" aria-label="阅读原文">阅读原文 →</a></div>
+  </article>
+<article class="card" data-sec="二、产品/技术动态">
+    <h3 class="title"><a href="https://www.engadget.com/mobile/smartphones/the-motorola-edge-70-is-another-ridiculously-thin-smartphone-080009244.html?src=rss" target="_blank" rel="noopener">摩托罗拉发布超薄智能手机Edge 70</a></h3>
+    <div class="meta">Lawrence Bonk（2025-11-06 00:00 北京时间）</div>
+    <p class="recap" title="摩托罗拉发布Edge 70超薄智能手机，厚度5.9毫米，配备三个5000万像素摄像头和4800mAh电池。该手机搭载骁龙7 Gen 4芯片组，内置moto ai2聊天机器人，起售价700英镑，目前在英国上市。">摩托罗拉发布Edge 70超薄智能手机，厚度5.9毫米，配备三个5000万像素摄像头和4800mAh电池。该手机搭载骁龙7 Gen 4芯片组，内置moto ai2聊天机器人，起售价700英镑，目前在英国上市。</p>
+    <div class="more"><a href="https://www.engadget.com/mobile/smartphones/the-motorola-edge-70-is-another-ridiculously-thin-smartphone-080009244.html?src=rss" target="_blank" rel="noopener" aria-label="阅读原文">阅读原文 →</a></div>
+  </article>
+<article class="card" data-sec="二、产品/技术动态">
+    <h3 class="title"><a href="https://www.qbitai.com/2025/11/349043.html" target="_blank" rel="noopener">趋境联合清华北航实现两张4090本地微调万亿参数Kimi模型</a></h3>
+    <div class="meta">十三（2025-11-05 23:58 北京时间）</div>
+    <p class="recap" title="趋境联合清华大学、北京航空航天大学研究团队，实现仅用两张RTX 4090显卡在本地微调万亿参数Kimi模型K2，大幅降低算力门槛。">趋境联合清华大学、北京航空航天大学研究团队，实现仅用两张RTX 4090显卡在本地微调万亿参数Kimi模型K2，大幅降低算力门槛。</p>
+    <div class="more"><a href="https://www.qbitai.com/2025/11/349043.html" target="_blank" rel="noopener" aria-label="阅读原文">阅读原文 →</a></div>
+  </article>
+<article class="card" data-sec="二、产品/技术动态">
+    <h3 class="title"><a href="https://www.theguardian.com/global-development/2025/nov/05/india-women-ai-deepfakes-internet-social-media-artificial-intelligence-nudify-extortion-abuse" target="_blank" rel="noopener">印度女性因AI深度伪造风险减少网络活动</a></h3>
+    <div class="meta">Aisha Down（2025-11-05 23:55 北京时间）</div>
+    <p class="recap" title="人工智能普及带来新型网络骚扰方式，印度女性因担心个人照片被AI深度伪造技术滥用而减少在社交媒体分享内容。一名孟买法律系毕业生表示，AI技术使图片安全无法保障。">人工智能普及带来新型网络骚扰方式，印度女性因担心个人照片被AI深度伪造技术滥用而减少在社交媒体分享内容。一名孟买法律系毕业生表示，AI技术使图片安全无法保障。</p>
+    <div class="more"><a href="https://www.theguardian.com/global-development/2025/nov/05/india-women-ai-deepfakes-internet-social-media-artificial-intelligence-nudify-extortion-abuse" target="_blank" rel="noopener" aria-label="阅读原文">阅读原文 →</a></div>
+  </article>
+<article class="card" data-sec="二、产品/技术动态">
+    <h3 class="title"><a href="http://mp.weixin.qq.com/s?__biz=MzIzNjc1NzUzMw==&mid=2247839661&idx=3&sn=ec051c3636897a51f79d2d3dfa126bda&chksm=e93fcdc240200cba8dcb2d9b24fc94b90209fbf7be9f4a225b5ffad193de84d0c335de65d69e&scene=0#rd" target="_blank" rel="noopener">北大与字节联合开源时空推理视频模型Open-o3 Video</a></h3>
+    <div class="meta">量子位（2025-11-05 23:53 北京时间）</div>
+    <p class="recap" title="北京大学与字节跳动联合团队推出首个开源时空推理视频模型Open-o3 Video，该模型在推理过程中嵌入显式时空证据，能标注事件发生的时间和位置。在多个视频推理测试中，其关键指标提升至24.2%，性能超越GPT-4o和Gemini-2-Flash等闭源模型。">北京大学与字节跳动联合团队推出首个开源时空推理视频模型Open-o3 Video，该模型在推理过程中嵌入显式时空证据，能标注事件发生的时间和位置。在多个视频推理测试中，其关键指标提升至24.2%，性能超越GPT-4o和Gemini-2-Flash等闭源模型。</p>
+    <div class="more"><a href="http://mp.weixin.qq.com/s?__biz=MzIzNjc1NzUzMw==&mid=2247839661&idx=3&sn=ec051c3636897a51f79d2d3dfa126bda&chksm=e93fcdc240200cba8dcb2d9b24fc94b90209fbf7be9f4a225b5ffad193de84d0c335de65d69e&scene=0#rd" target="_blank" rel="noopener" aria-label="阅读原文">阅读原文 →</a></div>
+  </article>
+<article class="card" data-sec="二、产品/技术动态">
+    <h3 class="title"><a href="http://mp.weixin.qq.com/s?__biz=MzIzNjc1NzUzMw==&mid=2247839661&idx=1&sn=580393ec18f0ad6099f76639462e813a&chksm=e93b2404564bb4da6329533ecdec5e7074810dff99d3815e4187497285f40fcc84cab6f886df&scene=0#rd" target="_blank" rel="noopener">趋境科技联合清华北航开源KTransformers支持低显存微调万亿参数模型</a></h3>
+    <div class="meta">量子位（2025-11-05 23:53 北京时间）</div>
+    <p class="recap" title="趋境科技联合清华KVCache.AI开源KTransformers项目，与LLaMA-Factory集成后，仅需2-4张消费级显卡即可在本地微调DeepSeek 671B和Kimi K2等超大模型。该技术将微调万亿参数模型的显存需求从理论上的上千GB大幅降低至70-90GB。">趋境科技联合清华KVCache.AI开源KTransformers项目，与LLaMA-Factory集成后，仅需2-4张消费级显卡即可在本地微调DeepSeek 671B和Kimi K2等超大模型。该技术将微调万亿参数模型的显存需求从理论上的上千GB大幅降低至70-90GB。</p>
+    <div class="more"><a href="http://mp.weixin.qq.com/s?__biz=MzIzNjc1NzUzMw==&mid=2247839661&idx=1&sn=580393ec18f0ad6099f76639462e813a&chksm=e93b2404564bb4da6329533ecdec5e7074810dff99d3815e4187497285f40fcc84cab6f886df&scene=0#rd" target="_blank" rel="noopener" aria-label="阅读原文">阅读原文 →</a></div>
+  </article>
+<article class="card" data-sec="二、产品/技术动态">
+    <h3 class="title"><a href="https://www.ithome.com/0/895/074.htm" target="_blank" rel="noopener">小鹏发布第二代VLA模型，支持无导航自动辅助驾驶并开源</a></h3>
+    <div class="meta">（2025-11-05 23:49 北京时间）</div>
+    <p class="recap" title="小鹏在科技日活动中发布第二代VLA模型，具备无导航自动辅助驾驶、识别手势和红绿灯逻辑等新功能。该模型将开源，大众成为其首发客户，计划2025年12月邀请用户测试，2026年第一季度向Ultra车型推送。">小鹏在科技日活动中发布第二代VLA模型，具备无导航自动辅助驾驶、识别手势和红绿灯逻辑等新功能。该模型将开源，大众成为其首发客户，计划2025年12月邀请用户测试，2026年第一季度向Ultra车型推送。</p>
+    <div class="more"><a href="https://www.ithome.com/0/895/074.htm" target="_blank" rel="noopener" aria-label="阅读原文">阅读原文 →</a></div>
+  </article>
+<article class="card" data-sec="二、产品/技术动态">
+    <h3 class="title"><a href="http://mp.weixin.qq.com/s?__biz=MjM5MjM2MzEyNQ==&mid=2651600971&idx=2&sn=9a13febc27f472454a3ed2016f55f062&chksm=bcb14035bf1c080060370d1db1a9cb2107da0acd82be55b01344b8b767b5fcb32c449f241d02&scene=0#rd" target="_blank" rel="noopener">人形机器人年销量预计达2万台，价格逼近成本，4S店模式兴起</a></h3>
+    <div class="meta">IT时报（2025-11-05 23:24 北京时间）</div>
+    <p class="recap" title="2025年人形机器人全国销量预计从去年几百台增至2万台，但价格已逼近原材料成本。深圳和北京相继开设机器人4S店，天工、宇树等品牌入驻。行业面临数据标准缺乏、技术路径选择等挑战。">2025年人形机器人全国销量预计从去年几百台增至2万台，但价格已逼近原材料成本。深圳和北京相继开设机器人4S店，天工、宇树等品牌入驻。行业面临数据标准缺乏、技术路径选择等挑战。</p>
+    <div class="more"><a href="http://mp.weixin.qq.com/s?__biz=MjM5MjM2MzEyNQ==&mid=2651600971&idx=2&sn=9a13febc27f472454a3ed2016f55f062&chksm=bcb14035bf1c080060370d1db1a9cb2107da0acd82be55b01344b8b767b5fcb32c449f241d02&scene=0#rd" target="_blank" rel="noopener" aria-label="阅读原文">阅读原文 →</a></div>
+  </article>
+<article class="card" data-sec="二、产品/技术动态">
+    <h3 class="title"><a href="https://www.ifanr.com/1643364?utm_source=rss&utm_medium=rss&utm_campaign=" target="_blank" rel="noopener">谷歌英伟达或因AI算力需求考虑太空部署</a></h3>
+    <div class="meta">张子豪（2025-11-05 22:54 北京时间）</div>
+    <p class="recap" title="报道称ChatGPT未来回复可能来自太空。谷歌和英伟达因AI算力需求被逼考虑太空部署，马斯克可能从中受益。">报道称ChatGPT未来回复可能来自太空。谷歌和英伟达因AI算力需求被逼考虑太空部署，马斯克可能从中受益。</p>
+    <div class="more"><a href="https://www.ifanr.com/1643364?utm_source=rss&utm_medium=rss&utm_campaign=" target="_blank" rel="noopener" aria-label="阅读原文">阅读原文 →</a></div>
+  </article>
+<article class="card" data-sec="二、产品/技术动态">
+    <h3 class="title"><a href="http://mp.weixin.qq.com/s?__biz=Mzg3Mzg5MjY3Nw==&mid=2247525102&idx=2&sn=f9329ae1065d2278a1e7225aed01b01f&chksm=cfe9a9c37e80b140c2c622fd3c3d3d25b68cab785e81acd6d50c0b510a106a9594b05709b583&scene=0#rd" target="_blank" rel="noopener">美团开源5600亿参数全模态模型LongCat-Flash-Omni</a></h3>
+    <div class="meta">AIGC开放社区（2025-11-05 20:05 北京时间）</div>
+    <p class="recap" title="美团LongCat团队发布5600亿参数开源全模态模型LongCat-Flash-Omni，支持文本、音频、图像、视频多模态输入与实时交互，响应延迟达毫秒级。该模型采用MoE架构和渐进式训练策略，在多项基准测试中表现优异。">美团LongCat团队发布5600亿参数开源全模态模型LongCat-Flash-Omni，支持文本、音频、图像、视频多模态输入与实时交互，响应延迟达毫秒级。该模型采用MoE架构和渐进式训练策略，在多项基准测试中表现优异。</p>
+    <div class="more"><a href="http://mp.weixin.qq.com/s?__biz=Mzg3Mzg5MjY3Nw==&mid=2247525102&idx=2&sn=f9329ae1065d2278a1e7225aed01b01f&chksm=cfe9a9c37e80b140c2c622fd3c3d3d25b68cab785e81acd6d50c0b510a106a9594b05709b583&scene=0#rd" target="_blank" rel="noopener" aria-label="阅读原文">阅读原文 →</a></div>
+  </article>
+<article class="card" data-sec="二、产品/技术动态">
+    <h3 class="title"><a href="http://mp.weixin.qq.com/s?__biz=MzA4NjM4ODQzNQ==&mid=2651661409&idx=1&sn=bab50b30a89294fe247c48bad6989a47&chksm=85e017c530ac9543a27475805648b99b8f47fd8003e56f0a5a9e4a582fd773924b863c75b204&scene=0#rd" target="_blank" rel="noopener">科大讯飞1024开发者节发布会提供多语种观看方式</a></h3>
+    <div class="meta">（2025-11-05 19:02 北京时间）</div>
+    <p class="recap" title="科大讯飞将于11月6日举办全球1024开发者节发布会。讯飞翻译APP将为直播提供15种语言互译的沉浸式翻译体验，讯飞同传则提供9种语言实时翻译字幕。">科大讯飞将于11月6日举办全球1024开发者节发布会。讯飞翻译APP将为直播提供15种语言互译的沉浸式翻译体验，讯飞同传则提供9种语言实时翻译字幕。</p>
+    <div class="more"><a href="http://mp.weixin.qq.com/s?__biz=MzA4NjM4ODQzNQ==&mid=2651661409&idx=1&sn=bab50b30a89294fe247c48bad6989a47&chksm=85e017c530ac9543a27475805648b99b8f47fd8003e56f0a5a9e4a582fd773924b863c75b204&scene=0#rd" target="_blank" rel="noopener" aria-label="阅读原文">阅读原文 →</a></div>
+  </article>
+<article class="card" data-sec="二、产品/技术动态">
+    <h3 class="title"><a href="http://mp.weixin.qq.com/s?__biz=MzI0NzU1NzI5NQ==&mid=2247529665&idx=1&sn=d47c8e18958fda0de17de08f02ac0406&chksm=e841435b68b3130c5253723fc7cde3afdd3de5ddb12d25d1bd9b7c95d39c9c7da63ead0c2ac9&scene=0#rd" target="_blank" rel="noopener">火山引擎发布大模型安全测评平台和智能体安全管理平台</a></h3>
+    <div class="meta">火山引擎（2025-11-05 18:59 北京时间）</div>
+    <p class="recap" title="火山引擎正式发布大模型安全测评平台和智能体安全管理平台，旨在保障智能体从开发、备案到上线运行的全生命周期安全。该智能体安全管理平台是国内首个实现对智能体资产风险管理和提示词加固的产品。">火山引擎正式发布大模型安全测评平台和智能体安全管理平台，旨在保障智能体从开发、备案到上线运行的全生命周期安全。该智能体安全管理平台是国内首个实现对智能体资产风险管理和提示词加固的产品。</p>
+    <div class="more"><a href="http://mp.weixin.qq.com/s?__biz=MzI0NzU1NzI5NQ==&mid=2247529665&idx=1&sn=d47c8e18958fda0de17de08f02ac0406&chksm=e841435b68b3130c5253723fc7cde3afdd3de5ddb12d25d1bd9b7c95d39c9c7da63ead0c2ac9&scene=0#rd" target="_blank" rel="noopener" aria-label="阅读原文">阅读原文 →</a></div>
+  </article>
+<article class="card" data-sec="二、产品/技术动态">
+    <h3 class="title"><a href="https://www.theverge.com/news/813894/google-project-suncatcher-ai-datacenter-satellites" target="_blank" rel="noopener">谷歌公布太空AI数据中心研究项目</a></h3>
+    <div class="meta">（2025-11-05 15:51 北京时间）</div>
+    <p class="recap" title="谷歌公布名为Project Suncatcher的太空AI数据中心研究项目，计划将AI芯片部署在太阳能卫星上以利用太空清洁能源。项目面临通信、辐射耐受和成本等挑战，计划2027年与Planet公司合作发射原型卫星测试。">谷歌公布名为Project Suncatcher的太空AI数据中心研究项目，计划将AI芯片部署在太阳能卫星上以利用太空清洁能源。项目面临通信、辐射耐受和成本等挑战，计划2027年与Planet公司合作发射原型卫星测试。</p>
+    <div class="more"><a href="https://www.theverge.com/news/813894/google-project-suncatcher-ai-datacenter-satellites" target="_blank" rel="noopener" aria-label="阅读原文">阅读原文 →</a></div>
+  </article>
+<article class="card" data-sec="二、产品/技术动态">
+    <h3 class="title"><a href="https://venturebeat.com/ai/databricks-research-reveals-that-building-better-ai-judges-isnt-just-a" target="_blank" rel="noopener">Databricks发布AI评估框架Judge Builder并分享企业部署经验</a></h3>
+    <div class="meta">（2025-11-05 12:00 北京时间）</div>
+    <p class="recap" title="Databricks推出AI评估框架Judge Builder，用于创建评估其他AI系统输出的AI法官。该框架通过结构化工作坊帮助企业解决质量标准共识、领域专业知识获取和规模化部署三大挑战。客户使用后生成AI支出显著增长，并推进了更高级的AI技术应用。">Databricks推出AI评估框架Judge Builder，用于创建评估其他AI系统输出的AI法官。该框架通过结构化工作坊帮助企业解决质量标准共识、领域专业知识获取和规模化部署三大挑战。客户使用后生成AI支出显著增长，并推进了更高级的AI技术应用。</p>
+    <div class="more"><a href="https://venturebeat.com/ai/databricks-research-reveals-that-building-better-ai-judges-isnt-just-a" target="_blank" rel="noopener" aria-label="阅读原文">阅读原文 →</a></div>
+  </article>
+<article class="card" data-sec="二、产品/技术动态">
+    <h3 class="title"><a href="https://venturebeat.com/ai/attention-isnt-all-you-need-new-qwen3-variant-brumby-14b-base-leverages" target="_blank" rel="noopener">Manifest AI发布Brumby-14B-Base模型，用动力保持技术替代注意力机制</a></h3>
+    <div class="meta">carl.franzen@venturebeat.com (Carl Franzen)（2025-11-05 11:37 北京时间）</div>
+    <p class="recap" title="Manifest AI于2025年10月28日发布Brumby-14B-Base模型，该模型基于Qwen3-14B-Base重训练，用动力保持技术完全替代了注意力机制，实现了恒定计算成本。模型训练成本仅4000美元，在多项基准测试中表现接近主流Transformer模型。">Manifest AI于2025年10月28日发布Brumby-14B-Base模型，该模型基于Qwen3-14B-Base重训练，用动力保持技术完全替代了注意力机制，实现了恒定计算成本。模型训练成本仅4000美元，在多项基准测试中表现接近主流Transformer模型。</p>
+    <div class="more"><a href="https://venturebeat.com/ai/attention-isnt-all-you-need-new-qwen3-variant-brumby-14b-base-leverages" target="_blank" rel="noopener" aria-label="阅读原文">阅读原文 →</a></div>
+  </article>
+<article class="card" data-sec="二、产品/技术动态">
+    <h3 class="title"><a href="https://venturebeat.com/data-infrastructure/snowflake-builds-new-intelligence-that-goes-beyond-rag-to-query-and" target="_blank" rel="noopener">Snowflake发布企业智能代理平台及文档分析功能</a></h3>
+    <div class="meta">（2025-11-05 08:00 北京时间）</div>
+    <p class="recap" title="Snowflake在BUILD 2025大会上推出Snowflake Intelligence平台，包含Agentic Document Analytics功能，可同时分析数千份文档。该平台统一结构化和非结构化数据分析，解决了传统RAG系统在聚合分析方面的局限性。">Snowflake在BUILD 2025大会上推出Snowflake Intelligence平台，包含Agentic Document Analytics功能，可同时分析数千份文档。该平台统一结构化和非结构化数据分析，解决了传统RAG系统在聚合分析方面的局限性。</p>
+    <div class="more"><a href="https://venturebeat.com/data-infrastructure/snowflake-builds-new-intelligence-that-goes-beyond-rag-to-query-and" target="_blank" rel="noopener" aria-label="阅读原文">阅读原文 →</a></div>
+  </article>
+    </div>
+  </section><section id="三、资本市场动态及企业战略布局" class="sec">
+    <h2 class="sec-hd"><span>三、资本市场动态及企业战略布局</span></h2>
+    <div class="grid">
+      <article class="card" data-sec="三、资本市场动态及企业战略布局">
+    <h3 class="title"><a href="https://www.theguardian.com/technology/2025/nov/05/amazon-perplexity-ai-lawsuit" target="_blank" rel="noopener">亚马逊起诉人工智能初创公司Perplexity</a></h3>
+    <div class="meta">Guardian staff and agency（2025-11-06 08:17 北京时间）</div>
+    <p class="recap" title="亚马逊起诉人工智能初创公司Perplexity，指控其浏览器购物功能秘密访问客户账户并伪装AI活动为人类浏览。亚马逊律师称Perplexity的行为属于非法侵入。">亚马逊起诉人工智能初创公司Perplexity，指控其浏览器购物功能秘密访问客户账户并伪装AI活动为人类浏览。亚马逊律师称Perplexity的行为属于非法侵入。</p>
+    <div class="more"><a href="https://www.theguardian.com/technology/2025/nov/05/amazon-perplexity-ai-lawsuit" target="_blank" rel="noopener" aria-label="阅读原文">阅读原文 →</a></div>
+  </article>
+<article class="card" data-sec="三、资本市场动态及企业战略布局">
+    <h3 class="title"><a href="https://www.theverge.com/news/814042/getty-lawsuit-stability-ai-copyright-ruling-uk" target="_blank" rel="noopener">英国法院裁定Stability AI在版权诉讼中胜诉</a></h3>
+    <div class="meta">（2025-11-06 04:22 北京时间）</div>
+    <p class="recap" title="英国高等法院就Getty Images起诉Stability AI侵权案作出裁决，Stability AI在核心版权训练争议中获胜，法院仅认定其生成带Getty水印图像构成商标侵权。该判决未就AI模型使用受版权保护内容训练是否需要许可这一关键问题确立明确先例。">英国高等法院就Getty Images起诉Stability AI侵权案作出裁决，Stability AI在核心版权训练争议中获胜，法院仅认定其生成带Getty水印图像构成商标侵权。该判决未就AI模型使用受版权保护内容训练是否需要许可这一关键问题确立明确先例。</p>
+    <div class="more"><a href="https://www.theverge.com/news/814042/getty-lawsuit-stability-ai-copyright-ruling-uk" target="_blank" rel="noopener" aria-label="阅读原文">阅读原文 →</a></div>
+  </article>
+<article class="card" data-sec="三、资本市场动态及企业战略布局">
+    <h3 class="title"><a href="https://www.bloomberg.com/news/articles/2025-11-05/softbank-chases-actual-revenue-with-openai-in-corporate-japan" target="_blank" rel="noopener">软银与OpenAI将合作在日本推出企业AI服务</a></h3>
+    <div class="meta">Min-Jeong Lee（2025-11-06 01:50 北京时间）</div>
+    <p class="recap" title="软银集团旗下移动部门与OpenAI计划于明年在日本推出面向企业的AI服务。双方旨在实现实际收入，以应对市场对过高估值的担忧。">软银集团旗下移动部门与OpenAI计划于明年在日本推出面向企业的AI服务。双方旨在实现实际收入，以应对市场对过高估值的担忧。</p>
+    <div class="more"><a href="https://www.bloomberg.com/news/articles/2025-11-05/softbank-chases-actual-revenue-with-openai-in-corporate-japan" target="_blank" rel="noopener" aria-label="阅读原文">阅读原文 →</a></div>
+  </article>
+<article class="card" data-sec="三、资本市场动态及企业战略布局">
+    <h3 class="title"><a href="https://www.ithome.com/0/895/078.htm" target="_blank" rel="noopener">软银与OpenAI成立合资公司，将推出企业级AI解决方案</a></h3>
+    <div class="meta">（2025-11-05 23:52 北京时间）</div>
+    <p class="recap" title="软银与OpenAI成立合资企业SB OAI Japan，将推出名为Crystal Intelligence的企业级AI解决方案，预计2026年上市。软银将率先部署该技术，OpenAI提供技术支持。">软银与OpenAI成立合资企业SB OAI Japan，将推出名为Crystal Intelligence的企业级AI解决方案，预计2026年上市。软银将率先部署该技术，OpenAI提供技术支持。</p>
+    <div class="more"><a href="https://www.ithome.com/0/895/078.htm" target="_blank" rel="noopener" aria-label="阅读原文">阅读原文 →</a></div>
+  </article>
+<article class="card" data-sec="三、资本市场动态及企业战略布局">
+    <h3 class="title"><a href="https://www.qbitai.com/2025/11/349055.html" target="_blank" rel="noopener">OpenAI与亚马逊合作，微软与Anthropic合作</a></h3>
+    <div class="meta">Jay（2025-11-05 22:38 北京时间）</div>
+    <p class="recap" title="OpenAI与亚马逊达成合作，微软与Anthropic建立合作关系。">OpenAI与亚马逊达成合作，微软与Anthropic建立合作关系。</p>
+    <div class="more"><a href="https://www.qbitai.com/2025/11/349055.html" target="_blank" rel="noopener" aria-label="阅读原文">阅读原文 →</a></div>
+  </article>
+<article class="card" data-sec="三、资本市场动态及企业战略布局">
+    <h3 class="title"><a href="http://mp.weixin.qq.com/s?__biz=MjM5NTM4MTUyMg==&mid=2447913449&idx=1&sn=c800d5dc4a715e4b64b65177776056db&chksm=b3b27870c395379715a3d53626aa2d12021cb6db6e27afb8d49695785e98539e78ef7dc5ee0c&scene=0#rd" target="_blank" rel="noopener">默升科技市值大幅上涨并公布业绩增长</a></h3>
+    <div class="meta">（2025-11-05 20:26 北京时间）</div>
+    <p class="recap" title="上海芯片公司默升科技自2022年上市以来市值上涨1929.36%，2026财年第一季度营收同比增长274%。其有源电缆产品应用于AI数据中心，客户包括亚马逊云科技、微软等科技公司。">上海芯片公司默升科技自2022年上市以来市值上涨1929.36%，2026财年第一季度营收同比增长274%。其有源电缆产品应用于AI数据中心，客户包括亚马逊云科技、微软等科技公司。</p>
+    <div class="more"><a href="http://mp.weixin.qq.com/s?__biz=MjM5NTM4MTUyMg==&mid=2447913449&idx=1&sn=c800d5dc4a715e4b64b65177776056db&chksm=b3b27870c395379715a3d53626aa2d12021cb6db6e27afb8d49695785e98539e78ef7dc5ee0c&scene=0#rd" target="_blank" rel="noopener" aria-label="阅读原文">阅读原文 →</a></div>
+  </article>
+<article class="card" data-sec="三、资本市场动态及企业战略布局">
+    <h3 class="title"><a href="https://www.bloomberg.com/news/articles/2025-11-05/tencent-ai-veteran-snags-funds-for-year-old-rival-to-openai-sora" target="_blank" rel="noopener">腾讯前AI科学家为对标OpenAI Sora的初创公司融资</a></h3>
+    <div class="meta">John Liu, Zheping Huang（2025-11-05 19:39 北京时间）</div>
+    <p class="recap" title="曾负责腾讯旗舰AI模型开发的科学家，为其初创公司筹集5000万美元资金，该公司计划推出与OpenAI Sora竞争的产品。">曾负责腾讯旗舰AI模型开发的科学家，为其初创公司筹集5000万美元资金，该公司计划推出与OpenAI Sora竞争的产品。</p>
+    <div class="more"><a href="https://www.bloomberg.com/news/articles/2025-11-05/tencent-ai-veteran-snags-funds-for-year-old-rival-to-openai-sora" target="_blank" rel="noopener" aria-label="阅读原文">阅读原文 →</a></div>
+  </article>
+<article class="card" data-sec="三、资本市场动态及企业战略布局">
+    <h3 class="title"><a href="https://www.engadget.com/ai/amazon-and-perplexity-are-fighting-over-the-future-of-ai-shopping-215445479.html?src=rss" target="_blank" rel="noopener">亚马逊要求Perplexity停止AI浏览器在平台购物</a></h3>
+    <div class="meta">（2025-11-05 13:54 北京时间）</div>
+    <p class="recap" title="亚马逊向AI初创公司Perplexity发出禁止函，要求其阻止Comet浏览器在亚马逊购物。Perplexity称亚马逊此举是霸凌并威胁互联网用户，亚马逊则认为该功能违反服务条款并损害购物体验。双方曾在2024年11月达成暂停协议但Perplexity后续重启该功能。">亚马逊向AI初创公司Perplexity发出禁止函，要求其阻止Comet浏览器在亚马逊购物。Perplexity称亚马逊此举是霸凌并威胁互联网用户，亚马逊则认为该功能违反服务条款并损害购物体验。双方曾在2024年11月达成暂停协议但Perplexity后续重启该功能。</p>
+    <div class="more"><a href="https://www.engadget.com/ai/amazon-and-perplexity-are-fighting-over-the-future-of-ai-shopping-215445479.html?src=rss" target="_blank" rel="noopener" aria-label="阅读原文">阅读原文 →</a></div>
+  </article>
+<article class="card" data-sec="三、资本市场动态及企业战略布局">
+    <h3 class="title"><a href="https://www.engadget.com/ai/uk-high-court-sides-with-stability-ai-over-getty-in-copyright-case-180029461.html?src=rss" target="_blank" rel="noopener">英国高等法院在版权案中部分支持稳定人工智能公司</a></h3>
+    <div class="meta">Matt Tate（2025-11-05 10:00 北京时间）</div>
+    <p class="recap" title="英国高等法院裁定Stable Diffusion AI模型不构成版权侵权，但认定其使用盖蒂图片社商标的行为构成侵权。法院认为AI模型不存储或复制受版权保护作品。盖蒂图片社表示将在美国案件中引用此次裁决结果。">英国高等法院裁定Stable Diffusion AI模型不构成版权侵权，但认定其使用盖蒂图片社商标的行为构成侵权。法院认为AI模型不存储或复制受版权保护作品。盖蒂图片社表示将在美国案件中引用此次裁决结果。</p>
+    <div class="more"><a href="https://www.engadget.com/ai/uk-high-court-sides-with-stability-ai-over-getty-in-copyright-case-180029461.html?src=rss" target="_blank" rel="noopener" aria-label="阅读原文">阅读原文 →</a></div>
+  </article>
+    </div>
+  </section><section id="四、品牌与市场动作" class="sec">
+    <h2 class="sec-hd"><span>四、品牌与市场动作</span></h2>
+    <div class="grid">
+      <article class="card" data-sec="四、品牌与市场动作">
+    <h3 class="title"><a href="https://www.ithome.com/0/895/148.htm" target="_blank" rel="noopener">可口可乐AI重制经典广告出现画面不一致引发争议</a></h3>
+    <div class="meta">（2025-11-06 04:16 北京时间）</div>
+    <p class="recap" title="可口可乐发布AI重制的1995年经典广告，因卡车轮子数量变化等画面不一致问题引发关注。广告由5名AI专家使用OpenAI Sora等工具在30天内完成。创意评估机构给予该广告满分5.9星评分。">可口可乐发布AI重制的1995年经典广告，因卡车轮子数量变化等画面不一致问题引发关注。广告由5名AI专家使用OpenAI Sora等工具在30天内完成。创意评估机构给予该广告满分5.9星评分。</p>
+    <div class="more"><a href="https://www.ithome.com/0/895/148.htm" target="_blank" rel="noopener" aria-label="阅读原文">阅读原文 →</a></div>
+  </article>
+<article class="card" data-sec="四、品牌与市场动作">
+    <h3 class="title"><a href="http://mp.weixin.qq.com/s?__biz=MzI3MTA0MTk1MA==&mid=2652642082&idx=4&sn=6786bd092bb4088da150fc34d0b62d57&chksm=f069c0288f53131de758b922ca7962c46514dffd8605d53f971e2f0aa93a1ee84afe74469dbd&scene=0#rd" target="_blank" rel="noopener">新智元将举办十周年峰会并发布招聘信息</a></h3>
+    <div class="meta">新智元（2025-11-06 03:00 北京时间）</div>
+    <p class="recap" title="新智元将于2025年9月7日在北京海淀上地举办十周年峰会，主题为“新天终启，万象智生”。同时发布多个职位招聘，包括AI产业报道主笔、高级视频编辑等岗位。">新智元将于2025年9月7日在北京海淀上地举办十周年峰会，主题为“新天终启，万象智生”。同时发布多个职位招聘，包括AI产业报道主笔、高级视频编辑等岗位。</p>
+    <div class="more"><a href="http://mp.weixin.qq.com/s?__biz=MzI3MTA0MTk1MA==&mid=2652642082&idx=4&sn=6786bd092bb4088da150fc34d0b62d57&chksm=f069c0288f53131de758b922ca7962c46514dffd8605d53f971e2f0aa93a1ee84afe74469dbd&scene=0#rd" target="_blank" rel="noopener" aria-label="阅读原文">阅读原文 →</a></div>
+  </article>
+<article class="card" data-sec="四、品牌与市场动作">
+    <h3 class="title"><a href="http://mp.weixin.qq.com/s?__biz=MjM5MjM2MzEyNQ==&mid=2651600971&idx=1&sn=371b667d32891dc28be25cf275ab4764&chksm=bc0fbd23f1c7ef66bc0bd88304b6f4fa1d98d8ae0f859c8b0efaeebbe0c9bad0753fd26baa34&scene=0#rd" target="_blank" rel="noopener">拼多多支持农业科创团队参加世界粮食论坛</a></h3>
+    <div class="meta">IT时报（2025-11-05 23:24 北京时间）</div>
+    <p class="recap" title="拼多多连续两年受邀出席联合国粮农组织主办的世界粮食论坛，并担任粮农创新大赛评委。拼多多支持的中国牧原云计算团队在论坛上展示了AI养猪方案，通过视觉与传感器技术监测猪只健康。">拼多多连续两年受邀出席联合国粮农组织主办的世界粮食论坛，并担任粮农创新大赛评委。拼多多支持的中国牧原云计算团队在论坛上展示了AI养猪方案，通过视觉与传感器技术监测猪只健康。</p>
+    <div class="more"><a href="http://mp.weixin.qq.com/s?__biz=MjM5MjM2MzEyNQ==&mid=2651600971&idx=1&sn=371b667d32891dc28be25cf275ab4764&chksm=bc0fbd23f1c7ef66bc0bd88304b6f4fa1d98d8ae0f859c8b0efaeebbe0c9bad0753fd26baa34&scene=0#rd" target="_blank" rel="noopener" aria-label="阅读原文">阅读原文 →</a></div>
+  </article>
+<article class="card" data-sec="四、品牌与市场动作">
+    <h3 class="title"><a href="http://mp.weixin.qq.com/s?__biz=MjM5MDE0Mjc4MA==&mid=2651261719&idx=3&sn=7a2361268c909881e1f7e3f641c7a25f&chksm=bc5f56cd4014f5524e0e1ea44717e04498228386dae25f7dda12573cb296004bdede9a1b1492&scene=0#rd" target="_blank" rel="noopener">InfoQ举办LLM时代软件研发新范式直播活动</a></h3>
+    <div class="meta">（2025-11-05 20:47 北京时间）</div>
+    <p class="recap" title="InfoQ将于11月5日举办“LLM时代的软件研发新范式”直播，邀请百度、汽车之家、平安科技的一线实践者分享AI在软件研发中的实践经验。直播将探讨AI从辅助工具向核心生产力转变、智能体崛起等话题。">InfoQ将于11月5日举办“LLM时代的软件研发新范式”直播，邀请百度、汽车之家、平安科技的一线实践者分享AI在软件研发中的实践经验。直播将探讨AI从辅助工具向核心生产力转变、智能体崛起等话题。</p>
+    <div class="more"><a href="http://mp.weixin.qq.com/s?__biz=MjM5MDE0Mjc4MA==&mid=2651261719&idx=3&sn=7a2361268c909881e1f7e3f641c7a25f&chksm=bc5f56cd4014f5524e0e1ea44717e04498228386dae25f7dda12573cb296004bdede9a1b1492&scene=0#rd" target="_blank" rel="noopener" aria-label="阅读原文">阅读原文 →</a></div>
+  </article>
     </div>
   </section>
-
-  <!-- 今日 -->
-  <div id="today" class="section active">
-    <h2 style="margin:6px 0 14px;">📌 今日重点资讯</h2>
-    <div id="today-content"></div>
-  </div>
-
-  <!-- 昨日 -->
-  <div id="yesterday" class="section">
-    <div class="accordion">
-      <div class="accordion-header" data-acc="yest-acc">🗓️ 昨日资讯（点击展开）</div>
-      <div class="accordion-content" id="yest-acc"><div id="yesterday-content"></div></div>
-    </div>
-  </div>
-
-  <!-- 前日 -->
-  <div id="before" class="section">
-    <div class="accordion">
-      <div class="accordion-header" data-acc="before-acc">📅 前日资讯（点击展开）</div>
-      <div class="accordion-content" id="before-acc"><div id="before-content"></div></div>
-    </div>
-  </div>
+  </main>
 </div>
 
-<!-- Chart.js（可改为本地：./assets/libs/chart.umd.min.js） -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<footer>生成自 n8n · 本页仅作资讯聚合导航，版权归原文方所有</footer>
 
 <script>
-// 读取新闻 JSON
-let pageData = { today:[], yesterday:[], before:[] };
-try{
-  const raw = document.getElementById('page-data')?.textContent || '{}';
-  pageData = JSON.parse(raw);
-}catch(e){ console.error('parse page-data failed', e); }
+const secSel  = document.getElementById('secSel');
+const search  = document.getElementById('search');
+const emptyEl = document.getElementById('emptyHint');
 
-// Tabs
-document.querySelectorAll(".tab").forEach(tab=>{
-  tab.addEventListener("click",()=>{
-    document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
-    tab.classList.add("active");
-    const target=tab.dataset.target;
-    document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
-    document.getElementById(target).classList.add("active");
-  });
-});
+(function syncFromHash(){
+  try{
+    const raw = location.hash.replace(/^#/, '');
+    if (!raw) return;
+    const kv = Object.fromEntries(
+      raw.split('&').map(s=>s.split('='))
+         .map(([k,v]) => [k, decodeURIComponent(v||'')])
+    );
+    if (kv.s) secSel.value = kv.s;
+    if (kv.q) search.value = kv.q;
+  }catch{}
+})();
 
-// 折叠
-document.querySelectorAll(".accordion-header").forEach(header=>{
-  header.addEventListener("click",()=>{
-    const id=header.getAttribute("data-acc");
-    const content=document.getElementById(id);
-    content.style.display = content.style.display==="block" ? "none" : "block";
-  });
-});
-
-// 渲染新闻卡片（失败也只影响趋势，不影响新闻）
-function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
-function renderCards(data, containerId){
-  const el=document.getElementById(containerId);
-  if(!el) return;
-  el.innerHTML = (data||[]).map(item=>{
-    const title = esc(item.title||'');
-    const src   = esc(item.source||'');
-    const when  = esc(item.date||'');
-    const recap = esc(item.recap||'');
-    const link  = item.link ? '<a href="'+esc(item.link)+'" target="_blank" rel="noopener">'+title+'</a>' : title;
-    return '<div class="card"><h3>'+link+'</h3><div class="meta">来源：'+src+' · '+when+'</div>'+(recap?'<p>'+recap+'</p>':'')+'</div>';
-  }).join("");
+function debounce(fn, wait=180){
+  let t=null;
+  return (...a)=>{
+    clearTimeout(t);
+    t=setTimeout(()=>fn(...a), wait);
+  };
 }
-renderCards(pageData.today,"today-content");
-renderCards(pageData.yesterday,"yesterday-content");
-renderCards(pageData.before,"before-content");
 
-// Chart.js 趋势（离线 JSON）
+function filter(){
+  const kw  = (search.value || '').trim().toLowerCase();
+  const sec = secSel.value;
+  let totalVisible = 0;
+
+  document.querySelectorAll('#main section').forEach(secEl=>{
+    let visible = 0;
+    secEl.querySelectorAll('.card').forEach(card=>{
+      const inSec = !sec || card.dataset.sec === sec;
+      const text  = card.textContent.toLowerCase();
+      const hit   = !kw || text.includes(kw);
+      const show  = inSec && hit;
+      card.classList.toggle('hidden', !show);
+      if (show) { visible++; totalVisible++; }
+    });
+    secEl.classList.toggle('hidden', visible === 0);
+  });
+
+  emptyEl.classList.toggle('hidden', totalVisible !== 0);
+
+  try{
+    const h = '#s=' + encodeURIComponent(secSel.value)
+            + '&q=' + encodeURIComponent(search.value.trim());
+    if (location.hash !== h) history.replaceState(null, '', h);
+  }catch{}
+}
+
+const run = debounce(filter, 180);
+secSel.addEventListener('change', filter);
+search.addEventListener('input', run);
+filter();
+
+/* Google Trends 挂载逻辑 */
 (function mountTrends(){
-  const FBF = document.getElementById('trend-fallback');
-  function trendsPath(){
-    const meta = document.querySelector('meta[name="trends-json-path"]');
-    if (meta && meta.content) return meta.content;
-    // —— 修正：使用正确的正则去掉最后一个“文件名” —— //
-    const base = location.pathname.replace(//[^/]*$/, '/');
-    return base + 'assets/trends/trends.json';
-  }
-  function buildCfg(labels, series){
-    return {
-      type:'line',
-      data:{ labels, datasets:(series||[]).map(s=>({label:s.name,data:s.data,tension:.25,pointRadius:0,borderWidth:2})) },
-      options:{
-        responsive:true, maintainAspectRatio:false,
-        plugins:{ legend:{ position:'bottom' } },
-        scales:{ x:{ ticks:{ maxTicksLimit:6 } }, y:{ beginAtZero:true } }
-      }
-    };
-  }
-  let charts = {};
-  async function loadAndRender(range){
+  const SCRIPT = 'https://ssl.gstatic.com/trends_nrtr/3528_RC01/embed_loader.js';
+
+  const cfg = {
+    foreign:  { el: 'gt-foreign',  geo: '',   kw: ['ChatGPT','Gemini','Claude','Grok','Llama'] },
+    domestic: { el: 'gt-domestic',  geo: '',   kw: ['DeepSeek','Ernie','Hunyuan','Qwen','Doubao'] },
+    vendors:  { el: 'gt-vendors',   geo: '',   kw: ['Baidu AI Cloud','Huawei Cloud','Tencent Cloud','Alibaba Cloud','Volcengine'] },
+    market:   { el: 'gt-market',    geo: '',   kw: ['LLM','AI Agent','RAG','Vector Database','Prompt Engineering'] }
+  };
+
+  function renderOne({ el, geo, kw }, time){
     try{
-      if (!window.Chart){ FBF.style.display='block'; FBF.textContent='Chart.js 未加载'; return; }
-      const url = trendsPath() + '?ts=' + Date.now();
-      const res = await fetch(url);
-      if (!res.ok) throw new Error('fetch trends.json failed: '+res.status);
-      const data = await res.json(); // {panels:{foreign:{'now 7-d':{labels,series},...},...}}
-      const panels = data.panels || {};
-      const ctx = {
-        foreign : document.getElementById('c-foreign')?.getContext('2d'),
-        domestic: document.getElementById('c-domestic')?.getContext('2d'),
-        vendors : document.getElementById('c-vendors')?.getContext('2d'),
-        market  : document.getElementById('c-market')?.getContext('2d'),
-      };
-      ['foreign','domestic','vendors','market'].forEach(k=>{
-        const pack = panels[k]?.[range];
-        if (!pack || !ctx[k]) return;
-        if (charts[k]) charts[k].destroy();
-        charts[k] = new Chart(ctx[k], buildCfg(pack.labels, pack.series));
-      });
-      FBF.style.display='none';
+      const host = 'https://trends.google.com/trends/embed/';
+      const container = document.getElementById(el);
+      if (!container) return;
+
+      const fb = container.parentElement.querySelector('.t-fallback');
+      if (fb) fb.style.display = 'none';
+
+      container.innerHTML = '';
+      const comparisonItem = kw.map(k => ({ keyword: k, geo: geo || '', time }));
+      const query = 'date=' + encodeURIComponent(time)
+                  + '&q=' + encodeURIComponent(kw.join(','))
+                  + (geo ? '&geo=' + geo : '');
+
+      trends.embed.renderExploreWidgetTo(
+        container,
+        'TIMESERIES',
+        { comparisonItem, category: 0, property: '' },
+        { exploreQuery: query, guestPath: host }
+      );
     }catch(e){
-      console.error(e);
-      FBF.style.display='block';
-      FBF.textContent='无法加载趋势数据（trends.json 不存在或网络异常）。';
+      const c = document.getElementById(el);
+      if (c) {
+        const fb = c.parentElement.querySelector('.t-fallback');
+        if (fb) { fb.style.display = 'flex'; fb.textContent = '无法显示趋势图（网络受限/被拦截）'; }
+      }
+      console.error('Trends render error', e);
     }
   }
-  const sel = document.getElementById('trend-time');
-  const initRange = sel?.value || 'now 7-d';
-  loadAndRender(initRange);
-  sel?.addEventListener('change',()=> loadAndRender(sel.value||'now 7-d'));
+
+  function boot(){
+    if (!(window.trends && window.trends.embed)) return;
+
+    const defaultTime = 'now 7-d';
+    renderOne(cfg.foreign,  defaultTime);
+    renderOne(cfg.domestic, defaultTime);
+    renderOne(cfg.vendors,  defaultTime);
+    renderOne(cfg.market,   defaultTime);
+
+    document.querySelectorAll('.t-sel').forEach(sel=>{
+      sel.addEventListener('change', ()=>{
+        const time = sel.value || 'now 7-d';
+        const targetId = sel.dataset.target;
+        const key = targetId.replace(/^gt-/, '');
+        const conf = cfg[key];
+        if (conf) renderOne(conf, time);
+      });
+    });
+  }
+
+  const s = document.createElement('script');
+  s.src = SCRIPT; s.async = true; s.onload = boot;
+  document.head.appendChild(s);
+
+  setTimeout(() => {
+    if (!(window.trends && window.trends.embed)) {
+      document.querySelectorAll('.t-fallback').forEach(el=>{
+        el.style.display = 'flex';
+        el.textContent = '无法加载 Google 趋势（可能被墙/被拦截）';
+      });
+    }
+  }, 5000);
 })();
 </script>
-</body>
-</html>
