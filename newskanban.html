@@ -57,6 +57,35 @@ select:focus-visible,input[type="search"]:focus-visible{
   box-shadow:0 0 0 3px rgba(79,70,229,.18);
 }
 
+/* 日期分类标签 */
+.date-tabs {
+  display: flex;
+  gap: 8px;
+  margin: 20px 0 10px;
+  padding: 0 18px;
+  max-width: 1180px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.date-tab {
+  padding: 8px 16px;
+  border-radius: 8px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+.date-tab.active {
+  background: var(--accent);
+  color: white;
+  border-color: var(--accent);
+}
+.date-tab:hover:not(.active) {
+  background: var(--bg);
+}
+
 /* 主容器 */
 .wrap{max-width:1180px;margin:0 auto;padding:0 14px 42px}
 
@@ -98,13 +127,27 @@ select:focus-visible,input[type="search"]:focus-visible{
 .more a{ color:var(--accent); text-decoration:none; font-weight:600; }
 .more a:hover{ text-decoration:underline }
 
-/* 空态 */
+/* 空状态样式 */
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--sub);
+  font-size: 16px;
+}
 #emptyHint{
   color:var(--sub); text-align:center; margin:22px 0 26px; font-size:14px;
   background:rgba(79,70,229,.06); border:1px dashed rgba(79,70,229,.28);
   padding:10px 12px; border-radius:12px;
 }
 .hidden{display:none!important}
+
+/* 日期内容区域 */
+.date-content {
+  display: none;
+}
+.date-content.active {
+  display: block;
+}
 
 footer{ max-width:1180px; margin:22px auto 44px; padding:0 18px; color:var(--sub); font-size:12px }
 
@@ -158,6 +201,9 @@ footer{ max-width:1180px; margin:22px auto 44px; padding:0 18px; color:var(--sub
   h1{font-size:22px}
   .sec-hd{font-size:18px}
   .t-body{height:300px}
+  .date-tabs {
+    flex-wrap: wrap;
+  }
 }
 </style>
 
@@ -172,6 +218,14 @@ footer{ max-width:1180px; margin:22px auto 44px; padding:0 18px; color:var(--sub
     <option value="一、权威观点/报告">一、权威观点/报告</option><option value="二、产品/技术动态">二、产品/技术动态</option><option value="三、资本市场动态及企业战略布局">三、资本市场动态及企业战略布局</option><option value="四、品牌与市场动作">四、品牌与市场动作</option>
   </select>
   <input id="search" type="search" placeholder="搜索标题 / 概要 / 标签…" aria-label="搜索">
+</div>
+
+<!-- 日期分类标签 -->
+<div class="date-tabs">
+  <div class="date-tab active" data-date-category="today">📌 今日（2025-11-06）</div>
+  <div class="date-tab" data-date-category="yesterday">🗓️ 昨日（2025-11-05）</div>
+  <div class="date-tab" data-date-category="beforeYesterday">📅 前日（2025-11-04）</div>
+  <div class="date-tab" data-date-category="other">📚 更早</div>
 </div>
 
 <section class="trends-top" aria-label="Google 趋势">
@@ -239,7 +293,10 @@ footer{ max-width:1180px; margin:22px auto 44px; padding:0 18px; color:var(--sub
 <div class="wrap">
   <main id="main">
     <p id="emptyHint" class="hidden">当前筛选无结果，换个关键词试试～</p>
-    <section id="一、权威观点/报告" class="sec">
+    
+    <!-- 按日期分类显示内容 -->
+    <div id="today-content" class="date-content active">
+      <section id="一、权威观点/报告" class="sec">
     <h2 class="sec-hd"><span>一、权威观点/报告</span></h2>
     <div class="grid">
       <article class="card" data-sec="一、权威观点/报告">
@@ -312,7 +369,53 @@ footer{ max-width:1180px; margin:22px auto 44px; padding:0 18px; color:var(--sub
     <p class="recap" title="摩托罗拉发布Edge 70超薄智能手机，厚度5.9毫米，配备三个5000万像素摄像头和4800mAh电池。该手机搭载骁龙7 Gen 4芯片组，内置moto ai2聊天机器人，起售价700英镑，目前在英国上市。">摩托罗拉发布Edge 70超薄智能手机，厚度5.9毫米，配备三个5000万像素摄像头和4800mAh电池。该手机搭载骁龙7 Gen 4芯片组，内置moto ai2聊天机器人，起售价700英镑，目前在英国上市。</p>
     <div class="more"><a href="https://www.engadget.com/mobile/smartphones/the-motorola-edge-70-is-another-ridiculously-thin-smartphone-080009244.html?src=rss" target="_blank" rel="noopener" aria-label="阅读原文">阅读原文 →</a></div>
   </article>
-<article class="card" data-sec="二、产品/技术动态">
+    </div>
+  </section><section id="三、资本市场动态及企业战略布局" class="sec">
+    <h2 class="sec-hd"><span>三、资本市场动态及企业战略布局</span></h2>
+    <div class="grid">
+      <article class="card" data-sec="三、资本市场动态及企业战略布局">
+    <h3 class="title"><a href="https://www.theguardian.com/technology/2025/nov/05/amazon-perplexity-ai-lawsuit" target="_blank" rel="noopener">亚马逊起诉人工智能初创公司Perplexity</a></h3>
+    <div class="meta">Guardian staff and agency（2025-11-06 08:17 北京时间）</div>
+    <p class="recap" title="亚马逊起诉人工智能初创公司Perplexity，指控其浏览器购物功能秘密访问客户账户并伪装AI活动为人类浏览。亚马逊律师称Perplexity的行为属于非法侵入。">亚马逊起诉人工智能初创公司Perplexity，指控其浏览器购物功能秘密访问客户账户并伪装AI活动为人类浏览。亚马逊律师称Perplexity的行为属于非法侵入。</p>
+    <div class="more"><a href="https://www.theguardian.com/technology/2025/nov/05/amazon-perplexity-ai-lawsuit" target="_blank" rel="noopener" aria-label="阅读原文">阅读原文 →</a></div>
+  </article>
+<article class="card" data-sec="三、资本市场动态及企业战略布局">
+    <h3 class="title"><a href="https://www.theverge.com/news/814042/getty-lawsuit-stability-ai-copyright-ruling-uk" target="_blank" rel="noopener">英国法院裁定Stability AI在版权诉讼中胜诉</a></h3>
+    <div class="meta">（2025-11-06 04:22 北京时间）</div>
+    <p class="recap" title="英国高等法院就Getty Images起诉Stability AI侵权案作出裁决，Stability AI在核心版权训练争议中获胜，法院仅认定其生成带Getty水印图像构成商标侵权。该判决未就AI模型使用受版权保护内容训练是否需要许可这一关键问题确立明确先例。">英国高等法院就Getty Images起诉Stability AI侵权案作出裁决，Stability AI在核心版权训练争议中获胜，法院仅认定其生成带Getty水印图像构成商标侵权。该判决未就AI模型使用受版权保护内容训练是否需要许可这一关键问题确立明确先例。</p>
+    <div class="more"><a href="https://www.theverge.com/news/814042/getty-lawsuit-stability-ai-copyright-ruling-uk" target="_blank" rel="noopener" aria-label="阅读原文">阅读原文 →</a></div>
+  </article>
+<article class="card" data-sec="三、资本市场动态及企业战略布局">
+    <h3 class="title"><a href="https://www.bloomberg.com/news/articles/2025-11-05/softbank-chases-actual-revenue-with-openai-in-corporate-japan" target="_blank" rel="noopener">软银与OpenAI将合作在日本推出企业AI服务</a></h3>
+    <div class="meta">Min-Jeong Lee（2025-11-06 01:50 北京时间）</div>
+    <p class="recap" title="软银集团旗下移动部门与OpenAI计划于明年在日本推出面向企业的AI服务。双方旨在实现实际收入，以应对市场对过高估值的担忧。">软银集团旗下移动部门与OpenAI计划于明年在日本推出面向企业的AI服务。双方旨在实现实际收入，以应对市场对过高估值的担忧。</p>
+    <div class="more"><a href="https://www.bloomberg.com/news/articles/2025-11-05/softbank-chases-actual-revenue-with-openai-in-corporate-japan" target="_blank" rel="noopener" aria-label="阅读原文">阅读原文 →</a></div>
+  </article>
+    </div>
+  </section><section id="四、品牌与市场动作" class="sec">
+    <h2 class="sec-hd"><span>四、品牌与市场动作</span></h2>
+    <div class="grid">
+      <article class="card" data-sec="四、品牌与市场动作">
+    <h3 class="title"><a href="https://www.ithome.com/0/895/148.htm" target="_blank" rel="noopener">可口可乐AI重制经典广告出现画面不一致引发争议</a></h3>
+    <div class="meta">（2025-11-06 04:16 北京时间）</div>
+    <p class="recap" title="可口可乐发布AI重制的1995年经典广告，因卡车轮子数量变化等画面不一致问题引发关注。广告由5名AI专家使用OpenAI Sora等工具在30天内完成。创意评估机构给予该广告满分5.9星评分。">可口可乐发布AI重制的1995年经典广告，因卡车轮子数量变化等画面不一致问题引发关注。广告由5名AI专家使用OpenAI Sora等工具在30天内完成。创意评估机构给予该广告满分5.9星评分。</p>
+    <div class="more"><a href="https://www.ithome.com/0/895/148.htm" target="_blank" rel="noopener" aria-label="阅读原文">阅读原文 →</a></div>
+  </article>
+<article class="card" data-sec="四、品牌与市场动作">
+    <h3 class="title"><a href="http://mp.weixin.qq.com/s?__biz=MzI3MTA0MTk1MA==&mid=2652642082&idx=4&sn=6786bd092bb4088da150fc34d0b62d57&chksm=f069c0288f53131de758b922ca7962c46514dffd8605d53f971e2f0aa93a1ee84afe74469dbd&scene=0#rd" target="_blank" rel="noopener">新智元将举办十周年峰会并发布招聘信息</a></h3>
+    <div class="meta">新智元（2025-11-06 03:00 北京时间）</div>
+    <p class="recap" title="新智元将于2025年9月7日在北京海淀上地举办十周年峰会，主题为“新天终启，万象智生”。同时发布多个职位招聘，包括AI产业报道主笔、高级视频编辑等岗位。">新智元将于2025年9月7日在北京海淀上地举办十周年峰会，主题为“新天终启，万象智生”。同时发布多个职位招聘，包括AI产业报道主笔、高级视频编辑等岗位。</p>
+    <div class="more"><a href="http://mp.weixin.qq.com/s?__biz=MzI3MTA0MTk1MA==&mid=2652642082&idx=4&sn=6786bd092bb4088da150fc34d0b62d57&chksm=f069c0288f53131de758b922ca7962c46514dffd8605d53f971e2f0aa93a1ee84afe74469dbd&scene=0#rd" target="_blank" rel="noopener" aria-label="阅读原文">阅读原文 →</a></div>
+  </article>
+    </div>
+  </section>
+    </div>
+    
+    <div id="yesterday-content" class="date-content">
+      <section id="二、产品/技术动态" class="sec">
+    <h2 class="sec-hd"><span>二、产品/技术动态</span></h2>
+    <div class="grid">
+      <article class="card" data-sec="二、产品/技术动态">
     <h3 class="title"><a href="https://www.qbitai.com/2025/11/349043.html" target="_blank" rel="noopener">趋境联合清华北航实现两张4090本地微调万亿参数Kimi模型</a></h3>
     <div class="meta">十三（2025-11-05 23:58 北京时间）</div>
     <p class="recap" title="趋境联合清华大学、北京航空航天大学研究团队，实现仅用两张RTX 4090显卡在本地微调万亿参数Kimi模型K2，大幅降低算力门槛。">趋境联合清华大学、北京航空航天大学研究团队，实现仅用两张RTX 4090显卡在本地微调万亿参数Kimi模型K2，大幅降低算力门槛。</p>
@@ -401,24 +504,6 @@ footer{ max-width:1180px; margin:22px auto 44px; padding:0 18px; color:var(--sub
     <h2 class="sec-hd"><span>三、资本市场动态及企业战略布局</span></h2>
     <div class="grid">
       <article class="card" data-sec="三、资本市场动态及企业战略布局">
-    <h3 class="title"><a href="https://www.theguardian.com/technology/2025/nov/05/amazon-perplexity-ai-lawsuit" target="_blank" rel="noopener">亚马逊起诉人工智能初创公司Perplexity</a></h3>
-    <div class="meta">Guardian staff and agency（2025-11-06 08:17 北京时间）</div>
-    <p class="recap" title="亚马逊起诉人工智能初创公司Perplexity，指控其浏览器购物功能秘密访问客户账户并伪装AI活动为人类浏览。亚马逊律师称Perplexity的行为属于非法侵入。">亚马逊起诉人工智能初创公司Perplexity，指控其浏览器购物功能秘密访问客户账户并伪装AI活动为人类浏览。亚马逊律师称Perplexity的行为属于非法侵入。</p>
-    <div class="more"><a href="https://www.theguardian.com/technology/2025/nov/05/amazon-perplexity-ai-lawsuit" target="_blank" rel="noopener" aria-label="阅读原文">阅读原文 →</a></div>
-  </article>
-<article class="card" data-sec="三、资本市场动态及企业战略布局">
-    <h3 class="title"><a href="https://www.theverge.com/news/814042/getty-lawsuit-stability-ai-copyright-ruling-uk" target="_blank" rel="noopener">英国法院裁定Stability AI在版权诉讼中胜诉</a></h3>
-    <div class="meta">（2025-11-06 04:22 北京时间）</div>
-    <p class="recap" title="英国高等法院就Getty Images起诉Stability AI侵权案作出裁决，Stability AI在核心版权训练争议中获胜，法院仅认定其生成带Getty水印图像构成商标侵权。该判决未就AI模型使用受版权保护内容训练是否需要许可这一关键问题确立明确先例。">英国高等法院就Getty Images起诉Stability AI侵权案作出裁决，Stability AI在核心版权训练争议中获胜，法院仅认定其生成带Getty水印图像构成商标侵权。该判决未就AI模型使用受版权保护内容训练是否需要许可这一关键问题确立明确先例。</p>
-    <div class="more"><a href="https://www.theverge.com/news/814042/getty-lawsuit-stability-ai-copyright-ruling-uk" target="_blank" rel="noopener" aria-label="阅读原文">阅读原文 →</a></div>
-  </article>
-<article class="card" data-sec="三、资本市场动态及企业战略布局">
-    <h3 class="title"><a href="https://www.bloomberg.com/news/articles/2025-11-05/softbank-chases-actual-revenue-with-openai-in-corporate-japan" target="_blank" rel="noopener">软银与OpenAI将合作在日本推出企业AI服务</a></h3>
-    <div class="meta">Min-Jeong Lee（2025-11-06 01:50 北京时间）</div>
-    <p class="recap" title="软银集团旗下移动部门与OpenAI计划于明年在日本推出面向企业的AI服务。双方旨在实现实际收入，以应对市场对过高估值的担忧。">软银集团旗下移动部门与OpenAI计划于明年在日本推出面向企业的AI服务。双方旨在实现实际收入，以应对市场对过高估值的担忧。</p>
-    <div class="more"><a href="https://www.bloomberg.com/news/articles/2025-11-05/softbank-chases-actual-revenue-with-openai-in-corporate-japan" target="_blank" rel="noopener" aria-label="阅读原文">阅读原文 →</a></div>
-  </article>
-<article class="card" data-sec="三、资本市场动态及企业战略布局">
     <h3 class="title"><a href="https://www.ithome.com/0/895/078.htm" target="_blank" rel="noopener">软银与OpenAI成立合资公司，将推出企业级AI解决方案</a></h3>
     <div class="meta">（2025-11-05 23:52 北京时间）</div>
     <p class="recap" title="软银与OpenAI成立合资企业SB OAI Japan，将推出名为Crystal Intelligence的企业级AI解决方案，预计2026年上市。软银将率先部署该技术，OpenAI提供技术支持。">软银与OpenAI成立合资企业SB OAI Japan，将推出名为Crystal Intelligence的企业级AI解决方案，预计2026年上市。软银将率先部署该技术，OpenAI提供技术支持。</p>
@@ -459,18 +544,6 @@ footer{ max-width:1180px; margin:22px auto 44px; padding:0 18px; color:var(--sub
     <h2 class="sec-hd"><span>四、品牌与市场动作</span></h2>
     <div class="grid">
       <article class="card" data-sec="四、品牌与市场动作">
-    <h3 class="title"><a href="https://www.ithome.com/0/895/148.htm" target="_blank" rel="noopener">可口可乐AI重制经典广告出现画面不一致引发争议</a></h3>
-    <div class="meta">（2025-11-06 04:16 北京时间）</div>
-    <p class="recap" title="可口可乐发布AI重制的1995年经典广告，因卡车轮子数量变化等画面不一致问题引发关注。广告由5名AI专家使用OpenAI Sora等工具在30天内完成。创意评估机构给予该广告满分5.9星评分。">可口可乐发布AI重制的1995年经典广告，因卡车轮子数量变化等画面不一致问题引发关注。广告由5名AI专家使用OpenAI Sora等工具在30天内完成。创意评估机构给予该广告满分5.9星评分。</p>
-    <div class="more"><a href="https://www.ithome.com/0/895/148.htm" target="_blank" rel="noopener" aria-label="阅读原文">阅读原文 →</a></div>
-  </article>
-<article class="card" data-sec="四、品牌与市场动作">
-    <h3 class="title"><a href="http://mp.weixin.qq.com/s?__biz=MzI3MTA0MTk1MA==&mid=2652642082&idx=4&sn=6786bd092bb4088da150fc34d0b62d57&chksm=f069c0288f53131de758b922ca7962c46514dffd8605d53f971e2f0aa93a1ee84afe74469dbd&scene=0#rd" target="_blank" rel="noopener">新智元将举办十周年峰会并发布招聘信息</a></h3>
-    <div class="meta">新智元（2025-11-06 03:00 北京时间）</div>
-    <p class="recap" title="新智元将于2025年9月7日在北京海淀上地举办十周年峰会，主题为“新天终启，万象智生”。同时发布多个职位招聘，包括AI产业报道主笔、高级视频编辑等岗位。">新智元将于2025年9月7日在北京海淀上地举办十周年峰会，主题为“新天终启，万象智生”。同时发布多个职位招聘，包括AI产业报道主笔、高级视频编辑等岗位。</p>
-    <div class="more"><a href="http://mp.weixin.qq.com/s?__biz=MzI3MTA0MTk1MA==&mid=2652642082&idx=4&sn=6786bd092bb4088da150fc34d0b62d57&chksm=f069c0288f53131de758b922ca7962c46514dffd8605d53f971e2f0aa93a1ee84afe74469dbd&scene=0#rd" target="_blank" rel="noopener" aria-label="阅读原文">阅读原文 →</a></div>
-  </article>
-<article class="card" data-sec="四、品牌与市场动作">
     <h3 class="title"><a href="http://mp.weixin.qq.com/s?__biz=MjM5MjM2MzEyNQ==&mid=2651600971&idx=1&sn=371b667d32891dc28be25cf275ab4764&chksm=bc0fbd23f1c7ef66bc0bd88304b6f4fa1d98d8ae0f859c8b0efaeebbe0c9bad0753fd26baa34&scene=0#rd" target="_blank" rel="noopener">拼多多支持农业科创团队参加世界粮食论坛</a></h3>
     <div class="meta">IT时报（2025-11-05 23:24 北京时间）</div>
     <p class="recap" title="拼多多连续两年受邀出席联合国粮农组织主办的世界粮食论坛，并担任粮农创新大赛评委。拼多多支持的中国牧原云计算团队在论坛上展示了AI养猪方案，通过视觉与传感器技术监测猪只健康。">拼多多连续两年受邀出席联合国粮农组织主办的世界粮食论坛，并担任粮农创新大赛评委。拼多多支持的中国牧原云计算团队在论坛上展示了AI养猪方案，通过视觉与传感器技术监测猪只健康。</p>
@@ -484,6 +557,15 @@ footer{ max-width:1180px; margin:22px auto 44px; padding:0 18px; color:var(--sub
   </article>
     </div>
   </section>
+    </div>
+    
+    <div id="beforeYesterday-content" class="date-content">
+      <div class="empty-state">前日暂无数据</div>
+    </div>
+    
+    <div id="other-content" class="date-content">
+      <div class="empty-state">更早暂无数据</div>
+    </div>
   </main>
 </div>
 
@@ -494,39 +576,67 @@ const secSel  = document.getElementById('secSel');
 const search  = document.getElementById('search');
 const emptyEl = document.getElementById('emptyHint');
 
+// 日期分类切换
+const dateTabs = document.querySelectorAll('.date-tab');
+const dateContents = document.querySelectorAll('.date-content');
+
+dateTabs.forEach(tab => {
+  tab.addEventListener('click', function() {
+    // 更新活跃标签
+    dateTabs.forEach(function(t) { t.classList.remove('active'); });
+    tab.classList.add('active');
+    
+    // 显示对应内容
+    const targetCategory = tab.getAttribute('data-date-category');
+    dateContents.forEach(function(content) {
+      content.classList.remove('active');
+    });
+    document.getElementById(targetCategory + '-content').classList.add('active');
+    
+    // 重新应用筛选
+    filter();
+  });
+});
+
 (function syncFromHash(){
   try{
     const raw = location.hash.replace(/^#/, '');
     if (!raw) return;
     const kv = Object.fromEntries(
-      raw.split('&').map(s=>s.split('='))
-         .map(([k,v]) => [k, decodeURIComponent(v||'')])
+      raw.split('&').map(function(s){ return s.split('='); })
+         .map(function([k,v]) { return [k, decodeURIComponent(v||'')]; })
     );
     if (kv.s) secSel.value = kv.s;
     if (kv.q) search.value = kv.q;
-  }catch{}
+  }catch(e){}
 })();
 
-function debounce(fn, wait=180){
-  let t=null;
-  return (...a)=>{
+function debounce(fn, wait){
+  wait = wait || 180;
+  var t = null;
+  return function(){
+    var a = arguments;
     clearTimeout(t);
-    t=setTimeout(()=>fn(...a), wait);
+    t = setTimeout(function(){ fn.apply(null, a); }, wait);
   };
 }
 
 function filter(){
-  const kw  = (search.value || '').trim().toLowerCase();
-  const sec = secSel.value;
-  let totalVisible = 0;
+  var kw  = (search.value || '').trim().toLowerCase();
+  var sec = secSel.value;
+  var totalVisible = 0;
 
-  document.querySelectorAll('#main section').forEach(secEl=>{
-    let visible = 0;
-    secEl.querySelectorAll('.card').forEach(card=>{
-      const inSec = !sec || card.dataset.sec === sec;
-      const text  = card.textContent.toLowerCase();
-      const hit   = !kw || text.includes(kw);
-      const show  = inSec && hit;
+  // 只在当前活跃的日期分类中筛选
+  var activeContent = document.querySelector('.date-content.active');
+  if (!activeContent) return;
+  
+  activeContent.querySelectorAll('section').forEach(function(secEl){
+    var visible = 0;
+    secEl.querySelectorAll('.card').forEach(function(card){
+      var inSec = !sec || card.getAttribute('data-sec') === sec;
+      var text  = card.textContent.toLowerCase();
+      var hit   = !kw || text.indexOf(kw) >= 0;
+      var show  = inSec && hit;
       card.classList.toggle('hidden', !show);
       if (show) { visible++; totalVisible++; }
     });
@@ -536,54 +646,59 @@ function filter(){
   emptyEl.classList.toggle('hidden', totalVisible !== 0);
 
   try{
-    const h = '#s=' + encodeURIComponent(secSel.value)
+    var h = '#s=' + encodeURIComponent(secSel.value)
             + '&q=' + encodeURIComponent(search.value.trim());
     if (location.hash !== h) history.replaceState(null, '', h);
-  }catch{}
+  }catch(e){}
 }
 
-const run = debounce(filter, 180);
+var run = debounce(filter, 180);
 secSel.addEventListener('change', filter);
 search.addEventListener('input', run);
+
+// 初始化筛选
 filter();
 
 /* Google Trends 挂载逻辑 */
 (function mountTrends(){
-  const SCRIPT = 'https://ssl.gstatic.com/trends_nrtr/3528_RC01/embed_loader.js';
+  var SCRIPT = 'https://ssl.gstatic.com/trends_nrtr/3528_RC01/embed_loader.js';
 
-  const cfg = {
+  var cfg = {
     foreign:  { el: 'gt-foreign',  geo: '',   kw: ['ChatGPT','Gemini','Claude','Grok','Llama'] },
     domestic: { el: 'gt-domestic',  geo: '',   kw: ['DeepSeek','Ernie','Hunyuan','Qwen','Doubao'] },
     vendors:  { el: 'gt-vendors',   geo: '',   kw: ['Baidu AI Cloud','Huawei Cloud','Tencent Cloud','Alibaba Cloud','Volcengine'] },
     market:   { el: 'gt-market',    geo: '',   kw: ['LLM','AI Agent','RAG','Vector Database','Prompt Engineering'] }
   };
 
-  function renderOne({ el, geo, kw }, time){
+  function renderOne(config, time){
     try{
-      const host = 'https://trends.google.com/trends/embed/';
-      const container = document.getElementById(el);
+      var host = 'https://trends.google.com/trends/embed/';
+      var container = document.getElementById(config.el);
       if (!container) return;
 
-      const fb = container.parentElement.querySelector('.t-fallback');
+      var fb = container.parentElement.querySelector('.t-fallback');
       if (fb) fb.style.display = 'none';
 
       container.innerHTML = '';
-      const comparisonItem = kw.map(k => ({ keyword: k, geo: geo || '', time }));
-      const query = 'date=' + encodeURIComponent(time)
-                  + '&q=' + encodeURIComponent(kw.join(','))
-                  + (geo ? '&geo=' + geo : '');
+      var comparisonItem = config.kw.map(function(k) { return { keyword: k, geo: config.geo || '', time: time }; });
+      var query = 'date=' + encodeURIComponent(time)
+                  + '&q=' + encodeURIComponent(config.kw.join(','))
+                  + (config.geo ? '&geo=' + config.geo : '');
 
       trends.embed.renderExploreWidgetTo(
         container,
         'TIMESERIES',
-        { comparisonItem, category: 0, property: '' },
+        { comparisonItem: comparisonItem, category: 0, property: '' },
         { exploreQuery: query, guestPath: host }
       );
     }catch(e){
-      const c = document.getElementById(el);
+      var c = document.getElementById(config.el);
       if (c) {
-        const fb = c.parentElement.querySelector('.t-fallback');
-        if (fb) { fb.style.display = 'flex'; fb.textContent = '无法显示趋势图（网络受限/被拦截）'; }
+        var fallback = c.parentElement.querySelector('.t-fallback');
+        if (fallback) { 
+          fallback.style.display = 'flex'; 
+          fallback.textContent = '无法显示趋势图（网络受限/被拦截）'; 
+        }
       }
       console.error('Trends render error', e);
     }
@@ -592,30 +707,32 @@ filter();
   function boot(){
     if (!(window.trends && window.trends.embed)) return;
 
-    const defaultTime = 'now 7-d';
+    var defaultTime = 'now 7-d';
     renderOne(cfg.foreign,  defaultTime);
     renderOne(cfg.domestic, defaultTime);
     renderOne(cfg.vendors,  defaultTime);
     renderOne(cfg.market,   defaultTime);
 
-    document.querySelectorAll('.t-sel').forEach(sel=>{
-      sel.addEventListener('change', ()=>{
-        const time = sel.value || 'now 7-d';
-        const targetId = sel.dataset.target;
-        const key = targetId.replace(/^gt-/, '');
-        const conf = cfg[key];
+    document.querySelectorAll('.t-sel').forEach(function(sel){
+      sel.addEventListener('change', function(){
+        var time = sel.value || 'now 7-d';
+        var targetId = sel.getAttribute('data-target');
+        var key = targetId.replace(/^gt-/, '');
+        var conf = cfg[key];
         if (conf) renderOne(conf, time);
       });
     });
   }
 
-  const s = document.createElement('script');
-  s.src = SCRIPT; s.async = true; s.onload = boot;
+  var s = document.createElement('script');
+  s.src = SCRIPT; 
+  s.async = true; 
+  s.onload = boot;
   document.head.appendChild(s);
 
-  setTimeout(() => {
+  setTimeout(function() {
     if (!(window.trends && window.trends.embed)) {
-      document.querySelectorAll('.t-fallback').forEach(el=>{
+      document.querySelectorAll('.t-fallback').forEach(function(el){
         el.style.display = 'flex';
         el.textContent = '无法加载 Google 趋势（可能被墙/被拦截）';
       });
