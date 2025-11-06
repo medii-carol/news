@@ -220,12 +220,11 @@ footer{ max-width:1180px; margin:22px auto 44px; padding:0 18px; color:var(--sub
   <input id="search" type="search" placeholder="搜索标题 / 概要 / 标签…" aria-label="搜索">
 </div>
 
-<!-- 日期分类标签 -->
+<!-- ⬇️ 修改：删除"更早"标签，只保留三日分类 -->
 <div class="date-tabs">
   <div class="date-tab active" data-date-category="today">📌 今日（2025-11-06）</div>
   <div class="date-tab" data-date-category="yesterday">🗓️ 昨日（2025-11-05）</div>
   <div class="date-tab" data-date-category="beforeYesterday">📅 前日（2025-11-04）</div>
-  <div class="date-tab" data-date-category="other">📚 更早</div>
 </div>
 
 <section class="trends-top" aria-label="Google 趋势">
@@ -294,7 +293,7 @@ footer{ max-width:1180px; margin:22px auto 44px; padding:0 18px; color:var(--sub
   <main id="main">
     <p id="emptyHint" class="hidden">当前筛选无结果，换个关键词试试～</p>
     
-    <!-- 按日期分类显示内容 -->
+    <!-- ⬇️ 修改：删除"更早"内容区域，只保留三日分类 -->
     <div id="today-content" class="date-content active">
       <section id="一、权威观点/报告" class="sec">
     <h2 class="sec-hd"><span>一、权威观点/报告</span></h2>
@@ -561,10 +560,6 @@ footer{ max-width:1180px; margin:22px auto 44px; padding:0 18px; color:var(--sub
     
     <div id="beforeYesterday-content" class="date-content">
       <div class="empty-state">前日暂无数据</div>
-    </div>
-    
-    <div id="other-content" class="date-content">
-      <div class="empty-state">更早暂无数据</div>
     </div>
   </main>
 </div>
