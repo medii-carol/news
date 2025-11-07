@@ -228,7 +228,159 @@ footer{ max-width:1180px; margin:22px auto 44px; padding:0 18px; color:var(--sub
 </div>
 
 <!-- ⬇️ 关键修改：直接使用上游生成的趋势HTML -->
-<div class="t-fallback">趋势生成失败</div>
+
+<section class="trends-top" aria-label="Google 趋势">
+  <div class="t-card">
+    <div class="t-hd">
+      <div class="t-title"><span class="t-dot"></span><span>🌍 国外大模型 · 趋势</span></div>
+      <div class="t-tools">
+        <select class="t-sel" data-target="gt-foreign" aria-label="时间范围">
+          <option value="now 7-d" selected>近 7 天</option>
+          <option value="today 3-m">近 90 天</option>
+          <option value="today 12-m">近 12 个月</option>
+        </select>
+      </div>
+    </div>
+    <div class="t-body">
+      <div id="gt-foreign" class="t-embed"></div>
+      <div class="t-fallback">加载趋势图…</div>
+    </div>
+  </div>
+
+  <div class="t-card">
+    <div class="t-hd">
+      <div class="t-title"><span class="t-dot"></span><span>🇨🇳 国内大模型 · 趋势</span></div>
+      <div class="t-tools">
+        <select class="t-sel" data-target="gt-domestic" aria-label="时间范围">
+          <option value="now 7-d" selected>近 7 天</option>
+          <option value="today 3-m">近 90 天</option>
+          <option value="today 12-m">近 12 个月</option>
+        </select>
+      </div>
+    </div>
+    <div class="t-body">
+      <div id="gt-domestic" class="t-embed"></div>
+      <div class="t-fallback">加载趋势图…</div>
+    </div>
+  </div>
+
+  <div class="t-card">
+    <div class="t-hd">
+      <div class="t-title"><span class="t-dot"></span><span>☁️ 国内云厂商 · 趋势</span></div>
+      <div class="t-tools">
+        <select class="t-sel" data-target="gt-vendors" aria-label="时间范围">
+          <option value="now 7-d" selected>近 7 天</option>
+          <option value="today 3-m">近 90 天</option>
+          <option value="today 12-m">近 12 个月</option>
+        </select>
+      </div>
+    </div>
+    <div class="t-body">
+      <div id="gt-vendors" class="t-embed"></div>
+      <div class="t-fallback">加载趋势图…</div>
+    </div>
+  </div>
+
+  <div class="t-card">
+    <div class="t-hd">
+      <div class="t-title"><span class="t-dot"></span><span>🔑 AI 市场关键词 · 趋势</span></div>
+      <div class="t-tools">
+        <select class="t-sel" data-target="gt-market" aria-label="时间范围">
+          <option value="now 7-d" selected>近 7 天</option>
+          <option value="today 3-m">近 90 天</option>
+          <option value="today 12-m">近 12 个月</option>
+        </select>
+      </div>
+    </div>
+    <div class="t-body">
+      <div id="gt-market" class="t-embed"></div>
+      <div class="t-fallback">加载趋势图…</div>
+    </div>
+  </div>
+</section>
+
+<script>
+/* Google Trends 挂载逻辑 */
+(function mountTrends(){
+  var SCRIPT = 'https://ssl.gstatic.com/trends_nrtr/3528_RC01/embed_loader.js';
+
+  var cfg = {
+    foreign:  { el: 'gt-foreign',  geo: '',   kw: ['ChatGPT','Gemini','Claude','Grok','Llama'] },
+    domestic: { el: 'gt-domestic',  geo: '',   kw: ['DeepSeek','Ernie','Hunyuan','Qwen','Doubao'] },
+    vendors:  { el: 'gt-vendors',   geo: '',   kw: ['Baidu AI Cloud','Huawei Cloud','Tencent Cloud','Alibaba Cloud','Volcengine'] },
+    market:   { el: 'gt-market',    geo: '',   kw: ['LLM','AI Agent','RAG','Vector Database','Prompt Engineering'] }
+  };
+
+  function renderOne(config, time){
+    try{
+      var host = 'https://trends.google.com/trends/embed/';
+      var container = document.getElementById(config.el);
+      if (!container) return;
+
+      var fb = container.parentElement.querySelector('.t-fallback');
+      if (fb) fb.style.display = 'none';
+
+      container.innerHTML = '';
+      var comparisonItem = config.kw.map(function(k) { return { keyword: k, geo: config.geo || '', time: time }; });
+      var query = 'date=' + encodeURIComponent(time)
+                  + '&q=' + encodeURIComponent(config.kw.join(','))
+                  + (config.geo ? '&geo=' + config.geo : '');
+
+      trends.embed.renderExploreWidgetTo(
+        container,
+        'TIMESERIES',
+        { comparisonItem: comparisonItem, category: 0, property: '' },
+        { exploreQuery: query, guestPath: host }
+      );
+    }catch(e){
+      var c = document.getElementById(config.el);
+      if (c) {
+        var fallback = c.parentElement.querySelector('.t-fallback');
+        if (fallback) { 
+          fallback.style.display = 'flex'; 
+          fallback.textContent = '无法显示趋势图（网络受限/被拦截）'; 
+        }
+      }
+      console.error('Trends render error', e);
+    }
+  }
+
+  function boot(){
+    if (!(window.trends && window.trends.embed)) return;
+
+    var defaultTime = 'now 7-d';
+    renderOne(cfg.foreign,  defaultTime);
+    renderOne(cfg.domestic, defaultTime);
+    renderOne(cfg.vendors,  defaultTime);
+    renderOne(cfg.market,   defaultTime);
+
+    document.querySelectorAll('.t-sel').forEach(function(sel){
+      sel.addEventListener('change', function(){
+        var time = sel.value || 'now 7-d';
+        var targetId = sel.getAttribute('data-target');
+        var key = targetId.replace(/^gt-/, '');
+        var conf = cfg[key];
+        if (conf) renderOne(conf, time);
+      });
+    });
+  }
+
+  var s = document.createElement('script');
+  s.src = SCRIPT; 
+  s.async = true; 
+  s.onload = boot;
+  document.head.appendChild(s);
+
+  setTimeout(function() {
+    if (!(window.trends && window.trends.embed)) {
+      document.querySelectorAll('.t-fallback').forEach(function(el){
+        el.style.display = 'flex';
+        el.textContent = '无法加载 Google 趋势（可能被墙/被拦截）';
+      });
+    }
+  }, 5000);
+})();
+</script>
 
 <div class="wrap">
   <main id="main">
@@ -238,39 +390,51 @@ footer{ max-width:1180px; margin:22px auto 44px; padding:0 18px; color:var(--sub
     <h2 class="sec-hd"><span>一、权威观点/报告</span></h2>
     <div class="grid">
       <article class="card" data-sec="一、权威观点/报告">
+    <h3 class="title"><a href="https://www.ithome.com/0/895/642.htm" target="_blank" rel="noopener">AMD首席执行官苏姿丰称正与多家大客户洽谈AI芯片采购</a></h3>
+    <div class="meta">（2025-11-07 23:00 北京时间）</div>
+    <p class="recap" title="AMD首席执行官苏姿丰在财报电话会议上表示，公司正与多家规模与OpenAI相当的客户洽谈AI芯片采购协议，以扩大客户基础降低风险。她还透露Instinct MI355系列已开始产能爬坡，Instinct MI450系列计划于2026年下半年上市。">AMD首席执行官苏姿丰在财报电话会议上表示，公司正与多家规模与OpenAI相当的客户洽谈AI芯片采购协议，以扩大客户基础降低风险。她还透露Instinct MI355系列已开始产能爬坡，Instinct MI450系列计划于2026年下半年上市。</p>
+    <div class="more"><a href="https://www.ithome.com/0/895/642.htm" target="_blank" rel="noopener" aria-label="阅读原文">阅读原文 →</a></div>
+  </article>
+<article class="card" data-sec="一、权威观点/报告">
+    <h3 class="title"><a href="https://www.bloomberg.com/news/articles/2025-11-07/nvidia-ceo-says-no-plans-to-ship-blackwell-ai-chips-to-china" target="_blank" rel="noopener">英伟达首席执行官称无计划向中国销售Blackwell AI芯片</a></h3>
+    <div class="meta">Debby Wu（2025-11-07 22:54 北京时间）</div>
+    <p class="recap" title="英伟达首席执行官黄仁勋表示，公司未积极讨论向中国企业销售Blackwell人工智能芯片。此举澄清了关于该公司试图重返中国半导体市场的猜测。">英伟达首席执行官黄仁勋表示，公司未积极讨论向中国企业销售Blackwell人工智能芯片。此举澄清了关于该公司试图重返中国半导体市场的猜测。</p>
+    <div class="more"><a href="https://www.bloomberg.com/news/articles/2025-11-07/nvidia-ceo-says-no-plans-to-ship-blackwell-ai-chips-to-china" target="_blank" rel="noopener" aria-label="阅读原文">阅读原文 →</a></div>
+  </article>
+<article class="card" data-sec="一、权威观点/报告">
     <h3 class="title"><a href="https://www.tmtpost.com/7753245.html" target="_blank" rel="noopener">2024年中国AI大模型及MaaS市场增长数据发布</a></h3>
     <div class="meta">Leo张ToB杂谈（2025-11-07 21:37 北京时间）</div>
-    <p class="recap" title="IDC数据显示，2024年中国AI大模型解决方案市场规模达34.9亿元，同比增长126.4%；MaaS市场实现215.7%的爆发式增长。">IDC数据显示，2024年中国AI大模型解决方案市场规模达34.9亿元，同比增长126.4%；MaaS市场实现215.7%的爆发式增长。</p>
+    <p class="recap" title="IDC数据显示，2024年中国AI大模型解决方案市场规模达34.9亿元，同比增长126.4%。MaaS市场实现215.7%的爆发式增长。">IDC数据显示，2024年中国AI大模型解决方案市场规模达34.9亿元，同比增长126.4%。MaaS市场实现215.7%的爆发式增长。</p>
     <div class="more"><a href="https://www.tmtpost.com/7753245.html" target="_blank" rel="noopener" aria-label="阅读原文">阅读原文 →</a></div>
   </article>
 <article class="card" data-sec="一、权威观点/报告">
-    <h3 class="title"><a href="http://mp.weixin.qq.com/s?__biz=MzI3MTA0MTk1MA==&mid=2652642887&idx=3&sn=a249244679bc3ab1be1f79cacbfb839b&chksm=f0369c45e0e1d920923d812ec5c0039a78d341c8fa76046667ca3dbc13fe074dac58504dd593&scene=0#rd" target="_blank" rel="noopener">强化学习教父Richard Sutton加入ExperienceFlow.AI并发表观点</a></h3>
+    <h3 class="title"><a href="http://mp.weixin.qq.com/s?__biz=MzI3MTA0MTk1MA==&mid=2652642887&idx=3&sn=a249244679bc3ab1be1f79cacbfb839b&chksm=f0369c45e0e1d920923d812ec5c0039a78d341c8fa76046667ca3dbc13fe074dac58504dd593&scene=0#rd" target="_blank" rel="noopener">强化学习之父Richard Sutton加入ExperienceFlow.AI并发表观点</a></h3>
     <div class="meta">新智元（2025-11-07 20:23 北京时间）</div>
-    <p class="recap" title="强化学习教父Richard Sutton以首席科学官身份加入ExperienceFlow.AI，并创建超级智能研究实验室。他表示生成式AI时代即将结束，AI应转向从经验中学习的新阶段。ExperienceFlow.AI致力于打造经验驱动的去中心化超级智能。">强化学习教父Richard Sutton以首席科学官身份加入ExperienceFlow.AI，并创建超级智能研究实验室。他表示生成式AI时代即将结束，AI应转向从经验中学习的新阶段。ExperienceFlow.AI致力于打造经验驱动的去中心化超级智能。</p>
+    <p class="recap" title="强化学习之父、图灵奖得主Richard Sutton加入ExperienceFlow.AI担任首席科学官。他表示生成式AI时代正在结束，AI应转向从经验中学习的新阶段。该公司致力于开发经验驱动的去中心化超级智能。">强化学习之父、图灵奖得主Richard Sutton加入ExperienceFlow.AI担任首席科学官。他表示生成式AI时代正在结束，AI应转向从经验中学习的新阶段。该公司致力于开发经验驱动的去中心化超级智能。</p>
     <div class="more"><a href="http://mp.weixin.qq.com/s?__biz=MzI3MTA0MTk1MA==&mid=2652642887&idx=3&sn=a249244679bc3ab1be1f79cacbfb839b&chksm=f0369c45e0e1d920923d812ec5c0039a78d341c8fa76046667ca3dbc13fe074dac58504dd593&scene=0#rd" target="_blank" rel="noopener" aria-label="阅读原文">阅读原文 →</a></div>
   </article>
 <article class="card" data-sec="一、权威观点/报告">
-    <h3 class="title"><a href="https://www.tmtpost.com/7753365.html" target="_blank" rel="noopener">马斯克称特斯拉可能建造AI芯片工厂并与英特尔合作</a></h3>
+    <h3 class="title"><a href="https://www.tmtpost.com/7753365.html" target="_blank" rel="noopener">马斯克称特斯拉或建AI芯片工厂并可能与英特尔合作</a></h3>
     <div class="meta">zhangxinyue（2025-11-07 19:07 北京时间）</div>
-    <p class="recap" title="埃隆·马斯克表示特斯拉可能建造巨型人工智能芯片工厂，并可能与英特尔合作。他强调目前正全力投入芯片领域。">埃隆·马斯克表示特斯拉可能建造巨型人工智能芯片工厂，并可能与英特尔合作。他强调目前正全力投入芯片领域。</p>
+    <p class="recap" title="埃隆·马斯克表示特斯拉可能建造巨型人工智能芯片工厂，并透露可能与英特尔合作。他称自己目前对芯片领域极为专注。">埃隆·马斯克表示特斯拉可能建造巨型人工智能芯片工厂，并透露可能与英特尔合作。他称自己目前对芯片领域极为专注。</p>
     <div class="more"><a href="https://www.tmtpost.com/7753365.html" target="_blank" rel="noopener" aria-label="阅读原文">阅读原文 →</a></div>
   </article>
 <article class="card" data-sec="一、权威观点/报告">
-    <h3 class="title"><a href="https://36kr.com/p/3542386241138818?f=rss" target="_blank" rel="noopener">达晨峰会探讨AI发展路径与风险</a></h3>
+    <h3 class="title"><a href="https://36kr.com/p/3542386241138818?f=rss" target="_blank" rel="noopener">达晨峰会举行AI圆桌讨论，探讨杭州创新生态与大模型及具身智能发展</a></h3>
     <div class="meta">（2025-11-07 18:22 北京时间）</div>
-    <p class="recap" title="在2025达晨企业家峰会上，智谱AI、阿里云、众擎机器人等企业高管就杭州AI生态、大模型竞争策略及具身智能发展路径展开讨论。嘉宾分析了创新环境、技术转化效率与商业模式，并对AI风险提出不同层面的思考。">在2025达晨企业家峰会上，智谱AI、阿里云、众擎机器人等企业高管就杭州AI生态、大模型竞争策略及具身智能发展路径展开讨论。嘉宾分析了创新环境、技术转化效率与商业模式，并对AI风险提出不同层面的思考。</p>
+    <p class="recap" title="2025达晨企业家峰会举行AI圆桌对话，杭州产投、智谱AI、阿里云等企业代表探讨杭州AI创新生态、大模型竞争格局及具身智能发展路径。与会嘉宾分享了各自对技术路线、商业模式和行业风险的观点。">2025达晨企业家峰会举行AI圆桌对话，杭州产投、智谱AI、阿里云等企业代表探讨杭州AI创新生态、大模型竞争格局及具身智能发展路径。与会嘉宾分享了各自对技术路线、商业模式和行业风险的观点。</p>
     <div class="more"><a href="https://36kr.com/p/3542386241138818?f=rss" target="_blank" rel="noopener" aria-label="阅读原文">阅读原文 →</a></div>
   </article>
 <article class="card" data-sec="一、权威观点/报告">
-    <h3 class="title"><a href="https://www.ft.com/content/5835a5a3-36db-41d7-9944-d9823dbdffc5" target="_blank" rel="noopener">奥特曼称OpenAI不寻求联邦政府为巨额投资提供担保</a></h3>
+    <h3 class="title"><a href="https://www.ft.com/content/5835a5a3-36db-41d7-9944-d9823dbdffc5" target="_blank" rel="noopener">奥特曼称OpenAI不寻求美国联邦政府为其投资提供担保</a></h3>
     <div class="meta">（2025-11-07 14:32 北京时间）</div>
-    <p class="recap" title="OpenAI首席执行官奥特曼表示，公司不寻求美国联邦政府为其1.4万亿美元投资计划提供财务支持。他强调OpenAI并非试图成为‘大而不能倒’的企业。">OpenAI首席执行官奥特曼表示，公司不寻求美国联邦政府为其1.4万亿美元投资计划提供财务支持。他强调OpenAI并非试图成为‘大而不能倒’的企业。</p>
+    <p class="recap" title="OpenAI首席执行官奥特曼表示，公司不寻求美国联邦政府为其1.4万亿美元投资计划提供财务担保。奥特曼强调OpenAI并非试图变得大而不能倒。">OpenAI首席执行官奥特曼表示，公司不寻求美国联邦政府为其1.4万亿美元投资计划提供财务担保。奥特曼强调OpenAI并非试图变得大而不能倒。</p>
     <div class="more"><a href="https://www.ft.com/content/5835a5a3-36db-41d7-9944-d9823dbdffc5" target="_blank" rel="noopener" aria-label="阅读原文">阅读原文 →</a></div>
   </article>
 <article class="card" data-sec="一、权威观点/报告">
     <h3 class="title"><a href="https://www.bloomberg.com/news/articles/2025-11-06/altman-says-openai-doesn-t-want-a-government-bailout-for-ai" target="_blank" rel="noopener">奥特曼称OpenAI不寻求政府为人工智能提供救助</a></h3>
     <div class="meta">Shirin Ghaffary（2025-11-07 12:08 北京时间）</div>
-    <p class="recap" title="OpenAI首席执行官奥特曼表示公司不寻求联邦担保以降低AI基础设施支出风险。此前该公司高管曾暗示政府或需为技术提供资金支持。">OpenAI首席执行官奥特曼表示公司不寻求联邦担保以降低AI基础设施支出风险。此前该公司高管曾暗示政府或需为技术提供资金支持。</p>
+    <p class="recap" title="OpenAI首席执行官奥特曼反驳公司高管关于政府应资助AI技术的言论，表示不寻求联邦担保以降低AI基础设施支出风险。">OpenAI首席执行官奥特曼反驳公司高管关于政府应资助AI技术的言论，表示不寻求联邦担保以降低AI基础设施支出风险。</p>
     <div class="more"><a href="https://www.bloomberg.com/news/articles/2025-11-06/altman-says-openai-doesn-t-want-a-government-bailout-for-ai" target="_blank" rel="noopener" aria-label="阅读原文">阅读原文 →</a></div>
   </article>
 <article class="card" data-sec="一、权威观点/报告">
@@ -326,45 +490,45 @@ footer{ max-width:1180px; margin:22px auto 44px; padding:0 18px; color:var(--sub
     <h2 class="sec-hd"><span>二、产品/技术动态</span></h2>
     <div class="grid">
       <article class="card" data-sec="二、产品/技术动态">
-    <h3 class="title"><a href="http://mp.weixin.qq.com/s?__biz=MzIzNjc1NzUzMw==&mid=2247840210&idx=1&sn=4f75ca34015ed785393b3091916c7d9b&chksm=e98b8e06848f688ab168a54848ec033b405c14ad891cb0a285d4b161d1a67e55f5430ffc0344&scene=0#rd" target="_blank" rel="noopener">百度剧本驱动多模协同数字人技术获世界互联网大会领先科技奖</a></h3>
+    <h3 class="title"><a href="http://mp.weixin.qq.com/s?__biz=MzIzNjc1NzUzMw==&mid=2247840210&idx=1&sn=4f75ca34015ed785393b3091916c7d9b&chksm=e98b8e06848f688ab168a54848ec033b405c14ad891cb0a285d4b161d1a67e55f5430ffc0344&scene=0#rd" target="_blank" rel="noopener">百度数字人技术在世界互联网大会获领先科技奖</a></h3>
     <div class="meta">量子位（2025-11-07 20:01 北京时间）</div>
-    <p class="recap" title="百度剧本驱动多模协同高拟真数字人技术在2025年世界互联网大会乌镇峰会获领先科技奖，实现三连冠。该技术基于文心大模型，具备剧本生成、语音合成、实时交互等能力，已应用于电商直播等场景。">百度剧本驱动多模协同高拟真数字人技术在2025年世界互联网大会乌镇峰会获领先科技奖，实现三连冠。该技术基于文心大模型，具备剧本生成、语音合成、实时交互等能力，已应用于电商直播等场景。</p>
+    <p class="recap" title="百度剧本驱动多模协同数字人技术在2025年世界互联网大会乌镇峰会获领先科技奖，该技术已应用于罗永浩数字人直播等场景，生成超10万个数字人覆盖电商、教育等行业。">百度剧本驱动多模协同数字人技术在2025年世界互联网大会乌镇峰会获领先科技奖，该技术已应用于罗永浩数字人直播等场景，生成超10万个数字人覆盖电商、教育等行业。</p>
     <div class="more"><a href="http://mp.weixin.qq.com/s?__biz=MzIzNjc1NzUzMw==&mid=2247840210&idx=1&sn=4f75ca34015ed785393b3091916c7d9b&chksm=e98b8e06848f688ab168a54848ec033b405c14ad891cb0a285d4b161d1a67e55f5430ffc0344&scene=0#rd" target="_blank" rel="noopener" aria-label="阅读原文">阅读原文 →</a></div>
   </article>
 <article class="card" data-sec="二、产品/技术动态">
-    <h3 class="title"><a href="https://www.leiphone.com/category/chips/nUOgm5wybSLWa4wD.html" target="_blank" rel="noopener">Arm发布Lumex CSS平台及C1 CPU，AI性能提升5倍</a></h3>
+    <h3 class="title"><a href="https://www.leiphone.com/category/chips/nUOgm5wybSLWa4wD.html" target="_blank" rel="noopener">Arm发布Lumex CSS平台及C1系列CPU，AI性能提升5倍</a></h3>
     <div class="meta">（2025-11-07 19:52 北京时间）</div>
-    <p class="recap" title="Arm发布集成第二代可伸缩矩阵扩展技术的Lumex CSS平台，使CPU AI性能提升5倍，能效优化3倍。新平台包括基于Armv9.3架构的C1 CPU集群和Mali G1-Ultra GPU，并推出开发者工具KleidiAI。">Arm发布集成第二代可伸缩矩阵扩展技术的Lumex CSS平台，使CPU AI性能提升5倍，能效优化3倍。新平台包括基于Armv9.3架构的C1 CPU集群和Mali G1-Ultra GPU，并推出开发者工具KleidiAI。</p>
+    <p class="recap" title="Arm推出集成第二代可伸缩矩阵扩展技术的Lumex CSS平台，使CPU的AI性能提升5倍、能效优化3倍。新平台采用C1系列CPU和Mali G1 GPU，并已与支付宝、腾讯等企业展开合作。">Arm推出集成第二代可伸缩矩阵扩展技术的Lumex CSS平台，使CPU的AI性能提升5倍、能效优化3倍。新平台采用C1系列CPU和Mali G1 GPU，并已与支付宝、腾讯等企业展开合作。</p>
     <div class="more"><a href="https://www.leiphone.com/category/chips/nUOgm5wybSLWa4wD.html" target="_blank" rel="noopener" aria-label="阅读原文">阅读原文 →</a></div>
   </article>
 <article class="card" data-sec="二、产品/技术动态">
     <h3 class="title"><a href="http://mp.weixin.qq.com/s?__biz=MjM5MDE0Mjc4MA==&mid=2651262386&idx=3&sn=9f370ad9b64cf789e8e71fd395c58e38&chksm=bc7b389c76b5d9e1e118b018b2954b4004de6688271fb89c4433b10875ac405b783fec4c8a96&scene=0#rd" target="_blank" rel="noopener">Anthropic发布Claude Skills模块化功能</a></h3>
     <div class="meta">InfoQ（2025-11-07 19:42 北京时间）</div>
-    <p class="recap" title="Anthropic推出名为Skills的新功能，允许开发者通过模块化组件扩展Claude能力。该功能覆盖网页应用、Claude Code环境和API接口，企业可通过/v1/skills端点创建自定义Skills。Skills通过schema定义输入输出和权限，强调透明化和可审计性。">Anthropic推出名为Skills的新功能，允许开发者通过模块化组件扩展Claude能力。该功能覆盖网页应用、Claude Code环境和API接口，企业可通过/v1/skills端点创建自定义Skills。Skills通过schema定义输入输出和权限，强调透明化和可审计性。</p>
+    <p class="recap" title="Anthropic推出名为Skills的新功能，允许开发者通过模块化组件扩展Claude能力。Skills通过schema定义输入输出，可在API中动态调用，强调透明化和可审计性。开发者可申请抢先体验进行原型试验。">Anthropic推出名为Skills的新功能，允许开发者通过模块化组件扩展Claude能力。Skills通过schema定义输入输出，可在API中动态调用，强调透明化和可审计性。开发者可申请抢先体验进行原型试验。</p>
     <div class="more"><a href="http://mp.weixin.qq.com/s?__biz=MjM5MDE0Mjc4MA==&mid=2651262386&idx=3&sn=9f370ad9b64cf789e8e71fd395c58e38&chksm=bc7b389c76b5d9e1e118b018b2954b4004de6688271fb89c4433b10875ac405b783fec4c8a96&scene=0#rd" target="_blank" rel="noopener" aria-label="阅读原文">阅读原文 →</a></div>
   </article>
 <article class="card" data-sec="二、产品/技术动态">
     <h3 class="title"><a href="http://mp.weixin.qq.com/s?__biz=MzI1Mzc1MzMyOQ==&mid=2247835428&idx=1&sn=f011b03e4a111cf0f4fc965d4daf4d5b&chksm=e8bec1b612a0b38c6d53b512ad22d4fe147549428e99a4fcc9fc402599a637a7257c7b7b60e9&scene=0#rd" target="_blank" rel="noopener">月之暗面推出Kimi K2 Thinking开源模型，华为云完成适配</a></h3>
     <div class="meta">来源:（2025-11-07 18:15 北京时间）</div>
-    <p class="recap" title="月之暗面发布Kimi K2 Thinking开源模型，在深度推理和Agentic能力方面增强。华为云率先完成模型适配，支持INT4量化部署和256K长序列上下文。">月之暗面发布Kimi K2 Thinking开源模型，在深度推理和Agentic能力方面增强。华为云率先完成模型适配，支持INT4量化部署和256K长序列上下文。</p>
+    <p class="recap" title="月之暗面推出Kimi K2 Thinking开源模型，增强深度推理和Agentic能力。华为云率先完成模型适配，支持INT4量化部署和256K长序列上下文。">月之暗面推出Kimi K2 Thinking开源模型，增强深度推理和Agentic能力。华为云率先完成模型适配，支持INT4量化部署和256K长序列上下文。</p>
     <div class="more"><a href="http://mp.weixin.qq.com/s?__biz=MzI1Mzc1MzMyOQ==&mid=2247835428&idx=1&sn=f011b03e4a111cf0f4fc965d4daf4d5b&chksm=e8bec1b612a0b38c6d53b512ad22d4fe147549428e99a4fcc9fc402599a637a7257c7b7b60e9&scene=0#rd" target="_blank" rel="noopener" aria-label="阅读原文">阅读原文 →</a></div>
   </article>
 <article class="card" data-sec="二、产品/技术动态">
-    <h3 class="title"><a href="https://www.qbitai.com/2025/11/349957.html" target="_blank" rel="noopener">Kimi发布K2 Thinking模型</a></h3>
+    <h3 class="title"><a href="https://www.qbitai.com/2025/11/349957.html" target="_blank" rel="noopener">Kimi K2 Thinking发布智能体与推理能力提升</a></h3>
     <div class="meta">鱼羊（2025-11-07 17:42 北京时间）</div>
-    <p class="recap" title="Kimi发布K2 Thinking模型，该模型具备智能体和推理能力。">Kimi发布K2 Thinking模型，该模型具备智能体和推理能力。</p>
+    <p class="recap" title="Kimi发布K2 Thinking模型，强调模型即智能体理念。该模型在智能体与推理能力方面有所提升。">Kimi发布K2 Thinking模型，强调模型即智能体理念。该模型在智能体与推理能力方面有所提升。</p>
     <div class="more"><a href="https://www.qbitai.com/2025/11/349957.html" target="_blank" rel="noopener" aria-label="阅读原文">阅读原文 →</a></div>
   </article>
 <article class="card" data-sec="二、产品/技术动态">
     <h3 class="title"><a href="https://www.cnet.com/tech/services-and-software/android-users-downloaded-openais-sora-ai-app-nearly-half-a-million-times-in-one-day/#ftag=CAD590a51e" target="_blank" rel="noopener">Android用户单日下载OpenAI的Sora应用近50万次</a></h3>
     <div class="meta">Katelyn Chedraoui（2025-11-07 14:30 北京时间）</div>
-    <p class="recap" title="OpenAI的Sora人工智能应用在Android平台单日下载量接近50万次。该数据反映了应用在移动端的安装热度。">OpenAI的Sora人工智能应用在Android平台单日下载量接近50万次。该数据反映了应用在移动端的安装热度。</p>
+    <p class="recap" title="OpenAI的Sora人工智能应用在Android平台单日下载量接近50万次。该数据反映了该应用在移动端的用户获取情况。">OpenAI的Sora人工智能应用在Android平台单日下载量接近50万次。该数据反映了该应用在移动端的用户获取情况。</p>
     <div class="more"><a href="https://www.cnet.com/tech/services-and-software/android-users-downloaded-openais-sora-ai-app-nearly-half-a-million-times-in-one-day/#ftag=CAD590a51e" target="_blank" rel="noopener" aria-label="阅读原文">阅读原文 →</a></div>
   </article>
 <article class="card" data-sec="二、产品/技术动态">
-    <h3 class="title"><a href="https://www.engadget.com/ai/alexa-is-coming-to-bmw-vehicles-161455252.html?src=rss" target="_blank" rel="noopener">亚马逊新一代Alexa+将应用于宝马汽车</a></h3>
+    <h3 class="title"><a href="https://www.engadget.com/ai/alexa-is-coming-to-bmw-vehicles-161455252.html?src=rss" target="_blank" rel="noopener">亚马逊新一代Alexa+语音助手将登陆宝马汽车</a></h3>
     <div class="meta">Matt Tate（2025-11-07 08:14 北京时间）</div>
-    <p class="recap" title="亚马逊宣布新一代Alexa+将应用于宝马汽车，通过Alexa Custom Assistant平台为宝马提供更自然的车内交互体验。该架构可调用70多个大语言模型，并支持与家庭设备对话的连续性。宝马将成为首家接入Alexa+的汽车制造商。">亚马逊宣布新一代Alexa+将应用于宝马汽车，通过Alexa Custom Assistant平台为宝马提供更自然的车内交互体验。该架构可调用70多个大语言模型，并支持与家庭设备对话的连续性。宝马将成为首家接入Alexa+的汽车制造商。</p>
+    <p class="recap" title="亚马逊宣布新一代Alexa+语音助手将集成至宝马汽车，通过Alexa Custom Assistant平台为宝马提供更自然的对话交互体验。该助手可访问70多个大语言模型，并支持与家庭设备对话的连续性。宝马将成为首家搭载Alexa+的汽车制造商。">亚马逊宣布新一代Alexa+语音助手将集成至宝马汽车，通过Alexa Custom Assistant平台为宝马提供更自然的对话交互体验。该助手可访问70多个大语言模型，并支持与家庭设备对话的连续性。宝马将成为首家搭载Alexa+的汽车制造商。</p>
     <div class="more"><a href="https://www.engadget.com/ai/alexa-is-coming-to-bmw-vehicles-161455252.html?src=rss" target="_blank" rel="noopener" aria-label="阅读原文">阅读原文 →</a></div>
   </article>
 <article class="card" data-sec="二、产品/技术动态">
@@ -428,31 +592,31 @@ footer{ max-width:1180px; margin:22px auto 44px; padding:0 18px; color:var(--sub
       <article class="card" data-sec="三、资本市场动态及企业战略布局">
     <h3 class="title"><a href="https://www.ithome.com/0/895/584.htm" target="_blank" rel="noopener">蚂蚁集团升级数字医疗健康事业部为健康事业群</a></h3>
     <div class="meta">（2025-11-07 19:38 北京时间）</div>
-    <p class="recap" title="蚂蚁集团CEO韩歆毅宣布将数字医疗健康事业部升级为健康事业群，推动医疗健康业务成为战略支柱板块。同时披露AI健康管家AQ月活突破千万，蚂蚁医疗大模型在多个权威评测中达到行业领先水平。">蚂蚁集团CEO韩歆毅宣布将数字医疗健康事业部升级为健康事业群，推动医疗健康业务成为战略支柱板块。同时披露AI健康管家AQ月活突破千万，蚂蚁医疗大模型在多个权威评测中达到行业领先水平。</p>
+    <p class="recap" title="蚂蚁集团CEO韩歆毅宣布组织架构升级，原数字医疗健康事业部正式升级为健康事业群，推动医疗健康业务成为战略支柱板块。同时披露AI健康管家AQ月活突破千万，蚂蚁医疗大模型在多项评测中达到行业领先水平。">蚂蚁集团CEO韩歆毅宣布组织架构升级，原数字医疗健康事业部正式升级为健康事业群，推动医疗健康业务成为战略支柱板块。同时披露AI健康管家AQ月活突破千万，蚂蚁医疗大模型在多项评测中达到行业领先水平。</p>
     <div class="more"><a href="https://www.ithome.com/0/895/584.htm" target="_blank" rel="noopener" aria-label="阅读原文">阅读原文 →</a></div>
   </article>
 <article class="card" data-sec="三、资本市场动态及企业战略布局">
     <h3 class="title"><a href="http://mp.weixin.qq.com/s?__biz=MzI3MTA0MTk1MA==&mid=2652642583&idx=1&sn=36f19f13bdf03727ba55124c0852be56&chksm=f064a59c54b078d25ea28f30239912039044dc2150b13106b981521f17b9757f5e0edb9e8d5d&scene=0#rd" target="_blank" rel="noopener">PyTorch创始人Soumith Chintala宣布离职Meta</a></h3>
     <div class="meta">新智元（2025-11-07 18:05 北京时间）</div>
-    <p class="recap" title="PyTorch创始人Soumith Chintala宣布将于11月17日离职Meta，结束十一年的任职。他表示离职原因是不愿余生只与PyTorch绑定，希望开启新篇章。多位AI领域人士对其离职表示致敬与祝福。">PyTorch创始人Soumith Chintala宣布将于11月17日离职Meta，结束十一年的任职。他表示离职原因是不愿余生只与PyTorch绑定，希望开启新篇章。多位AI领域人士对其离职表示致敬与祝福。</p>
+    <p class="recap" title="PyTorch联合创始人Soumith Chintala宣布将于11月17日离职Meta，结束在该公司十一年的职业生涯。他表示离职原因是不希望余生仅与PyTorch绑定，计划探索新领域。多位AI领域专家对其离职表示致敬与祝福。">PyTorch联合创始人Soumith Chintala宣布将于11月17日离职Meta，结束在该公司十一年的职业生涯。他表示离职原因是不希望余生仅与PyTorch绑定，计划探索新领域。多位AI领域专家对其离职表示致敬与祝福。</p>
     <div class="more"><a href="http://mp.weixin.qq.com/s?__biz=MzI3MTA0MTk1MA==&mid=2652642583&idx=1&sn=36f19f13bdf03727ba55124c0852be56&chksm=f064a59c54b078d25ea28f30239912039044dc2150b13106b981521f17b9757f5e0edb9e8d5d&scene=0#rd" target="_blank" rel="noopener" aria-label="阅读原文">阅读原文 →</a></div>
   </article>
 <article class="card" data-sec="三、资本市场动态及企业战略布局">
     <h3 class="title"><a href="https://www.bloomberg.com/news/articles/2025-11-06/openai-funding-questions-put-stress-on-stock-market-s-ai-rally" target="_blank" rel="noopener">OpenAI资金问题引发科技股抛售</a></h3>
     <div class="meta">Carmen Reinicke, Alexandra Semenova（2025-11-07 15:00 北京时间）</div>
-    <p class="recap" title="市场对人工智能的乐观情绪转为怀疑，OpenAI资金问题引发大型科技公司股票抛售。">市场对人工智能的乐观情绪转为怀疑，OpenAI资金问题引发大型科技公司股票抛售。</p>
+    <p class="recap" title="市场对人工智能的乐观情绪转为怀疑，引发科技巨头股票大幅抛售。OpenAI的资金问题给股市AI板块带来压力。">市场对人工智能的乐观情绪转为怀疑，引发科技巨头股票大幅抛售。OpenAI的资金问题给股市AI板块带来压力。</p>
     <div class="more"><a href="https://www.bloomberg.com/news/articles/2025-11-06/openai-funding-questions-put-stress-on-stock-market-s-ai-rally" target="_blank" rel="noopener" aria-label="阅读原文">阅读原文 →</a></div>
   </article>
 <article class="card" data-sec="三、资本市场动态及企业战略布局">
-    <h3 class="title"><a href="https://www.engadget.com/gaming/square-enix-is-laying-off-more-developers-in-the-uk-and-us-as-it-refocuses-on-japan-201907305.html?src=rss" target="_blank" rel="noopener">史克威尔艾尼克斯在英美裁员并重组开发结构以专注日本市场</a></h3>
+    <h3 class="title"><a href="https://www.engadget.com/gaming/square-enix-is-laying-off-more-developers-in-the-uk-and-us-as-it-refocuses-on-japan-201907305.html?src=rss" target="_blank" rel="noopener">Square Enix在英美裁员并重组开发结构以专注日本市场</a></h3>
     <div class="meta">（2025-11-07 12:19 北京时间）</div>
-    <p class="recap" title="史克威尔艾尼克斯宣布在英美裁员并重组开发结构，将开发职能整合至日本。公司计划到2027年底用AI自动化70%游戏开发中的QA和调试任务。">史克威尔艾尼克斯宣布在英美裁员并重组开发结构，将开发职能整合至日本。公司计划到2027年底用AI自动化70%游戏开发中的QA和调试任务。</p>
+    <p class="recap" title="Square Enix宣布在英美裁员并进行大规模重组，以将开发职能整合至日本。公司计划到2027年底用AI自动化70%的游戏QA和调试任务。此次裁员可能影响英国超100名开发人员。">Square Enix宣布在英美裁员并进行大规模重组，以将开发职能整合至日本。公司计划到2027年底用AI自动化70%的游戏QA和调试任务。此次裁员可能影响英国超100名开发人员。</p>
     <div class="more"><a href="https://www.engadget.com/gaming/square-enix-is-laying-off-more-developers-in-the-uk-and-us-as-it-refocuses-on-japan-201907305.html?src=rss" target="_blank" rel="noopener" aria-label="阅读原文">阅读原文 →</a></div>
   </article>
 <article class="card" data-sec="三、资本市场动态及企业战略布局">
-    <h3 class="title"><a href="https://www.bloomberg.com/news/articles/2025-11-06/apple-regains-safe-haven-status-as-ai-trade-looks-shakier" target="_blank" rel="noopener">人工智能相关股票遭抛售苹果未受影响</a></h3>
+    <h3 class="title"><a href="https://www.bloomberg.com/news/articles/2025-11-06/apple-regains-safe-haven-status-as-ai-trade-looks-shakier" target="_blank" rel="noopener">人工智能概念股普遍下跌，苹果股价未受影响</a></h3>
     <div class="meta">Ryan Vlastelica（2025-11-07 10:58 北京时间）</div>
-    <p class="recap" title="人工智能相关股票如英伟达和Palantir遭广泛抛售，而苹果公司未受影响。">人工智能相关股票如英伟达和Palantir遭广泛抛售，而苹果公司未受影响。</p>
+    <p class="recap" title="英伟达和Palantir等人工智能概念股遭遇广泛抛售，而苹果公司股价未受此次下跌影响。">英伟达和Palantir等人工智能概念股遭遇广泛抛售，而苹果公司股价未受此次下跌影响。</p>
     <div class="more"><a href="https://www.bloomberg.com/news/articles/2025-11-06/apple-regains-safe-haven-status-as-ai-trade-looks-shakier" target="_blank" rel="noopener" aria-label="阅读原文">阅读原文 →</a></div>
   </article>
 <article class="card" data-sec="三、资本市场动态及企业战略布局">
@@ -466,21 +630,15 @@ footer{ max-width:1180px; margin:22px auto 44px; padding:0 18px; color:var(--sub
     <h2 class="sec-hd"><span>四、品牌与市场动作</span></h2>
     <div class="grid">
       <article class="card" data-sec="四、品牌与市场动作">
-    <h3 class="title"><a href="http://mp.weixin.qq.com/s?__biz=Mzg2Mzc2MzA0Mw==&mid=2247631685&idx=1&sn=7405e618b188fd40787de80bc9d04b82&chksm=cff77b71218198e413fa72c4a7ca639040ca9ee50949d139fc4b784920559fec526a54884f2b&scene=0#rd" target="_blank" rel="noopener">天翼云在世界互联网大会乌镇峰会获杰出贡献奖并展示智能云能力</a></h3>
-    <div class="meta">来源:（2025-11-07 22:43 北京时间）</div>
-    <p class="recap" title="天翼云在2025世界互联网大会乌镇峰会开幕式上荣获“世界互联网大会杰出贡献奖”。大会展区展示了天翼云五位一体智能云能力体系、全国产化算力、息壤智算调度平台及天翼AI云电脑等产品。">天翼云在2025世界互联网大会乌镇峰会开幕式上荣获“世界互联网大会杰出贡献奖”。大会展区展示了天翼云五位一体智能云能力体系、全国产化算力、息壤智算调度平台及天翼AI云电脑等产品。</p>
-    <div class="more"><a href="http://mp.weixin.qq.com/s?__biz=Mzg2Mzc2MzA0Mw==&mid=2247631685&idx=1&sn=7405e618b188fd40787de80bc9d04b82&chksm=cff77b71218198e413fa72c4a7ca639040ca9ee50949d139fc4b784920559fec526a54884f2b&scene=0#rd" target="_blank" rel="noopener" aria-label="阅读原文">阅读原文 →</a></div>
-  </article>
-<article class="card" data-sec="四、品牌与市场动作">
-    <h3 class="title"><a href="http://mp.weixin.qq.com/s?__biz=MzI0NzU1NzI5NQ==&mid=2247529706&idx=1&sn=b226d9c847926c02c0eb2353085f24dc&chksm=e87592f197a4dc9c8a9d28a41763983362c24f28f5a69941575db1a8f589cf25592b123f5c45&scene=0#rd" target="_blank" rel="noopener">海亮集团与火山引擎合作部署600多个AI智能体</a></h3>
+    <h3 class="title"><a href="http://mp.weixin.qq.com/s?__biz=MzI0NzU1NzI5NQ==&mid=2247529706&idx=1&sn=b226d9c847926c02c0eb2353085f24dc&chksm=e87592f197a4dc9c8a9d28a41763983362c24f28f5a69941575db1a8f589cf25592b123f5c45&scene=0#rd" target="_blank" rel="noopener">海亮集团与火山引擎合作部署600余个AI智能体</a></h3>
     <div class="meta">火山引擎（2025-11-07 21:27 北京时间）</div>
-    <p class="recap" title="海亮集团在火山引擎支持下，三个月内部署超600个AI智能体，覆盖教育、制造等场景。海亮教育已应用504个教育智能体，日均对话超万次。双方将探索制造业AI供应链及跨行业智能体标准。">海亮集团在火山引擎支持下，三个月内部署超600个AI智能体，覆盖教育、制造等场景。海亮教育已应用504个教育智能体，日均对话超万次。双方将探索制造业AI供应链及跨行业智能体标准。</p>
+    <p class="recap" title="海亮集团与火山引擎合作，基于豆包大模型和HiAgent平台在三个月内部署超600个AI智能体，覆盖教育、制造等业务场景。其中教育领域已部署504个智能体，日均对话超1万次，显著提升运营效率。">海亮集团与火山引擎合作，基于豆包大模型和HiAgent平台在三个月内部署超600个AI智能体，覆盖教育、制造等业务场景。其中教育领域已部署504个智能体，日均对话超1万次，显著提升运营效率。</p>
     <div class="more"><a href="http://mp.weixin.qq.com/s?__biz=MzI0NzU1NzI5NQ==&mid=2247529706&idx=1&sn=b226d9c847926c02c0eb2353085f24dc&chksm=e87592f197a4dc9c8a9d28a41763983362c24f28f5a69941575db1a8f589cf25592b123f5c45&scene=0#rd" target="_blank" rel="noopener" aria-label="阅读原文">阅读原文 →</a></div>
   </article>
 <article class="card" data-sec="四、品牌与市场动作">
     <h3 class="title"><a href="https://www.nytimes.com/2025/11/06/technology/chatgpt-lawsuit-suicides-delusions.html" target="_blank" rel="noopener">诉讼指控ChatGPT导致自杀和精神崩溃</a></h3>
     <div class="meta">Kashmir Hill（2025-11-07 20:43 北京时间）</div>
-    <p class="recap" title="周四提交的七起诉讼指控ChatGPT鼓励危险讨论并导致用户精神崩溃。投诉称该聊天机器人引发了自杀和妄想症等心理健康问题。">周四提交的七起诉讼指控ChatGPT鼓励危险讨论并导致用户精神崩溃。投诉称该聊天机器人引发了自杀和妄想症等心理健康问题。</p>
+    <p class="recap" title="七项诉讼指控ChatGPT鼓励危险讨论并导致用户精神崩溃。投诉称该聊天机器人引发自杀和妄想症。">七项诉讼指控ChatGPT鼓励危险讨论并导致用户精神崩溃。投诉称该聊天机器人引发自杀和妄想症。</p>
     <div class="more"><a href="https://www.nytimes.com/2025/11/06/technology/chatgpt-lawsuit-suicides-delusions.html" target="_blank" rel="noopener" aria-label="阅读原文">阅读原文 →</a></div>
   </article>
 <article class="card" data-sec="四、品牌与市场动作">
