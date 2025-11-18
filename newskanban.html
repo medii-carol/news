@@ -184,7 +184,7 @@ footer{ max-width:1180px; margin:22px auto 44px; padding:0 18px; color:var(--sub
 
 <div class="controls">
   <select id="secSel"><option value="">全部板块</option>
-  <option value="一、权威观点/报告">一、权威观点/报告</option><option value="二、产品/技术动态">二、产品/技术动态</option><option value="三、资本市场动态及企业战略布局">三、资本市场动态及企业战略布局</option></select>
+  <option value="一、权威观点/报告">一、权威观点/报告</option><option value="二、产品/技术动态">二、产品/技术动态</option><option value="三、资本市场动态及企业战略布局">三、资本市场动态及企业战略布局</option><option value="四、品牌与市场动作">四、品牌与市场动作</option></select>
   <input id="search" type="search" placeholder="搜索标题 / 概要 / 标签…">
 </div>
 
@@ -194,119 +194,283 @@ footer{ max-width:1180px; margin:22px auto 44px; padding:0 18px; color:var(--sub
   <div class="date-tab" data-date-category="beforeYesterday">📅 前日（2025-11-16）</div>
 </div>
 
-<div class="t-fallback" style="text-align:center;padding:40px;color:#666;">趋势数据更新中...</div>
+
+<section class="trends-top" aria-label="Google 趋势">
+  <div class="t-card">
+    <div class="t-hd">
+      <div class="t-title"><span class="t-dot"></span><span>🌍 国外大模型 · 趋势</span></div>
+      <div class="t-tools">
+        <select class="t-sel" data-target="gt-foreign" aria-label="时间范围">
+          <option value="now 7-d" selected>近 7 天</option>
+          <option value="today 3-m">近 90 天</option>
+          <option value="today 12-m">近 12 个月</option>
+        </select>
+      </div>
+    </div>
+    <div class="t-body">
+      <div id="gt-foreign" class="t-embed"></div>
+      <div class="t-fallback">加载趋势图…</div>
+    </div>
+  </div>
+
+  <div class="t-card">
+    <div class="t-hd">
+      <div class="t-title"><span class="t-dot"></span><span>🇨🇳 国内大模型 · 趋势</span></div>
+      <div class="t-tools">
+        <select class="t-sel" data-target="gt-domestic" aria-label="时间范围">
+          <option value="now 7-d" selected>近 7 天</option>
+          <option value="today 3-m">近 90 天</option>
+          <option value="today 12-m">近 12 个月</option>
+        </select>
+      </div>
+    </div>
+    <div class="t-body">
+      <div id="gt-domestic" class="t-embed"></div>
+      <div class="t-fallback">加载趋势图…</div>
+    </div>
+  </div>
+
+  <div class="t-card">
+    <div class="t-hd">
+      <div class="t-title"><span class="t-dot"></span><span>☁️ 国内云厂商 · 趋势</span></div>
+      <div class="t-tools">
+        <select class="t-sel" data-target="gt-vendors" aria-label="时间范围">
+          <option value="now 7-d" selected>近 7 天</option>
+          <option value="today 3-m">近 90 天</option>
+          <option value="today 12-m">近 12 个月</option>
+        </select>
+      </div>
+    </div>
+    <div class="t-body">
+      <div id="gt-vendors" class="t-embed"></div>
+      <div class="t-fallback">加载趋势图…</div>
+    </div>
+  </div>
+
+  <div class="t-card">
+    <div class="t-hd">
+      <div class="t-title"><span class="t-dot"></span><span>🔑 AI 市场关键词 · 趋势</span></div>
+      <div class="t-tools">
+        <select class="t-sel" data-target="gt-market" aria-label="时间范围">
+          <option value="now 7-d" selected>近 7 天</option>
+          <option value="today 3-m">近 90 天</option>
+          <option value="today 12-m">近 12 个月</option>
+        </select>
+      </div>
+    </div>
+    <div class="t-body">
+      <div id="gt-market" class="t-embed"></div>
+      <div class="t-fallback">加载趋势图…</div>
+    </div>
+  </div>
+</section>
+
+<script>
+/* Google Trends 挂载逻辑 */
+(function mountTrends(){
+  var SCRIPT = 'https://ssl.gstatic.com/trends_nrtr/3528_RC01/embed_loader.js';
+
+  var cfg = {
+    foreign:  { el: 'gt-foreign',  geo: '',   kw: ['ChatGPT','Gemini','Claude','Grok','Llama'] },
+    domestic: { el: 'gt-domestic',  geo: '',   kw: ['DeepSeek','Ernie','Hunyuan','Qwen','Doubao'] },
+    vendors:  { el: 'gt-vendors',   geo: '',   kw: ['Baidu AI Cloud','Huawei Cloud','Tencent Cloud','Alibaba Cloud','Volcengine'] },
+    market:   { el: 'gt-market',    geo: '',   kw: ['LLM','AI Agent','RAG','Vector Database','Prompt Engineering'] }
+  };
+
+  function renderOne(config, time){
+    try{
+      var host = 'https://trends.google.com/trends/embed/';
+      var container = document.getElementById(config.el);
+      if (!container) return;
+
+      var fb = container.parentElement.querySelector('.t-fallback');
+      if (fb) fb.style.display = 'none';
+
+      container.innerHTML = '';
+      var comparisonItem = config.kw.map(function(k) { return { keyword: k, geo: config.geo || '', time: time }; });
+      var query = 'date=' + encodeURIComponent(time)
+                  + '&q=' + encodeURIComponent(config.kw.join(','))
+                  + (config.geo ? '&geo=' + config.geo : '');
+
+      trends.embed.renderExploreWidgetTo(
+        container,
+        'TIMESERIES',
+        { comparisonItem: comparisonItem, category: 0, property: '' },
+        { exploreQuery: query, guestPath: host }
+      );
+    }catch(e){
+      var c = document.getElementById(config.el);
+      if (c) {
+        var fallback = c.parentElement.querySelector('.t-fallback');
+        if (fallback) { 
+          fallback.style.display = 'flex'; 
+          fallback.textContent = '无法显示趋势图（网络受限/被拦截）'; 
+        }
+      }
+      console.error('Trends render error', e);
+    }
+  }
+
+  function boot(){
+    if (!(window.trends && window.trends.embed)) return;
+
+    var defaultTime = 'now 7-d';
+    renderOne(cfg.foreign,  defaultTime);
+    renderOne(cfg.domestic, defaultTime);
+    renderOne(cfg.vendors,  defaultTime);
+    renderOne(cfg.market,   defaultTime);
+
+    document.querySelectorAll('.t-sel').forEach(function(sel){
+      sel.addEventListener('change', function(){
+        var time = sel.value || 'now 7-d';
+        var targetId = sel.getAttribute('data-target');
+        var key = targetId.replace(/^gt-/, '');
+        var conf = cfg[key];
+        if (conf) renderOne(conf, time);
+      });
+    });
+  }
+
+  var s = document.createElement('script');
+  s.src = SCRIPT; 
+  s.async = true; 
+  s.onload = boot;
+  document.head.appendChild(s);
+
+  setTimeout(function() {
+    if (!(window.trends && window.trends.embed)) {
+      document.querySelectorAll('.t-fallback').forEach(function(el){
+        el.style.display = 'flex';
+        el.textContent = '无法加载 Google 趋势（可能被墙/被拦截）';
+      });
+    }
+  }, 5000);
+})();
+</script>
 
 <div class="wrap">
   <main id="main">
     <p id="emptyHint" class="hidden">当前筛选无结果，换个关键词试试～</p>
     <div id="today-content" class="date-content active"><section id="一、权威观点/报告" class="sec"><h2 class="sec-hd"><span>一、权威观点/报告</span></h2><div class="grid"><article class="card" data-sec="一、权威观点/报告">
+  <h3 class="title"><a href="https://www.bbc.com/news/articles/c8drzv37z4jo?at_medium=RSS&at_campaign=rss" target="_blank" rel="noopener">谷歌CEO皮查伊承认AI模型存在不准确回答</a></h3>
+  <div class="meta">（2025-11-18 18:37）</div><p class="recap" title="谷歌CEO桑达尔·皮查伊公开承认其AI模型生成不准确回答的问题。他提醒用户不要盲目相信AI提供的信息。">谷歌CEO桑达尔·皮查伊公开承认其AI模型生成不准确回答的问题。他提醒用户不要盲目相信AI提供的信息。</p>
+  <div class="more"><a href="https://www.bbc.com/news/articles/c8drzv37z4jo?at_medium=RSS&at_campaign=rss" target="_blank" rel="noopener">阅读原文 →</a></div>
+  </article><article class="card" data-sec="一、权威观点/报告">
+  <h3 class="title"><a href="https://www.theguardian.com/business/live/2025/nov/18/stock-market-sell-off-ai-bubble-google-nvidia-ftse-100-bitcoin-business-live-news" target="_blank" rel="noopener">全球股市下跌，谷歌高管对人工智能投资规模表示担忧</a></h3>
+  <div class="meta">Graeme Wearden and Julia Kollewe（2025-11-18 18:26）</div><p class="recap" title="全球股市持续下跌，欧洲主要股指跌幅超1%。市场关注英伟达财报和美国就业报告。谷歌高管对人工智能数据中心投资规模表示担忧。">全球股市持续下跌，欧洲主要股指跌幅超1%。市场关注英伟达财报和美国就业报告。谷歌高管对人工智能数据中心投资规模表示担忧。</p>
+  <div class="more"><a href="https://www.theguardian.com/business/live/2025/nov/18/stock-market-sell-off-ai-bubble-google-nvidia-ftse-100-bitcoin-business-live-news" target="_blank" rel="noopener">阅读原文 →</a></div>
+  </article><article class="card" data-sec="一、权威观点/报告">
   <h3 class="title"><a href="https://www.ithome.com/0/898/357.htm" target="_blank" rel="noopener">谷歌CEO皮查伊称AI泡沫破裂将影响所有企业</a></h3>
-  <div class="meta">（2025-11-18 18:07）</div><p class="recap" title="谷歌CEO皮查伊表示AI热潮存在非理性成分，若泡沫破裂所有企业都将受影响。他还谈及AI能源需求、气候目标及英国投资计划，并指出AI将重塑就业市场。">谷歌CEO皮查伊表示AI热潮存在非理性成分，若泡沫破裂所有企业都将受影响。他还谈及AI能源需求、气候目标及英国投资计划，并指出AI将重塑就业市场。</p>
+  <div class="meta">（2025-11-18 18:07）</div><p class="recap" title="谷歌CEO皮查伊在接受BBC采访时表示，当前AI投资存在非理性成分，若泡沫破裂所有企业都将受影响。他还谈及AI的能源需求、气候目标影响及英国投资计划。">谷歌CEO皮查伊在接受BBC采访时表示，当前AI投资存在非理性成分，若泡沫破裂所有企业都将受影响。他还谈及AI的能源需求、气候目标影响及英国投资计划。</p>
   <div class="more"><a href="https://www.ithome.com/0/898/357.htm" target="_blank" rel="noopener">阅读原文 →</a></div>
   </article><article class="card" data-sec="一、权威观点/报告">
   <h3 class="title"><a href="https://www.washingtonpost.com/technology/2025/11/18/chatgpt-health-advice-accuracy-rated/" target="_blank" rel="noopener">医生评估ChatGPT健康建议准确性</a></h3>
-  <div class="meta">Geoffrey A. Fowler（2025-11-18 18:00）</div><p class="recap" title="华盛顿邮报邀请医生对12个真实用户向ChatGPT咨询的健康问题及其回答进行评估，揭示了AI提供医疗建议的模式与准确性。">华盛顿邮报邀请医生对12个真实用户向ChatGPT咨询的健康问题及其回答进行评估，揭示了AI提供医疗建议的模式与准确性。</p>
+  <div class="meta">Geoffrey A. Fowler（2025-11-18 18:00）</div><p class="recap" title="医生对12个真实ChatGPT健康咨询案例进行审查，评估其回答准确性，并总结出提升AI健康咨询效果的模式。">医生对12个真实ChatGPT健康咨询案例进行审查，评估其回答准确性，并总结出提升AI健康咨询效果的模式。</p>
   <div class="more"><a href="https://www.washingtonpost.com/technology/2025/11/18/chatgpt-health-advice-accuracy-rated/" target="_blank" rel="noopener">阅读原文 →</a></div>
   </article><article class="card" data-sec="一、权威观点/报告">
-  <h3 class="title"><a href="http://mp.weixin.qq.com/s?__biz=MjM5MDgwMzc4MA==&mid=2654905509&idx=1&sn=2c1bf99c4b4b17913fe25256f39aebb5&chksm=bc483a067ee21696cbae040946acd5ae4eeb0aa6041af1da462f04c56ee6c6785185befd09cd&scene=0#rd" target="_blank" rel="noopener">腾讯云音视频连续十次获中国视频云解决方案市场份额第一</a></h3>
-  <div class="meta">（2025-11-18 17:33）</div><p class="recap" title="IDC报告显示腾讯云连续十次位居中国视频云解决方案市场份额第一。腾讯云音视频AI实时互动也在AIGC领域获得第一。该方案已应用于新加坡金融科技节直播及多个国际平台。">IDC报告显示腾讯云连续十次位居中国视频云解决方案市场份额第一。腾讯云音视频AI实时互动也在AIGC领域获得第一。该方案已应用于新加坡金融科技节直播及多个国际平台。</p>
+  <h3 class="title"><a href="http://mp.weixin.qq.com/s?__biz=MjM5MDgwMzc4MA==&mid=2654905509&idx=1&sn=2c1bf99c4b4b17913fe25256f39aebb5&chksm=bc483a067ee21696cbae040946acd5ae4eeb0aa6041af1da462f04c56ee6c6785185befd09cd&scene=0#rd" target="_blank" rel="noopener">腾讯云音视频在中国视频云解决方案市场连续十次份额第一</a></h3>
+  <div class="meta">（2025-11-18 17:33）</div><p class="recap" title="IDC报告显示腾讯云连续10次位居中国视频云解决方案市场份额第一。腾讯云音视频AI实时互动也在AIGC领域获得第一，其技术方案已应用于新加坡金融科技节直播及多个海外市场。">IDC报告显示腾讯云连续10次位居中国视频云解决方案市场份额第一。腾讯云音视频AI实时互动也在AIGC领域获得第一，其技术方案已应用于新加坡金融科技节直播及多个海外市场。</p>
   <div class="more"><a href="http://mp.weixin.qq.com/s?__biz=MjM5MDgwMzc4MA==&mid=2654905509&idx=1&sn=2c1bf99c4b4b17913fe25256f39aebb5&chksm=bc483a067ee21696cbae040946acd5ae4eeb0aa6041af1da462f04c56ee6c6785185befd09cd&scene=0#rd" target="_blank" rel="noopener">阅读原文 →</a></div>
   </article><article class="card" data-sec="一、权威观点/报告">
-  <h3 class="title"><a href="http://mp.weixin.qq.com/s?__biz=MzI3MTA0MTk1MA==&mid=2652646259&idx=2&sn=f79db03b99d4182234e22ee47a39ad15&chksm=f0b1df584126b5c11f64054e75905298097d395497bdb12c820a5dfabe2060740523e9aaf962&scene=0#rd" target="_blank" rel="noopener">研究人员发布医疗健康AI智能体综述报告</a></h3>
-  <div class="meta">新智元（2025-11-18 17:05）</div><p class="recap" title="圣母大学、约翰·霍普金斯大学和埃默里大学的研究团队联合发布了医疗健康AI智能体的全面综述，系统梳理了其从数据感知、核心能力到应用生态的全生命周期。报告指出医疗智能体研究正经历指数级增长，截至2025年相关论文数量较2024年增长超过130%。">圣母大学、约翰·霍普金斯大学和埃默里大学的研究团队联合发布了医疗健康AI智能体的全面综述，系统梳理了其从数据感知、核心能力到应用生态的全生命周期。报告指出医疗智能体研究正经历指数级增长，截至2025年相关论文数量较2024年增长超过130%。</p>
+  <h3 class="title"><a href="http://mp.weixin.qq.com/s?__biz=MzI3MTA0MTk1MA==&mid=2652646259&idx=2&sn=f79db03b99d4182234e22ee47a39ad15&chksm=f0b1df584126b5c11f64054e75905298097d395497bdb12c820a5dfabe2060740523e9aaf962&scene=0#rd" target="_blank" rel="noopener">多所大学联合发布医疗健康AI智能体综述报告</a></h3>
+  <div class="meta">新智元（2025-11-18 17:05）</div><p class="recap" title="圣母大学、约翰·霍普金斯大学和埃默里大学的研究团队联合发布了医疗健康AI智能体的全面综述，系统梳理了其数据感知、核心能力、应用生态及评估框架。报告指出，截至2025年，医疗智能体相关论文数量较2024年增长超过130%。">圣母大学、约翰·霍普金斯大学和埃默里大学的研究团队联合发布了医疗健康AI智能体的全面综述，系统梳理了其数据感知、核心能力、应用生态及评估框架。报告指出，截至2025年，医疗智能体相关论文数量较2024年增长超过130%。</p>
   <div class="more"><a href="http://mp.weixin.qq.com/s?__biz=MzI3MTA0MTk1MA==&mid=2652646259&idx=2&sn=f79db03b99d4182234e22ee47a39ad15&chksm=f0b1df584126b5c11f64054e75905298097d395497bdb12c820a5dfabe2060740523e9aaf962&scene=0#rd" target="_blank" rel="noopener">阅读原文 →</a></div>
   </article><article class="card" data-sec="一、权威观点/报告">
-  <h3 class="title"><a href="https://www.ithome.com/0/898/306.htm" target="_blank" rel="noopener">马斯克回应特斯拉股票何时迎英伟达时刻</a></h3>
-  <div class="meta">（2025-11-18 16:01）</div><p class="recap" title="特斯拉CEO马斯克表示，当无人监督自动驾驶大规模普及时，特斯拉估值将发生重大变化；当Optimus人形机器人实现量产时，估值变化会更显著。">特斯拉CEO马斯克表示，当无人监督自动驾驶大规模普及时，特斯拉估值将发生重大变化；当Optimus人形机器人实现量产时，估值变化会更显著。</p>
+  <h3 class="title"><a href="https://www.ithome.com/0/898/306.htm" target="_blank" rel="noopener">马斯克回应特斯拉股票何时迎来高光时刻</a></h3>
+  <div class="meta">（2025-11-18 16:01）</div><p class="recap" title="特斯拉CEO马斯克在X平台表示，当无人监督自动驾驶大规模普及时，特斯拉估值将发生重大变化；Optimus人形机器人量产时，估值变化会更显著。">特斯拉CEO马斯克在X平台表示，当无人监督自动驾驶大规模普及时，特斯拉估值将发生重大变化；Optimus人形机器人量产时，估值变化会更显著。</p>
   <div class="more"><a href="https://www.ithome.com/0/898/306.htm" target="_blank" rel="noopener">阅读原文 →</a></div>
   </article><article class="card" data-sec="一、权威观点/报告">
   <h3 class="title"><a href="https://www.theguardian.com/technology/2025/nov/18/warning-ai-chatbots-inaccurate-financial-advice-tips-chatgpt-copilot-uk" target="_blank" rel="noopener">英国研究显示AI聊天机器人提供错误金融建议</a></h3>
-  <div class="meta">Robert Booth UK technology editor（2025-11-18 14:00）</div><p class="recap" title="英国研究发现ChatGPT、Copilot等AI聊天机器人提供不准确金融建议，包括误导性税务和保险信息。测试显示这些模型建议突破ISA投资限额、错误声称欧盟旅行需强制保险。">英国研究发现ChatGPT、Copilot等AI聊天机器人提供不准确金融建议，包括误导性税务和保险信息。测试显示这些模型建议突破ISA投资限额、错误声称欧盟旅行需强制保险。</p>
+  <div class="meta">Robert Booth UK technology editor（2025-11-18 14:00）</div><p class="recap" title="英国研究发现ChatGPT、Copilot等AI聊天机器人提供不准确金融建议，包括误导性税务和保险信息。测试发现这些模型错误建议突破ISA投资限额、误称欧盟旅行需强制保险。">英国研究发现ChatGPT、Copilot等AI聊天机器人提供不准确金融建议，包括误导性税务和保险信息。测试发现这些模型错误建议突破ISA投资限额、误称欧盟旅行需强制保险。</p>
   <div class="more"><a href="https://www.theguardian.com/technology/2025/nov/18/warning-ai-chatbots-inaccurate-financial-advice-tips-chatgpt-copilot-uk" target="_blank" rel="noopener">阅读原文 →</a></div>
   </article><article class="card" data-sec="一、权威观点/报告">
-  <h3 class="title"><a href="http://mp.weixin.qq.com/s?__biz=MjM5MDE0Mjc4MA==&mid=2651263429&idx=1&sn=189ff34b49998f1c13c385c35af9fc1a&chksm=bc2b57740439dfaae9700dbe081f9c7855e7fe6430421e8a1fc50d3bc40d659664ec295263ed&scene=0#rd" target="_blank" rel="noopener">微软高管宣布Windows将转型为智能体操作系统引发开发者批评</a></h3>
-  <div class="meta">InfoQ（2025-11-18 13:28）</div><p class="recap" title="微软Windows负责人Pavan Davuluri宣布Windows将向Agentic OS转型，但推文引发开发者强烈批评，指责微软忽视系统稳定性与性能。面对负面反馈，Davuluri关闭评论并承认需改进系统可靠性。">微软Windows负责人Pavan Davuluri宣布Windows将向Agentic OS转型，但推文引发开发者强烈批评，指责微软忽视系统稳定性与性能。面对负面反馈，Davuluri关闭评论并承认需改进系统可靠性。</p>
+  <h3 class="title"><a href="http://mp.weixin.qq.com/s?__biz=MjM5MDE0Mjc4MA==&mid=2651263429&idx=1&sn=189ff34b49998f1c13c385c35af9fc1a&chksm=bc2b57740439dfaae9700dbe081f9c7855e7fe6430421e8a1fc50d3bc40d659664ec295263ed&scene=0#rd" target="_blank" rel="noopener">微软高管宣布Windows向智能体操作系统转型引发开发者批评</a></h3>
+  <div class="meta">InfoQ（2025-11-18 13:28）</div><p class="recap" title="微软Windows负责人Pavan Davuluri宣布Windows将演变为Agentic OS，引发开发者社区强烈批评。技术社区作者Gergely Orosz等开发者质疑该方向，要求系统稳定性和掌控权。Davuluri回应称已收到反馈并承认需改进可靠性、性能和易用性。">微软Windows负责人Pavan Davuluri宣布Windows将演变为Agentic OS，引发开发者社区强烈批评。技术社区作者Gergely Orosz等开发者质疑该方向，要求系统稳定性和掌控权。Davuluri回应称已收到反馈并承认需改进可靠性、性能和易用性。</p>
   <div class="more"><a href="http://mp.weixin.qq.com/s?__biz=MjM5MDE0Mjc4MA==&mid=2651263429&idx=1&sn=189ff34b49998f1c13c385c35af9fc1a&chksm=bc2b57740439dfaae9700dbe081f9c7855e7fe6430421e8a1fc50d3bc40d659664ec295263ed&scene=0#rd" target="_blank" rel="noopener">阅读原文 →</a></div>
   </article><article class="card" data-sec="一、权威观点/报告">
-  <h3 class="title"><a href="https://www.bbc.com/news/articles/c8drzv37z4jo?at_medium=RSS&at_campaign=rss" target="_blank" rel="noopener">谷歌CEO皮查伊承认AI模型存在不准确回答</a></h3>
-  <div class="meta">（2025-11-18 13:02）</div><p class="recap" title="谷歌CEO桑达尔·皮查伊公开承认公司AI模型生成不准确回答的问题。">谷歌CEO桑达尔·皮查伊公开承认公司AI模型生成不准确回答的问题。</p>
-  <div class="more"><a href="https://www.bbc.com/news/articles/c8drzv37z4jo?at_medium=RSS&at_campaign=rss" target="_blank" rel="noopener">阅读原文 →</a></div>
-  </article><article class="card" data-sec="一、权威观点/报告">
-  <h3 class="title"><a href="https://www.x.com/rohanpaul_ai/status/1990604669392204110" target="_blank" rel="noopener">李飞飞称AI由人创造并将影响个人与社会</a></h3>
-  <div class="meta">来源：（2025-11-18 10:15）</div><p class="recap" title="李飞飞博士表示AI并非人工，而是由人启发和创造。她强调AI将影响每个人的生活、社会及未来世代。">李飞飞博士表示AI并非人工，而是由人启发和创造。她强调AI将影响每个人的生活、社会及未来世代。</p>
+  <h3 class="title"><a href="https://www.x.com/rohanpaul_ai/status/1990604669392204110" target="_blank" rel="noopener">李飞飞称AI由人创造并影响社会未来</a></h3>
+  <div class="meta">来源:（2025-11-18 10:15）</div><p class="recap" title="李飞飞博士表示AI并非人工，而是由人启发和创造。她强调AI将影响每个人的生活、社会及未来世代。">李飞飞博士表示AI并非人工，而是由人启发和创造。她强调AI将影响每个人的生活、社会及未来世代。</p>
   <div class="more"><a href="https://www.x.com/rohanpaul_ai/status/1990604669392204110" target="_blank" rel="noopener">阅读原文 →</a></div>
   </article><article class="card" data-sec="一、权威观点/报告">
-  <h3 class="title"><a href="http://mp.weixin.qq.com/s?__biz=Mzg3MTkxMjYzOA==&mid=2247509880&idx=2&sn=d97e4d11f65ec777ec23a1c8735657a7&chksm=cfa2e44776a61c80c7ae2433165aca447900484a8d029aa2297c7dff1232a12ff4a57eb0a638&scene=0#rd" target="_blank" rel="noopener">Andrej Karpathy提出AI是软件2.0并阐述其自动化原理</a></h3>
-  <div class="meta">AI寒武纪（2025-11-18 07:00）</div><p class="recap" title="Andrej Karpathy分享对AI影响经济的最新思考，提出AI本质是“软件2.0”而非电力或工业革命。他认为软件1.0自动化“可指定”任务，而软件2.0将自动化“可验证”任务，并指出“可验证性”是预测AI自动化能力的核心指标。">Andrej Karpathy分享对AI影响经济的最新思考，提出AI本质是“软件2.0”而非电力或工业革命。他认为软件1.0自动化“可指定”任务，而软件2.0将自动化“可验证”任务，并指出“可验证性”是预测AI自动化能力的核心指标。</p>
+  <h3 class="title"><a href="http://mp.weixin.qq.com/s?__biz=Mzg3MTkxMjYzOA==&mid=2247509880&idx=2&sn=d97e4d11f65ec777ec23a1c8735657a7&chksm=cfa2e44776a61c80c7ae2433165aca447900484a8d029aa2297c7dff1232a12ff4a57eb0a638&scene=0#rd" target="_blank" rel="noopener">Andrej Karpathy提出AI本质是软件2.0并强调可验证性指标</a></h3>
+  <div class="meta">AI寒武纪（2025-11-18 07:00）</div><p class="recap" title="Andrej Karpathy认为AI本质是全新的计算范式“软件2.0”，而非电力或工业革命。他提出“可验证性”是预测AI自动化能力的核心指标，并以此解释大语言模型在不同任务上的进展差异。">Andrej Karpathy认为AI本质是全新的计算范式“软件2.0”，而非电力或工业革命。他提出“可验证性”是预测AI自动化能力的核心指标，并以此解释大语言模型在不同任务上的进展差异。</p>
   <div class="more"><a href="http://mp.weixin.qq.com/s?__biz=Mzg3MTkxMjYzOA==&mid=2247509880&idx=2&sn=d97e4d11f65ec777ec23a1c8735657a7&chksm=cfa2e44776a61c80c7ae2433165aca447900484a8d029aa2297c7dff1232a12ff4a57eb0a638&scene=0#rd" target="_blank" rel="noopener">阅读原文 →</a></div>
   </article><article class="card" data-sec="一、权威观点/报告">
-  <h3 class="title"><a href="https://www.youtube.com/watch?v=ORkiXpCiC8M" target="_blank" rel="noopener">专家称AI战略不应仅关注自动化而需重新构想业务</a></h3>
-  <div class="meta">来源:（2025-11-18 06:58）</div><p class="recap" title="Sangeet Paul Choudary在CXOTalk访谈中指出，企业高管常误将AI视为单纯自动化工具，而AI实质是协调基础设施，需重新思考业务模式和竞争优势。他通过集装箱等案例说明技术变革带来的系统性影响。">Sangeet Paul Choudary在CXOTalk访谈中指出，企业高管常误将AI视为单纯自动化工具，而AI实质是协调基础设施，需重新思考业务模式和竞争优势。他通过集装箱等案例说明技术变革带来的系统性影响。</p>
+  <h3 class="title"><a href="https://www.youtube.com/watch?v=ORkiXpCiC8M" target="_blank" rel="noopener">专家称企业AI战略不应仅关注自动化而需重构业务模式</a></h3>
+  <div class="meta">来源:（2025-11-18 06:58）</div><p class="recap" title="在CXOTalk节目中，顾问Sangeet Paul Choudary指出多数企业高管错误地将AI视为自动化工具，而AI实质是协调基础设施。他建议企业应重新构想业务模式而非仅优化现有流程。">在CXOTalk节目中，顾问Sangeet Paul Choudary指出多数企业高管错误地将AI视为自动化工具，而AI实质是协调基础设施。他建议企业应重新构想业务模式而非仅优化现有流程。</p>
   <div class="more"><a href="https://www.youtube.com/watch?v=ORkiXpCiC8M" target="_blank" rel="noopener">阅读原文 →</a></div>
   </article></div></section><section id="二、产品/技术动态" class="sec"><h2 class="sec-hd"><span>二、产品/技术动态</span></h2><div class="grid"><article class="card" data-sec="二、产品/技术动态">
-  <h3 class="title"><a href="https://www.ithome.com/0/898/353.htm" target="_blank" rel="noopener">马云现身蚂蚁集团园区，蚂蚁发布全模态AI助手灵光</a></h3>
-  <div class="meta">（2025-11-18 17:54）</div><p class="recap" title="马云佩戴工牌在蚂蚁集团董事长井贤栋与CEO韩歆毅陪同下现身蚂蚁园区。蚂蚁集团发布全模态通用AI助手“灵光”，支持自然语言生成应用及多模态内容输出。阿里巴巴昨日宣布“千问”项目，上线基于Qwen3模型的App公测版。">马云佩戴工牌在蚂蚁集团董事长井贤栋与CEO韩歆毅陪同下现身蚂蚁园区。蚂蚁集团发布全模态通用AI助手“灵光”，支持自然语言生成应用及多模态内容输出。阿里巴巴昨日宣布“千问”项目，上线基于Qwen3模型的App公测版。</p>
+  <h3 class="title"><a href="https://www.ithome.com/0/898/353.htm" target="_blank" rel="noopener">马云现身蚂蚁园区，蚂蚁发布全模态AI助手灵光，阿里巴巴推出千问App</a></h3>
+  <div class="meta">（2025-11-18 17:54）</div><p class="recap" title="马云佩戴工牌在蚂蚁集团董事长与CEO陪同下现身园区。蚂蚁集团发布全模态通用AI助手“灵光”，支持自然语言生成应用及多模态内容输出。阿里巴巴推出“千问”App公测版，基于开源模型Qwen3进军AI to C市场。">马云佩戴工牌在蚂蚁集团董事长与CEO陪同下现身园区。蚂蚁集团发布全模态通用AI助手“灵光”，支持自然语言生成应用及多模态内容输出。阿里巴巴推出“千问”App公测版，基于开源模型Qwen3进军AI to C市场。</p>
   <div class="more"><a href="https://www.ithome.com/0/898/353.htm" target="_blank" rel="noopener">阅读原文 →</a></div>
   </article><article class="card" data-sec="二、产品/技术动态">
-  <h3 class="title"><a href="https://www.ithome.com/0/898/339.htm" target="_blank" rel="noopener">岚图泰山旗舰SUV正式上市，售价37.99万元起</a></h3>
-  <div class="meta">IT之家（2025-11-18 17:31）</div><p class="recap" title="岚图泰山旗舰SUV今日正式上市，起售价37.99万元。新车搭载华为乾崑智驾ADS 4与鸿蒙座舱5，是国内首款配备三腔空气悬架的车型。">岚图泰山旗舰SUV今日正式上市，起售价37.99万元。新车搭载华为乾崑智驾ADS 4与鸿蒙座舱5，是国内首款配备三腔空气悬架的车型。</p>
+  <h3 class="title"><a href="https://www.ithome.com/0/898/339.htm" target="_blank" rel="noopener">岚图泰山旗舰SUV上市 搭载华为乾崑智驾ADS 4与鸿蒙座舱</a></h3>
+  <div class="meta">IT之家（2025-11-18 17:31）</div><p class="recap" title="岚图泰山旗舰SUV正式上市，起售价37.99万元。新车搭载华为乾崑智驾ADS 4系统与鸿蒙座舱5，并配备三腔空气悬架。该车采用插电混动系统，支持800V高压平台与5C超充技术。">岚图泰山旗舰SUV正式上市，起售价37.99万元。新车搭载华为乾崑智驾ADS 4系统与鸿蒙座舱5，并配备三腔空气悬架。该车采用插电混动系统，支持800V高压平台与5C超充技术。</p>
   <div class="more"><a href="https://www.ithome.com/0/898/339.htm" target="_blank" rel="noopener">阅读原文 →</a></div>
   </article><article class="card" data-sec="二、产品/技术动态">
-  <h3 class="title"><a href="http://mp.weixin.qq.com/s?__biz=MzI3MTA0MTk1MA==&mid=2652646259&idx=1&sn=47156bf7230eeb78834f573638eeb4e1&chksm=f08cdbf811d5db1d9b27573e6f5ea9bc95d5ed74e761926bc09d2a9666223106a9abd5d9f206&scene=0#rd" target="_blank" rel="noopener">哈佛大学研发人机共融智能系统用于实验协作</a></h3>
-  <div class="meta">新智元（2025-11-18 17:05）</div><p class="recap" title="哈佛大学刘嘉教授团队开发了人机共融智能系统，包括APEX和Agentic Lab两个平台。该系统通过MR/AR眼镜和多智能体协作，在微纳加工和生命科学实验中实现实时指导与纠错。">哈佛大学刘嘉教授团队开发了人机共融智能系统，包括APEX和Agentic Lab两个平台。该系统通过MR/AR眼镜和多智能体协作，在微纳加工和生命科学实验中实现实时指导与纠错。</p>
+  <h3 class="title"><a href="http://mp.weixin.qq.com/s?__biz=MzI3MTA0MTk1MA==&mid=2652646259&idx=1&sn=47156bf7230eeb78834f573638eeb4e1&chksm=f08cdbf811d5db1d9b27573e6f5ea9bc95d5ed74e761926bc09d2a9666223106a9abd5d9f206&scene=0#rd" target="_blank" rel="noopener">哈佛大学研发人机共融智能系统，用于微纳加工和生命实验</a></h3>
+  <div class="meta">新智元（2025-11-18 17:05）</div><p class="recap" title="哈佛大学刘嘉教授团队研发人机共融智能系统，包含APEX和Agentic Lab两个平台。系统通过MR/AR眼镜和多智能体协作，实现实验操作实时纠错、自动记录与分析。该系统已在微纳加工和类器官培养实验中验证效果。">哈佛大学刘嘉教授团队研发人机共融智能系统，包含APEX和Agentic Lab两个平台。系统通过MR/AR眼镜和多智能体协作，实现实验操作实时纠错、自动记录与分析。该系统已在微纳加工和类器官培养实验中验证效果。</p>
   <div class="more"><a href="http://mp.weixin.qq.com/s?__biz=MzI3MTA0MTk1MA==&mid=2652646259&idx=1&sn=47156bf7230eeb78834f573638eeb4e1&chksm=f08cdbf811d5db1d9b27573e6f5ea9bc95d5ed74e761926bc09d2a9666223106a9abd5d9f206&scene=0#rd" target="_blank" rel="noopener">阅读原文 →</a></div>
   </article><article class="card" data-sec="二、产品/技术动态">
-  <h3 class="title"><a href="https://www.ithome.com/0/898/316.htm" target="_blank" rel="noopener">OpenAI切断FoloToy公司GPT-4o访问权限</a></h3>
-  <div class="meta">（2025-11-18 16:30）</div><p class="recap" title="研究组织PIRG测试发现FoloToy的AI泰迪熊玩具缺乏安全防护，会教儿童点火柴并讨论性话题。FoloToy随后下架所有产品并进行安全审计，OpenAI已封禁其GPT-4o模型访问权限。">研究组织PIRG测试发现FoloToy的AI泰迪熊玩具缺乏安全防护，会教儿童点火柴并讨论性话题。FoloToy随后下架所有产品并进行安全审计，OpenAI已封禁其GPT-4o模型访问权限。</p>
+  <h3 class="title"><a href="https://www.ithome.com/0/898/316.htm" target="_blank" rel="noopener">OpenAI切断FoloToy公司GPT-4o访问权限，其AI玩具存在安全隐患</a></h3>
+  <div class="meta">（2025-11-18 16:30）</div><p class="recap" title="研究组织PIRG测试发现FoloToy的AI泰迪熊玩具缺乏防护，会教儿童点燃火柴并讨论性话题。FoloToy随后下架所有产品并进行安全审计，OpenAI已封禁其GPT-4o访问权限。PIRG负责人指出AI玩具监管不足，需系统性解决。">研究组织PIRG测试发现FoloToy的AI泰迪熊玩具缺乏防护，会教儿童点燃火柴并讨论性话题。FoloToy随后下架所有产品并进行安全审计，OpenAI已封禁其GPT-4o访问权限。PIRG负责人指出AI玩具监管不足，需系统性解决。</p>
   <div class="more"><a href="https://www.ithome.com/0/898/316.htm" target="_blank" rel="noopener">阅读原文 →</a></div>
   </article><article class="card" data-sec="二、产品/技术动态">
   <h3 class="title"><a href="https://www.qbitai.com/2025/11/353733.html" target="_blank" rel="noopener">马斯克发布Grok 4.1模型</a></h3>
-  <div class="meta">梦晨（2025-11-18 15:01）</div><p class="recap" title="马斯克发布Grok 4.1模型。该模型的非思考模式在公开排行榜上超越了所有其他模型的完整推理模式。">马斯克发布Grok 4.1模型。该模型的非思考模式在公开排行榜上超越了所有其他模型的完整推理模式。</p>
+  <div class="meta">梦晨（2025-11-18 15:01）</div><p class="recap" title="马斯克旗下xAI发布Grok 4.1模型。该模型的非思考模式在公开排行榜上超越了所有其他模型的完整推理模式。">马斯克旗下xAI发布Grok 4.1模型。该模型的非思考模式在公开排行榜上超越了所有其他模型的完整推理模式。</p>
   <div class="more"><a href="https://www.qbitai.com/2025/11/353733.html" target="_blank" rel="noopener">阅读原文 →</a></div>
   </article><article class="card" data-sec="二、产品/技术动态">
   <h3 class="title"><a href="https://www.qbitai.com/2025/11/353826.html" target="_blank" rel="noopener">微博发布15亿参数大模型数学能力超DeepSeek-R1</a></h3>
-  <div class="meta">思邈（2025-11-18 14:11）</div><p class="recap" title="微博发布15亿参数大模型，该模型以7800美元成本训练，在数学能力上超越DeepSeek-R1。">微博发布15亿参数大模型，该模型以7800美元成本训练，在数学能力上超越DeepSeek-R1。</p>
+  <div class="meta">思邈（2025-11-18 14:11）</div><p class="recap" title="微博发布15亿参数大模型，仅用7800美元训练成本，在数学能力上超越DeepSeek-R1。该模型以较小参数规模挑战千亿级参数模型。">微博发布15亿参数大模型，仅用7800美元训练成本，在数学能力上超越DeepSeek-R1。该模型以较小参数规模挑战千亿级参数模型。</p>
   <div class="more"><a href="https://www.qbitai.com/2025/11/353826.html" target="_blank" rel="noopener">阅读原文 →</a></div>
   </article><article class="card" data-sec="二、产品/技术动态">
   <h3 class="title"><a href="https://www.leiphone.com/category/industrynews/7tSPAH7fKSGAzbKh.html" target="_blank" rel="noopener">百度文库与网盘出海，发布一站式AI平台Oreate及GenFlow 3.0</a></h3>
   <div class="meta">（2025-11-18 13:29）</div><p class="recap" title="百度在世界大会上宣布文库与网盘出海，推出海外一站式AI学习办公平台Oreate，用户已突破百万。同时发布GenFlow 3.0版本，升级多智能体架构与记忆能力，支持全模态内容创作。百度集团副总裁王颖表示产品目标是赋能用户成为超级个体。">百度在世界大会上宣布文库与网盘出海，推出海外一站式AI学习办公平台Oreate，用户已突破百万。同时发布GenFlow 3.0版本，升级多智能体架构与记忆能力，支持全模态内容创作。百度集团副总裁王颖表示产品目标是赋能用户成为超级个体。</p>
   <div class="more"><a href="https://www.leiphone.com/category/industrynews/7tSPAH7fKSGAzbKh.html" target="_blank" rel="noopener">阅读原文 →</a></div>
   </article><article class="card" data-sec="二、产品/技术动态">
-  <h3 class="title"><a href="http://mp.weixin.qq.com/s?__biz=Mzg3Mzg5MjY3Nw==&mid=2247525226&idx=3&sn=9bdc1677c5e310ae110d0610db9def4e&chksm=cfed259390cc3db375ace3d9e01769da9baeefcf42b7f6d771a1f826f280e742cb250d04f2c1&scene=0#rd" target="_blank" rel="noopener">字节开源Depth Anything 3模型，实现视觉三维感知突破</a></h3>
-  <div class="meta">AIGC开放社区（2025-11-18 11:14）</div><p class="recap" title="字节跳动开源了Depth Anything 3模型，该模型能从任意数量和视角的视觉输入中恢复空间一致的三维几何结构。它采用极简的Transformer架构和深度-射线表示法，在多个基准测试中显著超越了先前的最佳性能。">字节跳动开源了Depth Anything 3模型，该模型能从任意数量和视角的视觉输入中恢复空间一致的三维几何结构。它采用极简的Transformer架构和深度-射线表示法，在多个基准测试中显著超越了先前的最佳性能。</p>
+  <h3 class="title"><a href="http://mp.weixin.qq.com/s?__biz=Mzg3Mzg5MjY3Nw==&mid=2247525226&idx=3&sn=9bdc1677c5e310ae110d0610db9def4e&chksm=cfed259390cc3db375ace3d9e01769da9baeefcf42b7f6d771a1f826f280e742cb250d04f2c1&scene=0#rd" target="_blank" rel="noopener">字节开源Depth Anything 3模型实现三维几何重建突破</a></h3>
+  <div class="meta">AIGC开放社区（2025-11-18 11:14）</div><p class="recap" title="字节跳动开源Depth Anything 3模型，能从任意数量及视角的视觉输入中恢复空间一致的三维几何结构。该模型采用极简Transformer架构和深度-射线表示法，在全新基准测试中位姿准确率和几何准确率分别提升35.7%和23.6%。">字节跳动开源Depth Anything 3模型，能从任意数量及视角的视觉输入中恢复空间一致的三维几何结构。该模型采用极简Transformer架构和深度-射线表示法，在全新基准测试中位姿准确率和几何准确率分别提升35.7%和23.6%。</p>
   <div class="more"><a href="http://mp.weixin.qq.com/s?__biz=Mzg3Mzg5MjY3Nw==&mid=2247525226&idx=3&sn=9bdc1677c5e310ae110d0610db9def4e&chksm=cfed259390cc3db375ace3d9e01769da9baeefcf42b7f6d771a1f826f280e742cb250d04f2c1&scene=0#rd" target="_blank" rel="noopener">阅读原文 →</a></div>
   </article><article class="card" data-sec="二、产品/技术动态">
-  <h3 class="title"><a href="http://mp.weixin.qq.com/s?__biz=Mzg3Mzg5MjY3Nw==&mid=2247525226&idx=2&sn=25617d1cd401c0d048f2643f89b69ef2&chksm=cfa93ed9e90dcb57f9f30789f01689fa21ef13fd7138ae329d176bf29af7c58ccb103e31f3ce&scene=0#rd" target="_blank" rel="noopener">介绍9个主流AI智能体框架</a></h3>
-  <div class="meta">AIGC开放社区（2025-11-18 11:14）</div><p class="recap" title="文章介绍了截至2025年11月市场上9个主流AI智能体框架，包括LangChain、AgentFlow、AutoGen、Semantic Kernel、Atomic Agents、CrewAI、RASA、Hugging Face SmolAgents和Langflow。这些框架各有特点，适用于不同场景，旨在帮助开发者选择合适的工具构建AI系统。">文章介绍了截至2025年11月市场上9个主流AI智能体框架，包括LangChain、AgentFlow、AutoGen、Semantic Kernel、Atomic Agents、CrewAI、RASA、Hugging Face SmolAgents和Langflow。这些框架各有特点，适用于不同场景，旨在帮助开发者选择合适的工具构建AI系统。</p>
+  <h3 class="title"><a href="http://mp.weixin.qq.com/s?__biz=Mzg3Mzg5MjY3Nw==&mid=2247525226&idx=2&sn=25617d1cd401c0d048f2643f89b69ef2&chksm=cfa93ed9e90dcb57f9f30789f01689fa21ef13fd7138ae329d176bf29af7c58ccb103e31f3ce&scene=0#rd" target="_blank" rel="noopener">介绍九个主流AI智能体框架</a></h3>
+  <div class="meta">AIGC开放社区（2025-11-18 11:14）</div><p class="recap" title="文章介绍了截至2025年11月市场上九个主流AI智能体框架，包括LangChain、AgentFlow、AutoGen等。这些框架各有特点，适用于构建大语言模型应用、多智能体系统、对话式AI等不同场景。">文章介绍了截至2025年11月市场上九个主流AI智能体框架，包括LangChain、AgentFlow、AutoGen等。这些框架各有特点，适用于构建大语言模型应用、多智能体系统、对话式AI等不同场景。</p>
   <div class="more"><a href="http://mp.weixin.qq.com/s?__biz=Mzg3Mzg5MjY3Nw==&mid=2247525226&idx=2&sn=25617d1cd401c0d048f2643f89b69ef2&chksm=cfa93ed9e90dcb57f9f30789f01689fa21ef13fd7138ae329d176bf29af7c58ccb103e31f3ce&scene=0#rd" target="_blank" rel="noopener">阅读原文 →</a></div>
   </article><article class="card" data-sec="二、产品/技术动态">
-  <h3 class="title"><a href="http://mp.weixin.qq.com/s?__biz=Mzg3MTkxMjYzOA==&mid=2247509880&idx=1&sn=130807644fd732a4e59343a055b04dd6&chksm=cfb4530cbf3396eb9e01945f5c74d77a2d06c6425b1bda86199b9425ecf85f9b229bd56917fa&scene=0#rd" target="_blank" rel="noopener">谷歌开发多智能体系统用于企业级Gemini产品</a></h3>
-  <div class="meta">AI寒武纪（2025-11-18 07:00）</div><p class="recap" title="谷歌正为企业级产品Gemini Enterprise开发多智能体系统，采用锦标赛机制生成和评估想法，单次运行约40分钟。该系统包含“想法生成”和“联席科学家”等智能体，目前处于开发阶段尚未发布。">谷歌正为企业级产品Gemini Enterprise开发多智能体系统，采用锦标赛机制生成和评估想法，单次运行约40分钟。该系统包含“想法生成”和“联席科学家”等智能体，目前处于开发阶段尚未发布。</p>
+  <h3 class="title"><a href="http://mp.weixin.qq.com/s?__biz=Mzg3MTkxMjYzOA==&mid=2247509880&idx=1&sn=130807644fd732a4e59343a055b04dd6&chksm=cfb4530cbf3396eb9e01945f5c74d77a2d06c6425b1bda86199b9425ecf85f9b229bd56917fa&scene=0#rd" target="_blank" rel="noopener">谷歌Gemini Enterprise开发多智能体系统用于研究自动化</a></h3>
+  <div class="meta">AI寒武纪（2025-11-18 07:00）</div><p class="recap" title="谷歌正为Gemini Enterprise开发多智能体系统，采用锦标赛机制生成和评估想法，单次运行约40分钟可产出约100个结构化研究方向。该系统包含“想法生成”和“联席科学家”等预置智能体，目前处于内部开发阶段尚未发布。">谷歌正为Gemini Enterprise开发多智能体系统，采用锦标赛机制生成和评估想法，单次运行约40分钟可产出约100个结构化研究方向。该系统包含“想法生成”和“联席科学家”等预置智能体，目前处于内部开发阶段尚未发布。</p>
   <div class="more"><a href="http://mp.weixin.qq.com/s?__biz=Mzg3MTkxMjYzOA==&mid=2247509880&idx=1&sn=130807644fd732a4e59343a055b04dd6&chksm=cfb4530cbf3396eb9e01945f5c74d77a2d06c6425b1bda86199b9425ecf85f9b229bd56917fa&scene=0#rd" target="_blank" rel="noopener">阅读原文 →</a></div>
   </article><article class="card" data-sec="二、产品/技术动态">
   <h3 class="title"><a href="https://www.bloomberg.com/news/articles/2025-11-17/arm-to-offer-nvidia-s-nvlink-technology-in-ai-data-center-chips" target="_blank" rel="noopener">Arm将在AI数据中心芯片设计中集成Nvidia NVLink技术</a></h3>
-  <div class="meta">Ian King（2025-11-18 06:25）</div><p class="recap" title="Arm计划在AI数据中心芯片设计中集成Nvidia的NVLink技术，这将加强两家半导体公司之间的合作关系。">Arm计划在AI数据中心芯片设计中集成Nvidia的NVLink技术，这将加强两家半导体公司之间的合作关系。</p>
+  <div class="meta">Ian King（2025-11-18 06:25）</div><p class="recap" title="Arm计划在AI数据中心芯片设计中集成Nvidia的NVLink技术，此举将加强两家半导体公司之间的合作关系。">Arm计划在AI数据中心芯片设计中集成Nvidia的NVLink技术，此举将加强两家半导体公司之间的合作关系。</p>
   <div class="more"><a href="https://www.bloomberg.com/news/articles/2025-11-17/arm-to-offer-nvidia-s-nvlink-technology-in-ai-data-center-chips" target="_blank" rel="noopener">阅读原文 →</a></div>
   </article><article class="card" data-sec="二、产品/技术动态">
-  <h3 class="title"><a href="https://www.theverge.com/news/822489/weather-forecast-ai-model-google-weathernext" target="_blank" rel="noopener">谷歌发布新一代人工智能天气模型WeatherNext 2</a></h3>
-  <div class="meta">（2025-11-18 06:00）</div><p class="recap" title="谷歌推出新一代AI天气模型WeatherNext 2，预测速度比前代快8倍，准确度更高。该模型将集成到搜索、Gemini和Pixel手机等产品中，并向企业客户提供早期访问。">谷歌推出新一代AI天气模型WeatherNext 2，预测速度比前代快8倍，准确度更高。该模型将集成到搜索、Gemini和Pixel手机等产品中，并向企业客户提供早期访问。</p>
+  <h3 class="title"><a href="https://www.theverge.com/news/822489/weather-forecast-ai-model-google-weathernext" target="_blank" rel="noopener">谷歌发布新版AI天气模型WeatherNext 2并集成至多款产品</a></h3>
+  <div class="meta">The Verge（2025-11-18 06:00）</div><p class="recap" title="谷歌推出新一代AI天气模型WeatherNext 2，预测速度提升8倍且精度更高，已集成至搜索、Gemini和Pixel等产品。该模型采用功能生成网络技术，能快速生成多场景预报。谷歌同时面向企业用户开放早期接入计划。">谷歌推出新一代AI天气模型WeatherNext 2，预测速度提升8倍且精度更高，已集成至搜索、Gemini和Pixel等产品。该模型采用功能生成网络技术，能快速生成多场景预报。谷歌同时面向企业用户开放早期接入计划。</p>
   <div class="more"><a href="https://www.theverge.com/news/822489/weather-forecast-ai-model-google-weathernext" target="_blank" rel="noopener">阅读原文 →</a></div>
   </article><article class="card" data-sec="二、产品/技术动态">
-  <h3 class="title"><a href="https://www.engadget.com/ai/deepmind-releases-a-new-weather-forecasting-model-for-more-accurate-predictions-175451228.html?src=rss" target="_blank" rel="noopener">DeepMind发布新一代天气预报模型WeatherNext 2</a></h3>
-  <div class="meta">Lawrence Bonk（2025-11-18 01:54）</div><p class="recap" title="DeepMind发布新一代AI天气预报模型WeatherNext 2，提供更高效、更准确的全球天气预报，预测时效延长至两周，热带风暴路径预测从两天提升至三天。新模型处理速度比前代快八倍，采用单步处理新方法降低对昂贵AI计算系统的依赖。">DeepMind发布新一代AI天气预报模型WeatherNext 2，提供更高效、更准确的全球天气预报，预测时效延长至两周，热带风暴路径预测从两天提升至三天。新模型处理速度比前代快八倍，采用单步处理新方法降低对昂贵AI计算系统的依赖。</p>
+  <h3 class="title"><a href="https://www.engadget.com/ai/deepmind-releases-a-new-weather-forecasting-model-for-more-accurate-predictions-175451228.html?src=rss" target="_blank" rel="noopener">DeepMind发布新版天气预报模型WeatherNext 2</a></h3>
+  <div class="meta">Lawrence Bonk（2025-11-18 01:54）</div><p class="recap" title="谷歌DeepMind发布新版AI天气预报模型WeatherNext 2，可提供长达两周的准确天气预报，预测效率提升8倍。该模型采用新方法减少对昂贵AI计算系统的依赖，但训练数据不足可能影响极端降水事件预测。">谷歌DeepMind发布新版AI天气预报模型WeatherNext 2，可提供长达两周的准确天气预报，预测效率提升8倍。该模型采用新方法减少对昂贵AI计算系统的依赖，但训练数据不足可能影响极端降水事件预测。</p>
   <div class="more"><a href="https://www.engadget.com/ai/deepmind-releases-a-new-weather-forecasting-model-for-more-accurate-predictions-175451228.html?src=rss" target="_blank" rel="noopener">阅读原文 →</a></div>
   </article></div></section><section id="三、资本市场动态及企业战略布局" class="sec"><h2 class="sec-hd"><span>三、资本市场动态及企业战略布局</span></h2><div class="grid"><article class="card" data-sec="三、资本市场动态及企业战略布局">
-  <h3 class="title"><a href="https://www.x.com/TechCrunch/status/1990649814137384963" target="_blank" rel="noopener">Peec AI公司完成2100万美元融资</a></h3>
-  <div class="meta">TechCrunch（2025-11-18 13:14）</div><p class="recap" title="Peec AI公司获得2100万美元融资，旨在帮助品牌适应消费者从谷歌转向ChatGPT的趋势。">Peec AI公司获得2100万美元融资，旨在帮助品牌适应消费者从谷歌转向ChatGPT的趋势。</p>
+  <h3 class="title"><a href="https://www.x.com/TechCrunch/status/1990649814137384963" target="_blank" rel="noopener">Peec AI 完成2100万美元融资以帮助品牌适应消费者搜索行为变化</a></h3>
+  <div class="meta">TechCrunch（2025-11-18 13:14）</div><p class="recap" title="Peec AI 获得2100万美元融资，旨在协助品牌应对消费者从谷歌转向 ChatGPT 的搜索行为变化。">Peec AI 获得2100万美元融资，旨在协助品牌应对消费者从谷歌转向 ChatGPT 的搜索行为变化。</p>
   <div class="more"><a href="https://www.x.com/TechCrunch/status/1990649814137384963" target="_blank" rel="noopener">阅读原文 →</a></div>
   </article><article class="card" data-sec="三、资本市场动态及企业战略布局">
-  <h3 class="title"><a href="https://www.bloomberg.com/news/articles/2025-11-18/nvidia-backed-cassava-pushes-to-expand-ai-access-across-africa" target="_blank" rel="noopener">Cassava科技计划融资建设非洲人工智能数据中心</a></h3>
-  <div class="meta">Loni Prinsloo, Antony Sguazzin（2025-11-18 13:10）</div><p class="recap" title="英伟达支持的Cassava科技公司计划融资至多7亿美元，在非洲建设和升级配备AI芯片的数据中心网络，旨在为企业、非营利组织及贫困人群提供更可负担的AI服务。">英伟达支持的Cassava科技公司计划融资至多7亿美元，在非洲建设和升级配备AI芯片的数据中心网络，旨在为企业、非营利组织及贫困人群提供更可负担的AI服务。</p>
+  <h3 class="title"><a href="https://www.bloomberg.com/news/articles/2025-11-18/nvidia-backed-cassava-pushes-to-expand-ai-access-across-africa" target="_blank" rel="noopener">Cassava科技公司计划融资建设非洲数据中心网络</a></h3>
+  <div class="meta">Loni Prinsloo, Antony Sguazzin（2025-11-18 13:10）</div><p class="recap" title="英伟达支持的Cassava科技公司计划融资至多7亿美元，在非洲建设和升级配备AI芯片的数据中心网络，旨在为企业和非营利组织提供更实惠的AI服务。">英伟达支持的Cassava科技公司计划融资至多7亿美元，在非洲建设和升级配备AI芯片的数据中心网络，旨在为企业和非营利组织提供更实惠的AI服务。</p>
   <div class="more"><a href="https://www.bloomberg.com/news/articles/2025-11-18/nvidia-backed-cassava-pushes-to-expand-ai-access-across-africa" target="_blank" rel="noopener">阅读原文 →</a></div>
   </article><article class="card" data-sec="三、资本市场动态及企业战略布局">
-  <h3 class="title"><a href="https://arstechnica.com/information-technology/2025/11/oracle-hit-hard-in-wall-streets-tech-sell-off-over-its-huge-ai-bet/" target="_blank" rel="noopener">甲骨文股价因AI投资和依赖OpenAI合同在华尔街科技股抛售中下跌</a></h3>
-  <div class="meta">Tabby Kinder and George Steer in New York and Rafe Rosner-Uddin in San Francisco（2025-11-18 00:41）</div><p class="recap" title="甲骨文公司因巨额AI投资及对OpenAI合同的依赖，在华尔街科技股抛售潮中股价跌幅超过同行。公司借贷状况和合同关系引发市场担忧。">甲骨文公司因巨额AI投资及对OpenAI合同的依赖，在华尔街科技股抛售潮中股价跌幅超过同行。公司借贷状况和合同关系引发市场担忧。</p>
+  <h3 class="title"><a href="https://www.theverge.com/ai-artificial-intelligence/822496/openai-employee-equity-donation-charity-rounds-share-valuation" target="_blank" rel="noopener">OpenAI允许员工将股权捐赠给慈善机构</a></h3>
+  <div class="meta">The Verge（2025-11-18 06:47）</div><p class="recap" title="OpenAI向员工发送邮件，允许现任和前任员工将符合资格的股权捐赠给慈善机构。此前员工因长期无法捐赠股权而感到不满，此举可能让部分员工得以捐赠数百万美元。">OpenAI向员工发送邮件，允许现任和前任员工将符合资格的股权捐赠给慈善机构。此前员工因长期无法捐赠股权而感到不满，此举可能让部分员工得以捐赠数百万美元。</p>
+  <div class="more"><a href="https://www.theverge.com/ai-artificial-intelligence/822496/openai-employee-equity-donation-charity-rounds-share-valuation" target="_blank" rel="noopener">阅读原文 →</a></div>
+  </article><article class="card" data-sec="三、资本市场动态及企业战略布局">
+  <h3 class="title"><a href="https://arstechnica.com/information-technology/2025/11/oracle-hit-hard-in-wall-streets-tech-sell-off-over-its-huge-ai-bet/" target="_blank" rel="noopener">甲骨文因AI投资与依赖OpenAI合同在华尔街科技股抛售中股价下跌</a></h3>
+  <div class="meta">Tabby Kinder and George Steer in New York and Rafe Rosner-Uddin in San Francisco（2025-11-18 00:41）</div><p class="recap" title="甲骨文公司因巨额AI投资及对OpenAI合同的依赖，在华尔街科技股抛售潮中股价跌幅超过同行。公司借贷状况与OpenAI合同关系是主要影响因素。">甲骨文公司因巨额AI投资及对OpenAI合同的依赖，在华尔街科技股抛售潮中股价跌幅超过同行。公司借贷状况与OpenAI合同关系是主要影响因素。</p>
   <div class="more"><a href="https://arstechnica.com/information-technology/2025/11/oracle-hit-hard-in-wall-streets-tech-sell-off-over-its-huge-ai-bet/" target="_blank" rel="noopener">阅读原文 →</a></div>
+  </article></div></section><section id="四、品牌与市场动作" class="sec"><h2 class="sec-hd"><span>四、品牌与市场动作</span></h2><div class="grid"><article class="card" data-sec="四、品牌与市场动作">
+  <h3 class="title"><a href="http://mp.weixin.qq.com/s?__biz=MjM5MjM2MzEyNQ==&mid=2651601508&idx=1&sn=d8e55fbb7cbaebf609beb703981216e9&chksm=bcada383bdf41bda36ce88ddf7255bf421b6f4663c68c15f5da77f374ba2a1fde37b8f64304c&scene=0#rd" target="_blank" rel="noopener">上海电信与市政府发布智云上海品牌并设置数字城市指示牌</a></h3>
+  <div class="meta">IT时报（2025-11-18 18:21）</div><p class="recap" title="中国电信与上海市政府在世界人工智能大会闭幕式上发布城市信息化服务品牌“智云上海”。上海街头出现数字城市指示牌，将5G-A、算力等技术术语转化为通俗标识，引导市民体验数字生活。">中国电信与上海市政府在世界人工智能大会闭幕式上发布城市信息化服务品牌“智云上海”。上海街头出现数字城市指示牌，将5G-A、算力等技术术语转化为通俗标识，引导市民体验数字生活。</p>
+  <div class="more"><a href="http://mp.weixin.qq.com/s?__biz=MjM5MjM2MzEyNQ==&mid=2651601508&idx=1&sn=d8e55fbb7cbaebf609beb703981216e9&chksm=bcada383bdf41bda36ce88ddf7255bf421b6f4663c68c15f5da77f374ba2a1fde37b8f64304c&scene=0#rd" target="_blank" rel="noopener">阅读原文 →</a></div>
   </article></div></section></div>
     <div id="yesterday-content" class="date-content"><section id="一、权威观点/报告" class="sec"><h2 class="sec-hd"><span>一、权威观点/报告</span></h2><div class="grid"><article class="card" data-sec="一、权威观点/报告">
   <h3 class="title"><a href="https://www.theguardian.com/technology/2025/nov/17/ai-firms-risks-tobacco-anthropic-artificial-intelligence-dario-amodei" target="_blank" rel="noopener">Anthropic负责人称人工智能公司需明确产品风险</a></h3>
