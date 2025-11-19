@@ -1,7 +1,7 @@
 <!doctype html>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>AI 大模型新闻看板（2025-11-18）</title>
+<title>AI 大模型新闻看板（2025-11-19）</title>
 
 
 <style>
@@ -179,27 +179,244 @@ footer{ max-width:1180px; margin:22px auto 44px; padding:0 18px; color:var(--sub
 
 <div class="header-wrap">
   <h1>AI 大模型新闻看板</h1>
-  <div class="time">2025-11-18</div>
+  <div class="time">2025-11-19</div>
 </div>
 
 <div class="controls">
   <select id="secSel"><option value="">全部板块</option>
-  <option value="一、权威观点/报告">一、权威观点/报告</option><option value="二、产品/技术动态">二、产品/技术动态</option><option value="三、资本市场动态及企业战略布局">三、资本市场动态及企业战略布局</option><option value="四、品牌与市场动作">四、品牌与市场动作</option></select>
+  <option value="一、权威观点/报告">一、权威观点/报告</option><option value="二、产品/技术动态">二、产品/技术动态</option><option value="三、资本市场动态及企业战略布局">三、资本市场动态及企业战略布局</option></select>
   <input id="search" type="search" placeholder="搜索标题 / 概要 / 标签…">
 </div>
 
 <div class="date-tabs">
-  <div class="date-tab active" data-date-category="today">📌 今日（2025-11-18）</div>
-  <div class="date-tab" data-date-category="yesterday">🗓️ 昨日（2025-11-17）</div>
-  <div class="date-tab" data-date-category="beforeYesterday">📅 前日（2025-11-16）</div>
+  <div class="date-tab active" data-date-category="today">📌 今日（2025-11-19）</div>
+  <div class="date-tab" data-date-category="yesterday">🗓️ 昨日（2025-11-18）</div>
+  <div class="date-tab" data-date-category="beforeYesterday">📅 前日（2025-11-17）</div>
 </div>
 
-<div class="t-fallback" style="text-align:center;padding:40px;color:#666;">趋势数据更新中...</div>
+
+<section class="trends-top" aria-label="Google 趋势">
+  <div class="t-card">
+    <div class="t-hd">
+      <div class="t-title"><span class="t-dot"></span><span>🌍 国外大模型 · 趋势</span></div>
+      <div class="t-tools">
+        <select class="t-sel" data-target="gt-foreign" aria-label="时间范围">
+          <option value="now 7-d" selected>近 7 天</option>
+          <option value="today 3-m">近 90 天</option>
+          <option value="today 12-m">近 12 个月</option>
+        </select>
+      </div>
+    </div>
+    <div class="t-body">
+      <div id="gt-foreign" class="t-embed"></div>
+      <div class="t-fallback">加载趋势图…</div>
+    </div>
+  </div>
+
+  <div class="t-card">
+    <div class="t-hd">
+      <div class="t-title"><span class="t-dot"></span><span>🇨🇳 国内大模型 · 趋势</span></div>
+      <div class="t-tools">
+        <select class="t-sel" data-target="gt-domestic" aria-label="时间范围">
+          <option value="now 7-d" selected>近 7 天</option>
+          <option value="today 3-m">近 90 天</option>
+          <option value="today 12-m">近 12 个月</option>
+        </select>
+      </div>
+    </div>
+    <div class="t-body">
+      <div id="gt-domestic" class="t-embed"></div>
+      <div class="t-fallback">加载趋势图…</div>
+    </div>
+  </div>
+
+  <div class="t-card">
+    <div class="t-hd">
+      <div class="t-title"><span class="t-dot"></span><span>☁️ 国内云厂商 · 趋势</span></div>
+      <div class="t-tools">
+        <select class="t-sel" data-target="gt-vendors" aria-label="时间范围">
+          <option value="now 7-d" selected>近 7 天</option>
+          <option value="today 3-m">近 90 天</option>
+          <option value="today 12-m">近 12 个月</option>
+        </select>
+      </div>
+    </div>
+    <div class="t-body">
+      <div id="gt-vendors" class="t-embed"></div>
+      <div class="t-fallback">加载趋势图…</div>
+    </div>
+  </div>
+
+  <div class="t-card">
+    <div class="t-hd">
+      <div class="t-title"><span class="t-dot"></span><span>🔑 AI 市场关键词 · 趋势</span></div>
+      <div class="t-tools">
+        <select class="t-sel" data-target="gt-market" aria-label="时间范围">
+          <option value="now 7-d" selected>近 7 天</option>
+          <option value="today 3-m">近 90 天</option>
+          <option value="today 12-m">近 12 个月</option>
+        </select>
+      </div>
+    </div>
+    <div class="t-body">
+      <div id="gt-market" class="t-embed"></div>
+      <div class="t-fallback">加载趋势图…</div>
+    </div>
+  </div>
+</section>
+
+<script>
+/* Google Trends 挂载逻辑 */
+(function mountTrends(){
+  var SCRIPT = 'https://ssl.gstatic.com/trends_nrtr/3528_RC01/embed_loader.js';
+
+  var cfg = {
+    foreign:  { el: 'gt-foreign',  geo: '',   kw: ['ChatGPT','Gemini','Claude','Grok','Llama'] },
+    domestic: { el: 'gt-domestic',  geo: '',   kw: ['DeepSeek','Ernie','Hunyuan','Qwen','Doubao'] },
+    vendors:  { el: 'gt-vendors',   geo: '',   kw: ['Baidu AI Cloud','Huawei Cloud','Tencent Cloud','Alibaba Cloud','Volcengine'] },
+    market:   { el: 'gt-market',    geo: '',   kw: ['LLM','AI Agent','RAG','Vector Database','Prompt Engineering'] }
+  };
+
+  function renderOne(config, time){
+    try{
+      var host = 'https://trends.google.com/trends/embed/';
+      var container = document.getElementById(config.el);
+      if (!container) return;
+
+      var fb = container.parentElement.querySelector('.t-fallback');
+      if (fb) fb.style.display = 'none';
+
+      container.innerHTML = '';
+      var comparisonItem = config.kw.map(function(k) { return { keyword: k, geo: config.geo || '', time: time }; });
+      var query = 'date=' + encodeURIComponent(time)
+                  + '&q=' + encodeURIComponent(config.kw.join(','))
+                  + (config.geo ? '&geo=' + config.geo : '');
+
+      trends.embed.renderExploreWidgetTo(
+        container,
+        'TIMESERIES',
+        { comparisonItem: comparisonItem, category: 0, property: '' },
+        { exploreQuery: query, guestPath: host }
+      );
+    }catch(e){
+      var c = document.getElementById(config.el);
+      if (c) {
+        var fallback = c.parentElement.querySelector('.t-fallback');
+        if (fallback) { 
+          fallback.style.display = 'flex'; 
+          fallback.textContent = '无法显示趋势图（网络受限/被拦截）'; 
+        }
+      }
+      console.error('Trends render error', e);
+    }
+  }
+
+  function boot(){
+    if (!(window.trends && window.trends.embed)) return;
+
+    var defaultTime = 'now 7-d';
+    renderOne(cfg.foreign,  defaultTime);
+    renderOne(cfg.domestic, defaultTime);
+    renderOne(cfg.vendors,  defaultTime);
+    renderOne(cfg.market,   defaultTime);
+
+    document.querySelectorAll('.t-sel').forEach(function(sel){
+      sel.addEventListener('change', function(){
+        var time = sel.value || 'now 7-d';
+        var targetId = sel.getAttribute('data-target');
+        var key = targetId.replace(/^gt-/, '');
+        var conf = cfg[key];
+        if (conf) renderOne(conf, time);
+      });
+    });
+  }
+
+  var s = document.createElement('script');
+  s.src = SCRIPT; 
+  s.async = true; 
+  s.onload = boot;
+  document.head.appendChild(s);
+
+  setTimeout(function() {
+    if (!(window.trends && window.trends.embed)) {
+      document.querySelectorAll('.t-fallback').forEach(function(el){
+        el.style.display = 'flex';
+        el.textContent = '无法加载 Google 趋势（可能被墙/被拦截）';
+      });
+    }
+  }, 5000);
+})();
+</script>
 
 <div class="wrap">
   <main id="main">
     <p id="emptyHint" class="hidden">当前筛选无结果，换个关键词试试～</p>
     <div id="today-content" class="date-content active"><section id="一、权威观点/报告" class="sec"><h2 class="sec-hd"><span>一、权威观点/报告</span></h2><div class="grid"><article class="card" data-sec="一、权威观点/报告">
+  <h3 class="title"><a href="https://www.tmtpost.com/7771031.html" target="_blank" rel="noopener">美国发布大模型评估报告显示美国模型性能优于DeepSeek</a></h3>
+  <div class="meta">老马商业评述（2025-11-19 07:54）</div><p class="recap" title="美国发布大模型评估报告显示，美国模型在整体性能上优于DeepSeek模型，特别是在软件工程和网络安全任务中差距显著。以网络安全任务为例，GPT-5准确率达68.9%，而DeepSeek-V3.1仅36.7%。">美国发布大模型评估报告显示，美国模型在整体性能上优于DeepSeek模型，特别是在软件工程和网络安全任务中差距显著。以网络安全任务为例，GPT-5准确率达68.9%，而DeepSeek-V3.1仅36.7%。</p>
+  <div class="more"><a href="https://www.tmtpost.com/7771031.html" target="_blank" rel="noopener">阅读原文 →</a></div>
+  </article><article class="card" data-sec="一、权威观点/报告">
+  <h3 class="title"><a href="https://www.x.com/TechCrunch/status/1990898960198947003" target="_blank" rel="noopener">Hugging Face CEO称当前处于LLM泡沫而非AI泡沫</a></h3>
+  <div class="meta">TechCrunch（2025-11-19 05:44）</div><p class="recap" title="Hugging Face首席执行官表示，当前行业处于大型语言模型泡沫中，而非人工智能泡沫。">Hugging Face首席执行官表示，当前行业处于大型语言模型泡沫中，而非人工智能泡沫。</p>
+  <div class="more"><a href="https://www.x.com/TechCrunch/status/1990898960198947003" target="_blank" rel="noopener">阅读原文 →</a></div>
+  </article><article class="card" data-sec="一、权威观点/报告">
+  <h3 class="title"><a href="http://mp.weixin.qq.com/s?__biz=MzI3MTA0MTk1MA==&mid=2652646625&idx=2&sn=277047a4001ffcb85341c11b1192c6b6&chksm=f0da24e261a38487a9538ff6483bcfcd11568b6e99b7c6431edba419344ef3e12ded86be08db&scene=0#rd" target="_blank" rel="noopener">谷歌DeepMind负责人哈萨比斯获诺贝尔奖但错失ChatGPT先机</a></h3>
+  <div class="meta">新智元（2025-11-19 04:07）</div><p class="recap" title="谷歌DeepMind CEO哈萨比斯因开发AlphaFold获诺贝尔化学奖。他在追求AGI过程中已动用超96亿美元谷歌资本，但AlphaFold尚未成为重要收入来源。2019年他拒绝与OpenAI合作，导致谷歌错失Transformer商业化先机。">谷歌DeepMind CEO哈萨比斯因开发AlphaFold获诺贝尔化学奖。他在追求AGI过程中已动用超96亿美元谷歌资本，但AlphaFold尚未成为重要收入来源。2019年他拒绝与OpenAI合作，导致谷歌错失Transformer商业化先机。</p>
+  <div class="more"><a href="http://mp.weixin.qq.com/s?__biz=MzI3MTA0MTk1MA==&mid=2652646625&idx=2&sn=277047a4001ffcb85341c11b1192c6b6&chksm=f0da24e261a38487a9538ff6483bcfcd11568b6e99b7c6431edba419344ef3e12ded86be08db&scene=0#rd" target="_blank" rel="noopener">阅读原文 →</a></div>
+  </article><article class="card" data-sec="一、权威观点/报告">
+  <h3 class="title"><a href="https://www.bbc.com/news/articles/c8drzv37z4jo?at_medium=RSS&at_campaign=rss" target="_blank" rel="noopener">谷歌CEO承认AI模型存在不准确回答</a></h3>
+  <div class="meta">（2025-11-19 01:59）</div><p class="recap" title="谷歌CEO桑达尔·皮查伊公开承认公司AI模型生成不准确回答的问题。他提醒用户不要盲目相信AI提供的信息。">谷歌CEO桑达尔·皮查伊公开承认公司AI模型生成不准确回答的问题。他提醒用户不要盲目相信AI提供的信息。</p>
+  <div class="more"><a href="https://www.bbc.com/news/articles/c8drzv37z4jo?at_medium=RSS&at_campaign=rss" target="_blank" rel="noopener">阅读原文 →</a></div>
+  </article></div></section><section id="二、产品/技术动态" class="sec"><h2 class="sec-hd"><span>二、产品/技术动态</span></h2><div class="grid"><article class="card" data-sec="二、产品/技术动态">
+  <h3 class="title"><a href="https://www.ithome.com/0/898/454.htm" target="_blank" rel="noopener">Cloudflare因数据库权限变更导致全球服务故障</a></h3>
+  <div class="meta">（2025-11-19 09:00）</div><p class="recap" title="Cloudflare因数据库权限变更导致功能文件异常增大，引发全球服务故障，影响多个网站。官方排除了网络攻击原因，并通过回滚文件与重启核心代理恢复正常。">Cloudflare因数据库权限变更导致功能文件异常增大，引发全球服务故障，影响多个网站。官方排除了网络攻击原因，并通过回滚文件与重启核心代理恢复正常。</p>
+  <div class="more"><a href="https://www.ithome.com/0/898/454.htm" target="_blank" rel="noopener">阅读原文 →</a></div>
+  </article><article class="card" data-sec="二、产品/技术动态">
+  <h3 class="title"><a href="https://www.tmtpost.com/7770734.html" target="_blank" rel="noopener">摩尔线程开发者大会将发布新产品，夸克接入千问助手，蚂蚁推出灵光AI助手</a></h3>
+  <div class="meta">钛媒体官方账号（2025-11-19 07:20）</div><p class="recap" title="摩尔线程宣布12月19日举办开发者大会，将发布全新产品和架构。夸克全面接入千问对话助手，将推出AI浏览器。蚂蚁集团推出全模态通用AI助手“灵光”。">摩尔线程宣布12月19日举办开发者大会，将发布全新产品和架构。夸克全面接入千问对话助手，将推出AI浏览器。蚂蚁集团推出全模态通用AI助手“灵光”。</p>
+  <div class="more"><a href="https://www.tmtpost.com/7770734.html" target="_blank" rel="noopener">阅读原文 →</a></div>
+  </article><article class="card" data-sec="二、产品/技术动态">
+  <h3 class="title"><a href="https://www.ithome.com/0/898/436.htm" target="_blank" rel="noopener">谷歌发布Gemini 3系列AI模型，具备原生多模态能力并集成至搜索与Gemini应用</a></h3>
+  <div class="meta">（2025-11-19 07:17）</div><p class="recap" title="谷歌正式推出Gemini 3系列模型，其核心能力为原生多模态处理文字、图片与音频。该模型已集成至Gemini应用及搜索订阅服务，提供更丰富的交互界面和推理能力，并在LMArena评测平台排名第一。">谷歌正式推出Gemini 3系列模型，其核心能力为原生多模态处理文字、图片与音频。该模型已集成至Gemini应用及搜索订阅服务，提供更丰富的交互界面和推理能力，并在LMArena评测平台排名第一。</p>
+  <div class="more"><a href="https://www.ithome.com/0/898/436.htm" target="_blank" rel="noopener">阅读原文 →</a></div>
+  </article><article class="card" data-sec="二、产品/技术动态">
+  <h3 class="title"><a href="https://www.ithome.com/0/898/432.htm" target="_blank" rel="noopener">福特智趣烈马开启预售，预售价22.98万元起，提供增程与纯电双动力</a></h3>
+  <div class="meta">（2025-11-19 06:30）</div><p class="recap" title="江铃福特智趣烈马正式开启预售，预售价22.98-28.28万元，提供增程和纯电两种动力版本。新车搭载高通骁龙8255芯片和双英伟达Orin-X芯片，配备31个感知硬件和一线激光雷达，支持RPA车外遥控泊车辅助。">江铃福特智趣烈马正式开启预售，预售价22.98-28.28万元，提供增程和纯电两种动力版本。新车搭载高通骁龙8255芯片和双英伟达Orin-X芯片，配备31个感知硬件和一线激光雷达，支持RPA车外遥控泊车辅助。</p>
+  <div class="more"><a href="https://www.ithome.com/0/898/432.htm" target="_blank" rel="noopener">阅读原文 →</a></div>
+  </article><article class="card" data-sec="二、产品/技术动态">
+  <h3 class="title"><a href="http://mp.weixin.qq.com/s?__biz=MzI3MTA0MTk1MA==&mid=2652646625&idx=1&sn=c2cf6c14c2052a54dbeacb25b75a54b6&chksm=f05571d462bddfc1216086f5339cf76475e90a47c78600ddaa467f697e859d54924c9e39f4df&scene=0#rd" target="_blank" rel="noopener">谷歌发布Gemini 3 Pro模型及Deep Think模式</a></h3>
+  <div class="meta">新智元（2025-11-19 04:07）</div><p class="recap" title="谷歌发布新一代旗舰模型Gemini 3 Pro，在多项基准测试中表现优异，并推出Deep Think增强推理模式。OpenAI CEO奥特曼在社交媒体上对此表示祝贺。Gemini 3 Pro预览版即日起上线。">谷歌发布新一代旗舰模型Gemini 3 Pro，在多项基准测试中表现优异，并推出Deep Think增强推理模式。OpenAI CEO奥特曼在社交媒体上对此表示祝贺。Gemini 3 Pro预览版即日起上线。</p>
+  <div class="more"><a href="http://mp.weixin.qq.com/s?__biz=MzI3MTA0MTk1MA==&mid=2652646625&idx=1&sn=c2cf6c14c2052a54dbeacb25b75a54b6&chksm=f05571d462bddfc1216086f5339cf76475e90a47c78600ddaa467f697e859d54924c9e39f4df&scene=0#rd" target="_blank" rel="noopener">阅读原文 →</a></div>
+  </article><article class="card" data-sec="二、产品/技术动态">
+  <h3 class="title"><a href="https://venturebeat.com/ai/musks-xai-launches-grok-4-1-with-lower-hallucination-rate-on-the-web-and" target="_blank" rel="noopener">xAI发布Grok 4.1模型，降低幻觉率但暂不开放API</a></h3>
+  <div class="meta">carl.franzen@venturebeat.com (Carl Franzen)（2025-11-19 04:03）</div><p class="recap" title="埃隆·马斯克的xAI公司推出Grok 4.1大语言模型，在推理速度、情感智能和幻觉率方面有显著改进，并在多个基准测试中领先竞争对手。但该模型目前仅限消费者通过网页和移动应用使用，尚未开放企业API接入。">埃隆·马斯克的xAI公司推出Grok 4.1大语言模型，在推理速度、情感智能和幻觉率方面有显著改进，并在多个基准测试中领先竞争对手。但该模型目前仅限消费者通过网页和移动应用使用，尚未开放企业API接入。</p>
+  <div class="more"><a href="https://venturebeat.com/ai/musks-xai-launches-grok-4-1-with-lower-hallucination-rate-on-the-web-and" target="_blank" rel="noopener">阅读原文 →</a></div>
+  </article><article class="card" data-sec="二、产品/技术动态">
+  <h3 class="title"><a href="http://www.geekpark.net/news/356579" target="_blank" rel="noopener">谷歌发布Gemini 3.0 Pro预览版及Antigravity编程平台</a></h3>
+  <div class="meta">极客公园（2025-11-19 03:17）</div><p class="recap" title="谷歌正式上线Gemini 3.0 Pro预览版并开放API，该模型在数学、视觉理解和Agent能力方面表现突出，同时在AIME 2025测试中获得满分。谷歌还发布了智能体优先的编程平台Antigravity。">谷歌正式上线Gemini 3.0 Pro预览版并开放API，该模型在数学、视觉理解和Agent能力方面表现突出，同时在AIME 2025测试中获得满分。谷歌还发布了智能体优先的编程平台Antigravity。</p>
+  <div class="more"><a href="http://www.geekpark.net/news/356579" target="_blank" rel="noopener">阅读原文 →</a></div>
+  </article><article class="card" data-sec="二、产品/技术动态">
+  <h3 class="title"><a href="https://www.nytimes.com/2025/11/18/technology/google-gemini-3.html" target="_blank" rel="noopener">谷歌发布双子座3人工智能模型</a></h3>
+  <div class="meta">Tripp Mickle and Cade Metz（2025-11-19 00:29）</div><p class="recap" title="谷歌发布新人工智能模型双子座3，这是该公司今年发布的第二个模型。OpenAI和Anthropic在几个月前也进行了类似更新。">谷歌发布新人工智能模型双子座3，这是该公司今年发布的第二个模型。OpenAI和Anthropic在几个月前也进行了类似更新。</p>
+  <div class="more"><a href="https://www.nytimes.com/2025/11/18/technology/google-gemini-3.html" target="_blank" rel="noopener">阅读原文 →</a></div>
+  </article><article class="card" data-sec="二、产品/技术动态">
+  <h3 class="title"><a href="https://www.cnet.com/tech/services-and-software/google-says-new-gemini-3-ai-model-will-better-understand-your-requests/#ftag=CAD590a51e" target="_blank" rel="noopener">谷歌发布双子座3 AI模型</a></h3>
+  <div class="meta">Imad Khan（2025-11-19 00:03）</div><p class="recap" title="谷歌推出新的双子座3 AI模型，该模型能更好地理解用户请求。双子座3已在Gemini应用中向所有用户开放，并为谷歌搜索的AI模式提供支持。">谷歌推出新的双子座3 AI模型，该模型能更好地理解用户请求。双子座3已在Gemini应用中向所有用户开放，并为谷歌搜索的AI模式提供支持。</p>
+  <div class="more"><a href="https://www.cnet.com/tech/services-and-software/google-says-new-gemini-3-ai-model-will-better-understand-your-requests/#ftag=CAD590a51e" target="_blank" rel="noopener">阅读原文 →</a></div>
+  </article><article class="card" data-sec="二、产品/技术动态">
+  <h3 class="title"><a href="https://www.engadget.com/ai/googles-new-gemini-3-model-arrives-in-ai-mode-and-the-gemini-app-160054273.html?src=rss" target="_blank" rel="noopener">谷歌发布Gemini 3 Pro模型并集成至Gemini应用和AI Mode</a></h3>
+  <div class="meta">Igor Bonifacic（2025-11-19 00:00）</div><p class="recap" title="谷歌发布Gemini 3 Pro人工智能模型，声称是其最智能的模型，在多项基准测试中取得领先成绩。该模型已在Gemini应用和搜索的AI Mode中推出，提供更简洁的回答和新的Gemini Agent功能。开发者可通过Gemini API、AI Studio和Vertex AI使用该模型。">谷歌发布Gemini 3 Pro人工智能模型，声称是其最智能的模型，在多项基准测试中取得领先成绩。该模型已在Gemini应用和搜索的AI Mode中推出，提供更简洁的回答和新的Gemini Agent功能。开发者可通过Gemini API、AI Studio和Vertex AI使用该模型。</p>
+  <div class="more"><a href="https://www.engadget.com/ai/googles-new-gemini-3-model-arrives-in-ai-mode-and-the-gemini-app-160054273.html?src=rss" target="_blank" rel="noopener">阅读原文 →</a></div>
+  </article><article class="card" data-sec="二、产品/技术动态">
+  <h3 class="title"><a href="https://www.bloomberg.com/news/articles/2025-11-18/google-launches-new-gemini-ai-model-with-interactive-answers" target="_blank" rel="noopener">谷歌发布新版双子座AI模型</a></h3>
+  <div class="meta">Davey Alba, Carmen Arroyo（2025-11-19 00:00）</div><p class="recap" title="谷歌推出更新版人工智能模型Gemini，公司高管称该版本在推理和编程能力方面实现巨大提升。">谷歌推出更新版人工智能模型Gemini，公司高管称该版本在推理和编程能力方面实现巨大提升。</p>
+  <div class="more"><a href="https://www.bloomberg.com/news/articles/2025-11-18/google-launches-new-gemini-ai-model-with-interactive-answers" target="_blank" rel="noopener">阅读原文 →</a></div>
+  </article></div></section><section id="三、资本市场动态及企业战略布局" class="sec"><h2 class="sec-hd"><span>三、资本市场动态及企业战略布局</span></h2><div class="grid"><article class="card" data-sec="三、资本市场动态及企业战略布局">
+  <h3 class="title"><a href="https://www.bloomberg.com/news/videos/2025-11-18/bloomberg-tech-11-18-2025-video" target="_blank" rel="noopener">微软与英伟达将向AI初创公司Anthropic投资150亿美元</a></h3>
+  <div class="meta">Bloomberg（2025-11-19 06:07）</div><p class="recap" title="微软和英伟达计划共同向AI初创公司Anthropic投资高达150亿美元。沙特王储访问白宫将讨论芯片和AI技术投资。Roblox推出年龄验证工具以提升用户安全。">微软和英伟达计划共同向AI初创公司Anthropic投资高达150亿美元。沙特王储访问白宫将讨论芯片和AI技术投资。Roblox推出年龄验证工具以提升用户安全。</p>
+  <div class="more"><a href="https://www.bloomberg.com/news/videos/2025-11-18/bloomberg-tech-11-18-2025-video" target="_blank" rel="noopener">阅读原文 →</a></div>
+  </article></div></section></div>
+    <div id="yesterday-content" class="date-content"><section id="一、权威观点/报告" class="sec"><h2 class="sec-hd"><span>一、权威观点/报告</span></h2><div class="grid"><article class="card" data-sec="一、权威观点/报告">
   <h3 class="title"><a href="http://mp.weixin.qq.com/s?__biz=MzI3MTA0MTk1MA==&mid=2652646370&idx=1&sn=d31c50efdad2fb8ebdc1dd8dc5202b22&chksm=f0448316a2b1ebcb5ba0f63819a11aa0c90c895236e286f426a5c640a49461c1a03dcbe8de94&scene=0#rd" target="_blank" rel="noopener">Anthropic CEO预测AI将取代一半初级白领岗位</a></h3>
   <div class="meta">新智元（2025-11-18 19:07）</div><p class="recap" title="Anthropic CEO达里奥·阿莫代在接受《60分钟》采访时表示，未来一到五年内AI可能淘汰一半初级白领岗位，导致失业率升至10%-20%。他还透露Anthropic在压力测试中发现AI模型曾出现敲诈行为，公司已进行调整。">Anthropic CEO达里奥·阿莫代在接受《60分钟》采访时表示，未来一到五年内AI可能淘汰一半初级白领岗位，导致失业率升至10%-20%。他还透露Anthropic在压力测试中发现AI模型曾出现敲诈行为，公司已进行调整。</p>
   <div class="more"><a href="http://mp.weixin.qq.com/s?__biz=MzI3MTA0MTk1MA==&mid=2652646370&idx=1&sn=d31c50efdad2fb8ebdc1dd8dc5202b22&chksm=f0448316a2b1ebcb5ba0f63819a11aa0c90c895236e286f426a5c640a49461c1a03dcbe8de94&scene=0#rd" target="_blank" rel="noopener">阅读原文 →</a></div>
@@ -308,7 +525,7 @@ footer{ max-width:1180px; margin:22px auto 44px; padding:0 18px; color:var(--sub
   <div class="meta">The Verge（2025-11-18 06:47）</div><p class="recap" title="OpenAI向员工发送邮件，允许现任及前任员工将符合条件的股权捐赠给慈善机构。此前员工因长期无法捐赠股权感到不满。">OpenAI向员工发送邮件，允许现任及前任员工将符合条件的股权捐赠给慈善机构。此前员工因长期无法捐赠股权感到不满。</p>
   <div class="more"><a href="https://www.theverge.com/ai-artificial-intelligence/822496/openai-employee-equity-donation-charity-rounds-share-valuation" target="_blank" rel="noopener">阅读原文 →</a></div>
   </article></div></section></div>
-    <div id="yesterday-content" class="date-content"><section id="一、权威观点/报告" class="sec"><h2 class="sec-hd"><span>一、权威观点/报告</span></h2><div class="grid"><article class="card" data-sec="一、权威观点/报告">
+    <div id="beforeYesterday-content" class="date-content"><section id="一、权威观点/报告" class="sec"><h2 class="sec-hd"><span>一、权威观点/报告</span></h2><div class="grid"><article class="card" data-sec="一、权威观点/报告">
   <h3 class="title"><a href="https://www.theguardian.com/technology/2025/nov/17/ai-firms-risks-tobacco-anthropic-artificial-intelligence-dario-amodei" target="_blank" rel="noopener">Anthropic负责人称人工智能公司需明确产品风险</a></h3>
   <div class="meta">Dan Milmo Global technology editor（2025-11-17 19:35）</div><p class="recap" title="Anthropic首席执行官Dario Amodei表示，人工智能将比大多数或所有人类更聪明，AI公司必须对其产品风险保持透明，否则可能重蹈烟草和制药公司的覆辙。">Anthropic首席执行官Dario Amodei表示，人工智能将比大多数或所有人类更聪明，AI公司必须对其产品风险保持透明，否则可能重蹈烟草和制药公司的覆辙。</p>
   <div class="more"><a href="https://www.theguardian.com/technology/2025/nov/17/ai-firms-risks-tobacco-anthropic-artificial-intelligence-dario-amodei" target="_blank" rel="noopener">阅读原文 →</a></div>
@@ -413,7 +630,6 @@ footer{ max-width:1180px; margin:22px auto 44px; padding:0 18px; color:var(--sub
   <div class="meta">Jackson Chen（2025-11-17 02:30）</div><p class="recap" title="谷歌宣布计划投资400亿美元在得克萨斯州建设三座新数据中心，用于支持其云服务和人工智能业务。该投资是谷歌在美国各州中规模最大的，预计将持续至2027年。">谷歌宣布计划投资400亿美元在得克萨斯州建设三座新数据中心，用于支持其云服务和人工智能业务。该投资是谷歌在美国各州中规模最大的，预计将持续至2027年。</p>
   <div class="more"><a href="https://www.engadget.com/big-tech/google-plans-to-invest-40-billion-towards-building-data-centers-in-texas-183056066.html?src=rss" target="_blank" rel="noopener">阅读原文 →</a></div>
   </article></div></section></div>
-    <div id="beforeYesterday-content" class="date-content"><div class="empty-state">前日暂无数据</div></div>
   </main>
 </div>
 
