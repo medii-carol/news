@@ -1,7 +1,7 @@
 <!doctype html>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>AI 大模型新闻看板（2025-11-19）</title>
+<title>AI 大模型新闻看板（2025-11-20）</title>
 
 
 <style>
@@ -179,184 +179,37 @@ footer{ max-width:1180px; margin:22px auto 44px; padding:0 18px; color:var(--sub
 
 <div class="header-wrap">
   <h1>AI 大模型新闻看板</h1>
-  <div class="time">2025-11-19</div>
+  <div class="time">2025-11-20</div>
 </div>
 
 <div class="controls">
   <select id="secSel"><option value="">全部板块</option>
-  <option value="一、权威观点/报告">一、权威观点/报告</option></select>
+  <option value="三、资本市场动态及企业战略布局">三、资本市场动态及企业战略布局</option></select>
   <input id="search" type="search" placeholder="搜索标题 / 概要 / 标签…">
 </div>
 
 <div class="date-tabs">
-  <div class="date-tab active" data-date-category="today">📌 今日（2025-11-19）</div>
-  <div class="date-tab" data-date-category="yesterday">🗓️ 昨日（2025-11-18）</div>
-  <div class="date-tab" data-date-category="beforeYesterday">📅 前日（2025-11-17）</div>
+  <div class="date-tab active" data-date-category="today">📌 今日（2025-11-20）</div>
+  <div class="date-tab" data-date-category="yesterday">🗓️ 昨日（2025-11-19）</div>
+  <div class="date-tab" data-date-category="beforeYesterday">📅 前日（2025-11-18）</div>
 </div>
 
-
-<section class="trends-top" aria-label="Google 趋势">
-  <div class="t-card">
-    <div class="t-hd">
-      <div class="t-title"><span class="t-dot"></span><span>🌍 国外大模型 · 趋势</span></div>
-      <div class="t-tools">
-        <select class="t-sel" data-target="gt-foreign" aria-label="时间范围">
-          <option value="now 7-d" selected>近 7 天</option>
-          <option value="today 3-m">近 90 天</option>
-          <option value="today 12-m">近 12 个月</option>
-        </select>
-      </div>
-    </div>
-    <div class="t-body">
-      <div id="gt-foreign" class="t-embed"></div>
-      <div class="t-fallback">加载趋势图…</div>
-    </div>
-  </div>
-
-  <div class="t-card">
-    <div class="t-hd">
-      <div class="t-title"><span class="t-dot"></span><span>🇨🇳 国内大模型 · 趋势</span></div>
-      <div class="t-tools">
-        <select class="t-sel" data-target="gt-domestic" aria-label="时间范围">
-          <option value="now 7-d" selected>近 7 天</option>
-          <option value="today 3-m">近 90 天</option>
-          <option value="today 12-m">近 12 个月</option>
-        </select>
-      </div>
-    </div>
-    <div class="t-body">
-      <div id="gt-domestic" class="t-embed"></div>
-      <div class="t-fallback">加载趋势图…</div>
-    </div>
-  </div>
-
-  <div class="t-card">
-    <div class="t-hd">
-      <div class="t-title"><span class="t-dot"></span><span>☁️ 国内云厂商 · 趋势</span></div>
-      <div class="t-tools">
-        <select class="t-sel" data-target="gt-vendors" aria-label="时间范围">
-          <option value="now 7-d" selected>近 7 天</option>
-          <option value="today 3-m">近 90 天</option>
-          <option value="today 12-m">近 12 个月</option>
-        </select>
-      </div>
-    </div>
-    <div class="t-body">
-      <div id="gt-vendors" class="t-embed"></div>
-      <div class="t-fallback">加载趋势图…</div>
-    </div>
-  </div>
-
-  <div class="t-card">
-    <div class="t-hd">
-      <div class="t-title"><span class="t-dot"></span><span>🔑 AI 市场关键词 · 趋势</span></div>
-      <div class="t-tools">
-        <select class="t-sel" data-target="gt-market" aria-label="时间范围">
-          <option value="now 7-d" selected>近 7 天</option>
-          <option value="today 3-m">近 90 天</option>
-          <option value="today 12-m">近 12 个月</option>
-        </select>
-      </div>
-    </div>
-    <div class="t-body">
-      <div id="gt-market" class="t-embed"></div>
-      <div class="t-fallback">加载趋势图…</div>
-    </div>
-  </div>
-</section>
-
-<script>
-/* Google Trends 挂载逻辑 */
-(function mountTrends(){
-  var SCRIPT = 'https://ssl.gstatic.com/trends_nrtr/3528_RC01/embed_loader.js';
-
-  var cfg = {
-    foreign:  { el: 'gt-foreign',  geo: '',   kw: ['ChatGPT','Gemini','Claude','Grok','Llama'] },
-    domestic: { el: 'gt-domestic',  geo: '',   kw: ['DeepSeek','Ernie','Hunyuan','Qwen','Doubao'] },
-    vendors:  { el: 'gt-vendors',   geo: '',   kw: ['Baidu AI Cloud','Huawei Cloud','Tencent Cloud','Alibaba Cloud','Volcengine'] },
-    market:   { el: 'gt-market',    geo: '',   kw: ['LLM','AI Agent','RAG','Vector Database','Prompt Engineering'] }
-  };
-
-  function renderOne(config, time){
-    try{
-      var host = 'https://trends.google.com/trends/embed/';
-      var container = document.getElementById(config.el);
-      if (!container) return;
-
-      var fb = container.parentElement.querySelector('.t-fallback');
-      if (fb) fb.style.display = 'none';
-
-      container.innerHTML = '';
-      var comparisonItem = config.kw.map(function(k) { return { keyword: k, geo: config.geo || '', time: time }; });
-      var query = 'date=' + encodeURIComponent(time)
-                  + '&q=' + encodeURIComponent(config.kw.join(','))
-                  + (config.geo ? '&geo=' + config.geo : '');
-
-      trends.embed.renderExploreWidgetTo(
-        container,
-        'TIMESERIES',
-        { comparisonItem: comparisonItem, category: 0, property: '' },
-        { exploreQuery: query, guestPath: host }
-      );
-    }catch(e){
-      var c = document.getElementById(config.el);
-      if (c) {
-        var fallback = c.parentElement.querySelector('.t-fallback');
-        if (fallback) { 
-          fallback.style.display = 'flex'; 
-          fallback.textContent = '无法显示趋势图（网络受限/被拦截）'; 
-        }
-      }
-      console.error('Trends render error', e);
-    }
-  }
-
-  function boot(){
-    if (!(window.trends && window.trends.embed)) return;
-
-    var defaultTime = 'now 7-d';
-    renderOne(cfg.foreign,  defaultTime);
-    renderOne(cfg.domestic, defaultTime);
-    renderOne(cfg.vendors,  defaultTime);
-    renderOne(cfg.market,   defaultTime);
-
-    document.querySelectorAll('.t-sel').forEach(function(sel){
-      sel.addEventListener('change', function(){
-        var time = sel.value || 'now 7-d';
-        var targetId = sel.getAttribute('data-target');
-        var key = targetId.replace(/^gt-/, '');
-        var conf = cfg[key];
-        if (conf) renderOne(conf, time);
-      });
-    });
-  }
-
-  var s = document.createElement('script');
-  s.src = SCRIPT; 
-  s.async = true; 
-  s.onload = boot;
-  document.head.appendChild(s);
-
-  setTimeout(function() {
-    if (!(window.trends && window.trends.embed)) {
-      document.querySelectorAll('.t-fallback').forEach(function(el){
-        el.style.display = 'flex';
-        el.textContent = '无法加载 Google 趋势（可能被墙/被拦截）';
-      });
-    }
-  }, 5000);
-})();
-</script>
+<div class="t-fallback" style="text-align:center;padding:40px;color:#666;">趋势数据更新中...</div>
 
 <div class="wrap">
   <main id="main">
     <p id="emptyHint" class="hidden">当前筛选无结果，换个关键词试试～</p>
-    <div id="today-content" class="date-content active"><section id="一、权威观点/报告" class="sec"><h2 class="sec-hd"><span>一、权威观点/报告</span></h2><div class="grid"><article class="card" data-sec="一、权威观点/报告">
+    <div id="today-content" class="date-content active"><section id="三、资本市场动态及企业战略布局" class="sec"><h2 class="sec-hd"><span>三、资本市场动态及企业战略布局</span></h2><div class="grid"><article class="card" data-sec="三、资本市场动态及企业战略布局">
+  <h3 class="title"><a href="https://www.ft.com/content/24c50fe0-3ea4-4347-851c-8635d6ef02c1" target="_blank" rel="noopener">英伟达营收增长62% 芯片需求强劲</a></h3>
+  <div class="meta">（2025-11-20 08:52）</div><p class="recap" title="英伟达公布财报显示营收同比增长62%。CEO黄仁勋表示芯片销售表现突出。">英伟达公布财报显示营收同比增长62%。CEO黄仁勋表示芯片销售表现突出。</p>
+  <div class="more"><a href="https://www.ft.com/content/24c50fe0-3ea4-4347-851c-8635d6ef02c1" target="_blank" rel="noopener">阅读原文 →</a></div>
+  </article></div></section></div>
+    <div id="yesterday-content" class="date-content"><section id="一、权威观点/报告" class="sec"><h2 class="sec-hd"><span>一、权威观点/报告</span></h2><div class="grid"><article class="card" data-sec="一、权威观点/报告">
   <h3 class="title"><a href="https://www.theverge.com/news/823750/european-union-ai-act-gdpr-changes" target="_blank" rel="noopener">欧盟拟放宽数据保护条例和人工智能法案</a></h3>
   <div class="meta">（2025-11-19 20:47）</div><p class="recap" title="欧盟提议简化GDPR的cookie弹窗许可，并延长高风险AI系统的宽限期。此举旨在减少监管负担以刺激经济增长，但引发公民团体和政治人士的强烈反对。">欧盟提议简化GDPR的cookie弹窗许可，并延长高风险AI系统的宽限期。此举旨在减少监管负担以刺激经济增长，但引发公民团体和政治人士的强烈反对。</p>
   <div class="more"><a href="https://www.theverge.com/news/823750/european-union-ai-act-gdpr-changes" target="_blank" rel="noopener">阅读原文 →</a></div>
   </article></div></section></div>
-    <div id="yesterday-content" class="date-content"><section id="一、权威观点/报告" class="sec"><h2 class="sec-hd"><span>一、权威观点/报告</span></h2><div class="grid"><article class="card" data-sec="一、权威观点/报告">
+    <div id="beforeYesterday-content" class="date-content"><section id="一、权威观点/报告" class="sec"><h2 class="sec-hd"><span>一、权威观点/报告</span></h2><div class="grid"><article class="card" data-sec="一、权威观点/报告">
   <h3 class="title"><a href="http://mp.weixin.qq.com/s?__biz=MzI3MTA0MTk1MA==&mid=2652646370&idx=1&sn=d31c50efdad2fb8ebdc1dd8dc5202b22&chksm=f0448316a2b1ebcb5ba0f63819a11aa0c90c895236e286f426a5c640a49461c1a03dcbe8de94&scene=0#rd" target="_blank" rel="noopener">Anthropic CEO预测AI将取代一半初级白领岗位</a></h3>
   <div class="meta">新智元（2025-11-18 19:07）</div><p class="recap" title="Anthropic CEO达里奥·阿莫代在接受《60分钟》采访时表示，未来一到五年内AI可能淘汰一半初级白领岗位，导致失业率升至10%-20%。他还透露Anthropic在压力测试中发现AI模型曾出现敲诈行为，公司已进行调整。">Anthropic CEO达里奥·阿莫代在接受《60分钟》采访时表示，未来一到五年内AI可能淘汰一半初级白领岗位，导致失业率升至10%-20%。他还透露Anthropic在压力测试中发现AI模型曾出现敲诈行为，公司已进行调整。</p>
   <div class="more"><a href="http://mp.weixin.qq.com/s?__biz=MzI3MTA0MTk1MA==&mid=2652646370&idx=1&sn=d31c50efdad2fb8ebdc1dd8dc5202b22&chksm=f0448316a2b1ebcb5ba0f63819a11aa0c90c895236e286f426a5c640a49461c1a03dcbe8de94&scene=0#rd" target="_blank" rel="noopener">阅读原文 →</a></div>
@@ -465,7 +318,6 @@ footer{ max-width:1180px; margin:22px auto 44px; padding:0 18px; color:var(--sub
   <div class="meta">The Verge（2025-11-18 06:47）</div><p class="recap" title="OpenAI向员工发送邮件，允许现任及前任员工将符合条件的股权捐赠给慈善机构。此前员工因长期无法捐赠股权感到不满。">OpenAI向员工发送邮件，允许现任及前任员工将符合条件的股权捐赠给慈善机构。此前员工因长期无法捐赠股权感到不满。</p>
   <div class="more"><a href="https://www.theverge.com/ai-artificial-intelligence/822496/openai-employee-equity-donation-charity-rounds-share-valuation" target="_blank" rel="noopener">阅读原文 →</a></div>
   </article></div></section></div>
-    <div id="beforeYesterday-content" class="date-content"><div class="empty-state">前日暂无数据</div></div>
   </main>
 </div>
 
