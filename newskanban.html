@@ -184,7 +184,7 @@ footer{ max-width:1180px; margin:22px auto 44px; padding:0 18px; color:var(--sub
 
 <div class="controls">
   <select id="secSel"><option value="">全部板块</option>
-  <option value="一、权威观点/报告">一、权威观点/报告</option><option value="二、产品/技术动态">二、产品/技术动态</option><option value="三、资本市场动态及企业战略布局">三、资本市场动态及企业战略布局</option></select>
+  <option value="一、权威观点/报告">一、权威观点/报告</option><option value="二、产品/技术动态">二、产品/技术动态</option><option value="三、资本市场动态及企业战略布局">三、资本市场动态及企业战略布局</option><option value="四、品牌与市场动作">四、品牌与市场动作</option></select>
   <input id="search" type="search" placeholder="搜索标题 / 概要 / 标签…">
 </div>
 
@@ -194,191 +194,67 @@ footer{ max-width:1180px; margin:22px auto 44px; padding:0 18px; color:var(--sub
   <div class="date-tab" data-date-category="beforeYesterday">📅 前日（2025-11-21）</div>
 </div>
 
-
-<section class="trends-top" aria-label="Google 趋势">
-  <div class="t-card">
-    <div class="t-hd">
-      <div class="t-title"><span class="t-dot"></span><span>🌍 国外大模型 · 趋势</span></div>
-      <div class="t-tools">
-        <select class="t-sel" data-target="gt-foreign" aria-label="时间范围">
-          <option value="now 7-d" selected>近 7 天</option>
-          <option value="today 3-m">近 90 天</option>
-          <option value="today 12-m">近 12 个月</option>
-        </select>
-      </div>
-    </div>
-    <div class="t-body">
-      <div id="gt-foreign" class="t-embed"></div>
-      <div class="t-fallback">加载趋势图…</div>
-    </div>
-  </div>
-
-  <div class="t-card">
-    <div class="t-hd">
-      <div class="t-title"><span class="t-dot"></span><span>🇨🇳 国内大模型 · 趋势</span></div>
-      <div class="t-tools">
-        <select class="t-sel" data-target="gt-domestic" aria-label="时间范围">
-          <option value="now 7-d" selected>近 7 天</option>
-          <option value="today 3-m">近 90 天</option>
-          <option value="today 12-m">近 12 个月</option>
-        </select>
-      </div>
-    </div>
-    <div class="t-body">
-      <div id="gt-domestic" class="t-embed"></div>
-      <div class="t-fallback">加载趋势图…</div>
-    </div>
-  </div>
-
-  <div class="t-card">
-    <div class="t-hd">
-      <div class="t-title"><span class="t-dot"></span><span>☁️ 国内云厂商 · 趋势</span></div>
-      <div class="t-tools">
-        <select class="t-sel" data-target="gt-vendors" aria-label="时间范围">
-          <option value="now 7-d" selected>近 7 天</option>
-          <option value="today 3-m">近 90 天</option>
-          <option value="today 12-m">近 12 个月</option>
-        </select>
-      </div>
-    </div>
-    <div class="t-body">
-      <div id="gt-vendors" class="t-embed"></div>
-      <div class="t-fallback">加载趋势图…</div>
-    </div>
-  </div>
-
-  <div class="t-card">
-    <div class="t-hd">
-      <div class="t-title"><span class="t-dot"></span><span>🔑 AI 市场关键词 · 趋势</span></div>
-      <div class="t-tools">
-        <select class="t-sel" data-target="gt-market" aria-label="时间范围">
-          <option value="now 7-d" selected>近 7 天</option>
-          <option value="today 3-m">近 90 天</option>
-          <option value="today 12-m">近 12 个月</option>
-        </select>
-      </div>
-    </div>
-    <div class="t-body">
-      <div id="gt-market" class="t-embed"></div>
-      <div class="t-fallback">加载趋势图…</div>
-    </div>
-  </div>
-</section>
-
-<script>
-/* Google Trends 挂载逻辑 */
-(function mountTrends(){
-  var SCRIPT = 'https://ssl.gstatic.com/trends_nrtr/3528_RC01/embed_loader.js';
-
-  var cfg = {
-    foreign:  { el: 'gt-foreign',  geo: '',   kw: ['ChatGPT','Gemini','Claude','Grok','Llama'] },
-    domestic: { el: 'gt-domestic',  geo: '',   kw: ['DeepSeek','Ernie','Hunyuan','Qwen','Doubao'] },
-    vendors:  { el: 'gt-vendors',   geo: '',   kw: ['Baidu AI Cloud','Huawei Cloud','Tencent Cloud','Alibaba Cloud','Volcengine'] },
-    market:   { el: 'gt-market',    geo: '',   kw: ['LLM','AI Agent','RAG','Vector Database','Prompt Engineering'] }
-  };
-
-  function renderOne(config, time){
-    try{
-      var host = 'https://trends.google.com/trends/embed/';
-      var container = document.getElementById(config.el);
-      if (!container) return;
-
-      var fb = container.parentElement.querySelector('.t-fallback');
-      if (fb) fb.style.display = 'none';
-
-      container.innerHTML = '';
-      var comparisonItem = config.kw.map(function(k) { return { keyword: k, geo: config.geo || '', time: time }; });
-      var query = 'date=' + encodeURIComponent(time)
-                  + '&q=' + encodeURIComponent(config.kw.join(','))
-                  + (config.geo ? '&geo=' + config.geo : '');
-
-      trends.embed.renderExploreWidgetTo(
-        container,
-        'TIMESERIES',
-        { comparisonItem: comparisonItem, category: 0, property: '' },
-        { exploreQuery: query, guestPath: host }
-      );
-    }catch(e){
-      var c = document.getElementById(config.el);
-      if (c) {
-        var fallback = c.parentElement.querySelector('.t-fallback');
-        if (fallback) { 
-          fallback.style.display = 'flex'; 
-          fallback.textContent = '无法显示趋势图（网络受限/被拦截）'; 
-        }
-      }
-      console.error('Trends render error', e);
-    }
-  }
-
-  function boot(){
-    if (!(window.trends && window.trends.embed)) return;
-
-    var defaultTime = 'now 7-d';
-    renderOne(cfg.foreign,  defaultTime);
-    renderOne(cfg.domestic, defaultTime);
-    renderOne(cfg.vendors,  defaultTime);
-    renderOne(cfg.market,   defaultTime);
-
-    document.querySelectorAll('.t-sel').forEach(function(sel){
-      sel.addEventListener('change', function(){
-        var time = sel.value || 'now 7-d';
-        var targetId = sel.getAttribute('data-target');
-        var key = targetId.replace(/^gt-/, '');
-        var conf = cfg[key];
-        if (conf) renderOne(conf, time);
-      });
-    });
-  }
-
-  var s = document.createElement('script');
-  s.src = SCRIPT; 
-  s.async = true; 
-  s.onload = boot;
-  document.head.appendChild(s);
-
-  setTimeout(function() {
-    if (!(window.trends && window.trends.embed)) {
-      document.querySelectorAll('.t-fallback').forEach(function(el){
-        el.style.display = 'flex';
-        el.textContent = '无法加载 Google 趋势（可能被墙/被拦截）';
-      });
-    }
-  }, 5000);
-})();
-</script>
+<div class="t-fallback" style="text-align:center;padding:40px;color:#666;">趋势数据更新中...</div>
 
 <div class="wrap">
   <main id="main">
     <p id="emptyHint" class="hidden">当前筛选无结果，换个关键词试试～</p>
     <div id="today-content" class="date-content active"><section id="一、权威观点/报告" class="sec"><h2 class="sec-hd"><span>一、权威观点/报告</span></h2><div class="grid"><article class="card" data-sec="一、权威观点/报告">
-  <h3 class="title"><a href="http://mp.weixin.qq.com/s?__biz=MjM5MDE0Mjc4MA==&mid=2651263952&idx=1&sn=14696e47347d9ca62cb19af5a5a6f9c6&chksm=bc3464ef49970c2bc2fa8d51f94207c8b43625bb2b306956bf18486a9c50dcb6b06e4cf7e350&scene=0#rd" target="_blank" rel="noopener">Fireflies估值达10亿美元，创始人曾人工提供AI会议记录服务</a></h3>
-  <div class="meta">AI前线（2025-11-23 10:15）</div><p class="recap" title="AI笔记创业公司Fireflies宣布估值达到10亿美元，联合创始人透露早期曾人工提供会议记录服务。该公司与Perplexity合作推出交互式AI会议助手功能，支持多语言和主流会议平台。">AI笔记创业公司Fireflies宣布估值达到10亿美元，联合创始人透露早期曾人工提供会议记录服务。该公司与Perplexity合作推出交互式AI会议助手功能，支持多语言和主流会议平台。</p>
+  <h3 class="title"><a href="https://www.ithome.com/0/899/558.htm" target="_blank" rel="noopener">AMD CEO苏姿丰称不担心AI泡沫并强调投资不足更危险</a></h3>
+  <div class="meta">（2025-11-23 15:11）</div><p class="recap" title="AMD CEO苏姿丰在采访中表示不担心人工智能泡沫，认为持此观点者过于短视。她强调科技公司对AI应用的探索才起步，投资不足比投资过多危险得多。">AMD CEO苏姿丰在采访中表示不担心人工智能泡沫，认为持此观点者过于短视。她强调科技公司对AI应用的探索才起步，投资不足比投资过多危险得多。</p>
+  <div class="more"><a href="https://www.ithome.com/0/899/558.htm" target="_blank" rel="noopener">阅读原文 →</a></div>
+  </article><article class="card" data-sec="一、权威观点/报告">
+  <h3 class="title"><a href="http://mp.weixin.qq.com/s?__biz=MjM5MDE0Mjc4MA==&mid=2651263952&idx=1&sn=14696e47347d9ca62cb19af5a5a6f9c6&chksm=bc3464ef49970c2bc2fa8d51f94207c8b43625bb2b306956bf18486a9c50dcb6b06e4cf7e350&scene=0#rd" target="_blank" rel="noopener">Fireflies估值达10亿美元，创始人曾人工冒充AI参会</a></h3>
+  <div class="meta">AI前线（2025-11-23 10:15）</div><p class="recap" title="AI笔记创企Fireflies宣布估值达到10亿美元，自2023年以来保持盈利。该公司联合创始人透露，创业初期曾人工冒充AI参会并记录笔记，引发伦理争议。">AI笔记创企Fireflies宣布估值达到10亿美元，自2023年以来保持盈利。该公司联合创始人透露，创业初期曾人工冒充AI参会并记录笔记，引发伦理争议。</p>
   <div class="more"><a href="http://mp.weixin.qq.com/s?__biz=MjM5MDE0Mjc4MA==&mid=2651263952&idx=1&sn=14696e47347d9ca62cb19af5a5a6f9c6&chksm=bc3464ef49970c2bc2fa8d51f94207c8b43625bb2b306956bf18486a9c50dcb6b06e4cf7e350&scene=0#rd" target="_blank" rel="noopener">阅读原文 →</a></div>
   </article></div></section><section id="二、产品/技术动态" class="sec"><h2 class="sec-hd"><span>二、产品/技术动态</span></h2><div class="grid"><article class="card" data-sec="二、产品/技术动态">
-  <h3 class="title"><a href="https://www.qbitai.com/2025/11/355572.html" target="_blank" rel="noopener">卡帕西发布大模型匿名评测方法，四大AI参与评分</a></h3>
-  <div class="meta">鹭羽（2025-11-23 13:52）</div><p class="recap" title="卡帕西提出新的大模型评测方法，让四个AI模型匿名参与并相互评分。评测过程中模型会承认自身答案不足。">卡帕西提出新的大模型评测方法，让四个AI模型匿名参与并相互评分。评测过程中模型会承认自身答案不足。</p>
+  <h3 class="title"><a href="http://mp.weixin.qq.com/s?__biz=MzI3MTA0MTk1MA==&mid=2652648210&idx=1&sn=a2f833c44b1aa98c8282e430d0c0db63&chksm=f0458523557feba1762580db1322b387dc729eba30beff54df631ee868e064b73c55bcd5b855&scene=0#rd" target="_blank" rel="noopener">谷歌Gemini 3在数学和物理基准测试中创纪录</a></h3>
+  <div class="meta">新智元（2025-11-23 16:58）</div><p class="recap" title="谷歌Gemini 3 Pro在FrontierMath数学基准测试中创下新纪录，并在CritPt物理基准测试中领先。数学家陶哲轩使用Gemini DeepThink模式在十分钟内解决了埃尔德什问题#367的关键证明。">谷歌Gemini 3 Pro在FrontierMath数学基准测试中创下新纪录，并在CritPt物理基准测试中领先。数学家陶哲轩使用Gemini DeepThink模式在十分钟内解决了埃尔德什问题#367的关键证明。</p>
+  <div class="more"><a href="http://mp.weixin.qq.com/s?__biz=MzI3MTA0MTk1MA==&mid=2652648210&idx=1&sn=a2f833c44b1aa98c8282e430d0c0db63&chksm=f0458523557feba1762580db1322b387dc729eba30beff54df631ee868e064b73c55bcd5b855&scene=0#rd" target="_blank" rel="noopener">阅读原文 →</a></div>
+  </article><article class="card" data-sec="二、产品/技术动态">
+  <h3 class="title"><a href="https://www.ithome.com/0/899/567.htm" target="_blank" rel="noopener">AMD将超分辨率技术名称简化为FSR</a></h3>
+  <div class="meta">（2025-11-23 15:48）</div><p class="recap" title="AMD将FidelityFX Super Resolution技术名称缩短为FSR。FSR 'Redstone'将于12月10日发布，包含超分辨率、帧生成等四个组成部分。该技术仅限Radeon RX 9000系列显卡使用。">AMD将FidelityFX Super Resolution技术名称缩短为FSR。FSR 'Redstone'将于12月10日发布，包含超分辨率、帧生成等四个组成部分。该技术仅限Radeon RX 9000系列显卡使用。</p>
+  <div class="more"><a href="https://www.ithome.com/0/899/567.htm" target="_blank" rel="noopener">阅读原文 →</a></div>
+  </article><article class="card" data-sec="二、产品/技术动态">
+  <h3 class="title"><a href="http://mp.weixin.qq.com/s?__biz=Mzg3MTkxMjYzOA==&mid=2247510043&idx=1&sn=9fc980c0160b84927a8d4d50cca0ea16&chksm=cf6b2e0169f8ac398add16411d546e946cbe72b4280128250d12aa7eb6b28a05a4991e889c24&scene=0#rd" target="_blank" rel="noopener">Karpathy开源大模型议会应用llm-council</a></h3>
+  <div class="meta">AI寒武纪（2025-11-23 15:24）</div><p class="recap" title="AI专家Andrej Karpathy开源了名为llm-council的Web应用，通过OpenRouter分发查询至多个大模型并互相评审。该项目探索了LLM集成的新方法，模型在测试中能互相评估并生成最终回复。">AI专家Andrej Karpathy开源了名为llm-council的Web应用，通过OpenRouter分发查询至多个大模型并互相评审。该项目探索了LLM集成的新方法，模型在测试中能互相评估并生成最终回复。</p>
+  <div class="more"><a href="http://mp.weixin.qq.com/s?__biz=Mzg3MTkxMjYzOA==&mid=2247510043&idx=1&sn=9fc980c0160b84927a8d4d50cca0ea16&chksm=cf6b2e0169f8ac398add16411d546e946cbe72b4280128250d12aa7eb6b28a05a4991e889c24&scene=0#rd" target="_blank" rel="noopener">阅读原文 →</a></div>
+  </article><article class="card" data-sec="二、产品/技术动态">
+  <h3 class="title"><a href="https://www.qbitai.com/2025/11/355572.html" target="_blank" rel="noopener">卡帕西发布大模型横评方法，四大AI匿名参赛评分</a></h3>
+  <div class="meta">鹭羽（2025-11-23 13:52）</div><p class="recap" title="卡帕西发布新的大模型评测方法，让四大AI模型匿名参赛并相互评分。评测过程中模型会承认自身答案不足。">卡帕西发布新的大模型评测方法，让四大AI模型匿名参赛并相互评分。评测过程中模型会承认自身答案不足。</p>
   <div class="more"><a href="https://www.qbitai.com/2025/11/355572.html" target="_blank" rel="noopener">阅读原文 →</a></div>
   </article><article class="card" data-sec="二、产品/技术动态">
-  <h3 class="title"><a href="http://mp.weixin.qq.com/s?__biz=MzI3MTA0MTk1MA==&mid=2652648205&idx=1&sn=9dab0eaccfe5c54438b33143450605be&chksm=f0a5ee00a2fb7b66daf9b215dd856c32953ec6b611680d125681ca150296d57ad3d00d81739c&scene=0#rd" target="_blank" rel="noopener">谷歌Nano Banana Pro生成硅谷CEO合影引发热议</a></h3>
-  <div class="meta">新智元（2025-11-23 13:35）</div><p class="recap" title="谷歌发布的Nano Banana Pro生成以假乱真的硅谷CEO合影图片，在社交平台广泛传播。该模型在LMArena榜单上取得双榜第一的成绩。DeepMind CEO Hassabis表示其成功得益于世界级研究、工程和基础设施。">谷歌发布的Nano Banana Pro生成以假乱真的硅谷CEO合影图片，在社交平台广泛传播。该模型在LMArena榜单上取得双榜第一的成绩。DeepMind CEO Hassabis表示其成功得益于世界级研究、工程和基础设施。</p>
+  <h3 class="title"><a href="http://mp.weixin.qq.com/s?__biz=MzI3MTA0MTk1MA==&mid=2652648205&idx=1&sn=9dab0eaccfe5c54438b33143450605be&chksm=f0a5ee00a2fb7b66daf9b215dd856c32953ec6b611680d125681ca150296d57ad3d00d81739c&scene=0#rd" target="_blank" rel="noopener">谷歌Nano Banana Pro生成硅谷CEO合影引发关注</a></h3>
+  <div class="meta">新智元（2025-11-23 13:35）</div><p class="recap" title="谷歌AI图像生成模型Nano Banana Pro因生成逼真的硅谷CEO合影在社交平台传播。该模型在LMArena榜单上排名第一，谷歌DeepMind CEO Hassabis称其优势在于世界级研究、工程和基础设施。">谷歌AI图像生成模型Nano Banana Pro因生成逼真的硅谷CEO合影在社交平台传播。该模型在LMArena榜单上排名第一，谷歌DeepMind CEO Hassabis称其优势在于世界级研究、工程和基础设施。</p>
   <div class="more"><a href="http://mp.weixin.qq.com/s?__biz=MzI3MTA0MTk1MA==&mid=2652648205&idx=1&sn=9dab0eaccfe5c54438b33143450605be&chksm=f0a5ee00a2fb7b66daf9b215dd856c32953ec6b611680d125681ca150296d57ad3d00d81739c&scene=0#rd" target="_blank" rel="noopener">阅读原文 →</a></div>
   </article><article class="card" data-sec="二、产品/技术动态">
   <h3 class="title"><a href="http://mp.weixin.qq.com/s?__biz=MjM5MDE0Mjc4MA==&mid=2651263952&idx=3&sn=a2c65bfb917e6035810d26e352e62522&chksm=bc2237cde34bfc0facf477e2289c8dddb1c941a84069a18bdee0a1fddffe1c69d3505ff541ff&scene=0#rd" target="_blank" rel="noopener">银行业RAG语义缓存误报率优化研究</a></h3>
-  <div class="meta">InfoQ（2025-11-23 10:15）</div><p class="recap" title="研究通过优化缓存设计将银行业RAG语义缓存误报率从99%降至3.8%。实验测试了七个双编码器模型在1000个银行查询上的表现，提出最佳候选原则比模型优化更有效。">研究通过优化缓存设计将银行业RAG语义缓存误报率从99%降至3.8%。实验测试了七个双编码器模型在1000个银行查询上的表现，提出最佳候选原则比模型优化更有效。</p>
+  <div class="meta">InfoQ（2025-11-23 10:15）</div><p class="recap" title="研究通过优化缓存设计和引入质量控制，将银行业RAG语义缓存误报率从99%降至3.8%。实验测试了七个双编码器模型在1000个银行查询上的表现，提出最佳候选原则。">研究通过优化缓存设计和引入质量控制，将银行业RAG语义缓存误报率从99%降至3.8%。实验测试了七个双编码器模型在1000个银行查询上的表现，提出最佳候选原则。</p>
   <div class="more"><a href="http://mp.weixin.qq.com/s?__biz=MjM5MDE0Mjc4MA==&mid=2651263952&idx=3&sn=a2c65bfb917e6035810d26e352e62522&chksm=bc2237cde34bfc0facf477e2289c8dddb1c941a84069a18bdee0a1fddffe1c69d3505ff541ff&scene=0#rd" target="_blank" rel="noopener">阅读原文 →</a></div>
   </article><article class="card" data-sec="二、产品/技术动态">
   <h3 class="title"><a href="http://mp.weixin.qq.com/s?__biz=MjM5MDE0Mjc4MA==&mid=2651263952&idx=2&sn=aef1e5e1a1c1afb1675ecc6603da20e4&chksm=bcd79aaf151a3bcbd57f9f52425066f49c4cf37f73b915aa31268bde32fdffb6b18550cc4ea7&scene=0#rd" target="_blank" rel="noopener">谷歌预览AI代码文档工具Code Wiki</a></h3>
-  <div class="meta">InfoQ（2025-11-23 10:15）</div><p class="recap" title="谷歌预览了AI项目Code Wiki，可为代码库生成文档并在代码变更后自动更新。该预览版收录了数百个开源项目文档，即将推出的Gemini CLI扩展将支持内部代码库运行。">谷歌预览了AI项目Code Wiki，可为代码库生成文档并在代码变更后自动更新。该预览版收录了数百个开源项目文档，即将推出的Gemini CLI扩展将支持内部代码库运行。</p>
+  <div class="meta">InfoQ（2025-11-23 10:15）</div><p class="recap" title="谷歌预览了AI代码文档工具Code Wiki，可为代码库生成文档并在代码变更后自动更新。该预览版收录了数百个开源项目文档，未来将通过Gemini CLI扩展支持内部代码库。">谷歌预览了AI代码文档工具Code Wiki，可为代码库生成文档并在代码变更后自动更新。该预览版收录了数百个开源项目文档，未来将通过Gemini CLI扩展支持内部代码库。</p>
   <div class="more"><a href="http://mp.weixin.qq.com/s?__biz=MjM5MDE0Mjc4MA==&mid=2651263952&idx=2&sn=aef1e5e1a1c1afb1675ecc6603da20e4&chksm=bcd79aaf151a3bcbd57f9f52425066f49c4cf37f73b915aa31268bde32fdffb6b18550cc4ea7&scene=0#rd" target="_blank" rel="noopener">阅读原文 →</a></div>
   </article><article class="card" data-sec="二、产品/技术动态">
   <h3 class="title"><a href="https://venturebeat.com/ai/lean4-how-the-theorem-prover-works-and-why-its-the-new-competitive-edge-in" target="_blank" rel="noopener">Lean4定理证明器提升AI系统可靠性与安全性</a></h3>
-  <div class="meta">（2025-11-23 08:30）</div><p class="recap" title="Lean4作为开源编程语言和定理证明器，通过形式化验证为AI系统提供确定性。OpenAI、Meta、Google DeepMind等公司及Harmonic AI等初创企业已将其用于提升大模型推理准确性和软件安全性。">Lean4作为开源编程语言和定理证明器，通过形式化验证为AI系统提供确定性。OpenAI、Meta、Google DeepMind等公司及Harmonic AI等初创企业已将其用于提升大模型推理准确性和软件安全性。</p>
+  <div class="meta">（2025-11-23 08:30）</div><p class="recap" title="Lean4作为开源编程语言和定理证明器，通过形式化验证为AI系统提供数学严谨性，可减少大模型幻觉并验证代码正确性。OpenAI、Meta、Google DeepMind等公司及Harmonic AI等初创企业已采用该技术。">Lean4作为开源编程语言和定理证明器，通过形式化验证为AI系统提供数学严谨性，可减少大模型幻觉并验证代码正确性。OpenAI、Meta、Google DeepMind等公司及Harmonic AI等初创企业已采用该技术。</p>
   <div class="more"><a href="https://venturebeat.com/ai/lean4-how-the-theorem-prover-works-and-why-its-the-new-competitive-edge-in" target="_blank" rel="noopener">阅读原文 →</a></div>
   </article></div></section><section id="三、资本市场动态及企业战略布局" class="sec"><h2 class="sec-hd"><span>三、资本市场动态及企业战略布局</span></h2><div class="grid"><article class="card" data-sec="三、资本市场动态及企业战略布局">
+  <h3 class="title"><a href="https://www.ithome.com/0/899/571.htm" target="_blank" rel="noopener">甲骨文股价下跌致埃里森财富缩水，滑落至全球富豪榜第三</a></h3>
+  <div class="meta">（2025-11-23 16:11）</div><p class="recap" title="甲骨文股价自9月高点下跌39%，致创始人拉里・埃里森个人净资产缩水1300亿美元，在彭博亿万富豪指数中滑落至第三位。谷歌联合创始人拉里・佩奇因Alphabet股价上涨，净资产增至2569亿美元，首次超越埃里森居第二。">甲骨文股价自9月高点下跌39%，致创始人拉里・埃里森个人净资产缩水1300亿美元，在彭博亿万富豪指数中滑落至第三位。谷歌联合创始人拉里・佩奇因Alphabet股价上涨，净资产增至2569亿美元，首次超越埃里森居第二。</p>
+  <div class="more"><a href="https://www.ithome.com/0/899/571.htm" target="_blank" rel="noopener">阅读原文 →</a></div>
+  </article><article class="card" data-sec="三、资本市场动态及企业战略布局">
+  <h3 class="title"><a href="http://mp.weixin.qq.com/s?__biz=MjM5MDE0Mjc4MA==&mid=2651263982&idx=1&sn=ae375778141e5fc52a26f87c01b588b3&chksm=bc8dd8b6ba259bd9ca32f589c7c7f037f55d8b22af4eb99f63e2dabb7a3babe21c235840d74f&scene=0#rd" target="_blank" rel="noopener">英伟达称不保证与OpenAI达成最终投资协议</a></h3>
+  <div class="meta">来源：（2025-11-23 13:30）</div><p class="recap" title="英伟达在季度财报中表示，不保证与OpenAI就1000亿美元投资达成最终协议。同时披露了对英特尔投资50亿美元及与Anthropic最高100亿美元的投资协议。">英伟达在季度财报中表示，不保证与OpenAI就1000亿美元投资达成最终协议。同时披露了对英特尔投资50亿美元及与Anthropic最高100亿美元的投资协议。</p>
+  <div class="more"><a href="http://mp.weixin.qq.com/s?__biz=MjM5MDE0Mjc4MA==&mid=2651263982&idx=1&sn=ae375778141e5fc52a26f87c01b588b3&chksm=bc8dd8b6ba259bd9ca32f589c7c7f037f55d8b22af4eb99f63e2dabb7a3babe21c235840d74f&scene=0#rd" target="_blank" rel="noopener">阅读原文 →</a></div>
+  </article><article class="card" data-sec="三、资本市场动态及企业战略布局">
   <h3 class="title"><a href="http://mp.weixin.qq.com/s?__biz=Mzg3NDc2MjQxMg==&mid=2247492001&idx=1&sn=ba39f5274e35d530871c04102a1031d7&chksm=cf94e771b61f38aa176612f0b6beda6a707d7e62ab9e674bd5fbd90c8139f771b813defb6182&scene=0#rd" target="_blank" rel="noopener">电话AI公司Beside完成3200万美元融资</a></h3>
-  <div class="meta">深思圈（2025-11-23 09:43）</div><p class="recap" title="电话AI公司Beside完成3200万美元融资，由EQT Ventures领投。该公司从底层重建电话系统，为小企业提供AI接待员服务，18个月内已拥有2万付费客户，年度经常性收入达400万美元。">电话AI公司Beside完成3200万美元融资，由EQT Ventures领投。该公司从底层重建电话系统，为小企业提供AI接待员服务，18个月内已拥有2万付费客户，年度经常性收入达400万美元。</p>
+  <div class="meta">深思圈（2025-11-23 09:43）</div><p class="recap" title="电话AI公司Beside完成3200万美元融资，包括EQT Ventures领投的A轮融资。该公司18个月内从M1更名为Beside，已积累2万付费客户，年度经常性收入达400万美元。">电话AI公司Beside完成3200万美元融资，包括EQT Ventures领投的A轮融资。该公司18个月内从M1更名为Beside，已积累2万付费客户，年度经常性收入达400万美元。</p>
   <div class="more"><a href="http://mp.weixin.qq.com/s?__biz=Mzg3NDc2MjQxMg==&mid=2247492001&idx=1&sn=ba39f5274e35d530871c04102a1031d7&chksm=cf94e771b61f38aa176612f0b6beda6a707d7e62ab9e674bd5fbd90c8139f771b813defb6182&scene=0#rd" target="_blank" rel="noopener">阅读原文 →</a></div>
+  </article></div></section><section id="四、品牌与市场动作" class="sec"><h2 class="sec-hd"><span>四、品牌与市场动作</span></h2><div class="grid"><article class="card" data-sec="四、品牌与市场动作">
+  <h3 class="title"><a href="https://www.ithome.com/0/899/525.htm" target="_blank" rel="noopener">中国铁塔发布科技成果并启动擎天人工智能平台</a></h3>
+  <div class="meta">（2025-11-23 11:46）</div><p class="recap" title="中国铁塔在科技创新大会上发布《2025年度优秀科技成果集》和《科技创新体系评估白皮书》，并启动擎天人工智能应用开发平台。公司累计建设基站项目超700万，其中5G基站超300万，在320个城市部署了8万多个换电柜。">中国铁塔在科技创新大会上发布《2025年度优秀科技成果集》和《科技创新体系评估白皮书》，并启动擎天人工智能应用开发平台。公司累计建设基站项目超700万，其中5G基站超300万，在320个城市部署了8万多个换电柜。</p>
+  <div class="more"><a href="https://www.ithome.com/0/899/525.htm" target="_blank" rel="noopener">阅读原文 →</a></div>
   </article></div></section></div>
     <div id="yesterday-content" class="date-content"><section id="一、权威观点/报告" class="sec"><h2 class="sec-hd"><span>一、权威观点/报告</span></h2><div class="grid"><article class="card" data-sec="一、权威观点/报告">
   <h3 class="title"><a href="https://www.ithome.com/0/899/453.htm" target="_blank" rel="noopener">Karpathy发文阐述大模型与人类智能的本质差异</a></h3>
