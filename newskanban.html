@@ -1,7 +1,7 @@
 <!doctype html>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>AI 大模型新闻看板（2025-11-23）</title>
+<title>AI 大模型新闻看板（2025-11-24）</title>
 
 
 <style>
@@ -179,7 +179,7 @@ footer{ max-width:1180px; margin:22px auto 44px; padding:0 18px; color:var(--sub
 
 <div class="header-wrap">
   <h1>AI 大模型新闻看板</h1>
-  <div class="time">2025-11-23</div>
+  <div class="time">2025-11-24</div>
 </div>
 
 <div class="controls">
@@ -189,169 +189,42 @@ footer{ max-width:1180px; margin:22px auto 44px; padding:0 18px; color:var(--sub
 </div>
 
 <div class="date-tabs">
-  <div class="date-tab active" data-date-category="today">📌 今日（2025-11-23）</div>
-  <div class="date-tab" data-date-category="yesterday">🗓️ 昨日（2025-11-22）</div>
-  <div class="date-tab" data-date-category="beforeYesterday">📅 前日（2025-11-21）</div>
+  <div class="date-tab active" data-date-category="today">📌 今日（2025-11-24）</div>
+  <div class="date-tab" data-date-category="yesterday">🗓️ 昨日（2025-11-23）</div>
+  <div class="date-tab" data-date-category="beforeYesterday">📅 前日（2025-11-22）</div>
 </div>
 
-
-<section class="trends-top" aria-label="Google 趋势">
-  <div class="t-card">
-    <div class="t-hd">
-      <div class="t-title"><span class="t-dot"></span><span>🌍 国外大模型 · 趋势</span></div>
-      <div class="t-tools">
-        <select class="t-sel" data-target="gt-foreign" aria-label="时间范围">
-          <option value="now 7-d" selected>近 7 天</option>
-          <option value="today 3-m">近 90 天</option>
-          <option value="today 12-m">近 12 个月</option>
-        </select>
-      </div>
-    </div>
-    <div class="t-body">
-      <div id="gt-foreign" class="t-embed"></div>
-      <div class="t-fallback">加载趋势图…</div>
-    </div>
-  </div>
-
-  <div class="t-card">
-    <div class="t-hd">
-      <div class="t-title"><span class="t-dot"></span><span>🇨🇳 国内大模型 · 趋势</span></div>
-      <div class="t-tools">
-        <select class="t-sel" data-target="gt-domestic" aria-label="时间范围">
-          <option value="now 7-d" selected>近 7 天</option>
-          <option value="today 3-m">近 90 天</option>
-          <option value="today 12-m">近 12 个月</option>
-        </select>
-      </div>
-    </div>
-    <div class="t-body">
-      <div id="gt-domestic" class="t-embed"></div>
-      <div class="t-fallback">加载趋势图…</div>
-    </div>
-  </div>
-
-  <div class="t-card">
-    <div class="t-hd">
-      <div class="t-title"><span class="t-dot"></span><span>☁️ 国内云厂商 · 趋势</span></div>
-      <div class="t-tools">
-        <select class="t-sel" data-target="gt-vendors" aria-label="时间范围">
-          <option value="now 7-d" selected>近 7 天</option>
-          <option value="today 3-m">近 90 天</option>
-          <option value="today 12-m">近 12 个月</option>
-        </select>
-      </div>
-    </div>
-    <div class="t-body">
-      <div id="gt-vendors" class="t-embed"></div>
-      <div class="t-fallback">加载趋势图…</div>
-    </div>
-  </div>
-
-  <div class="t-card">
-    <div class="t-hd">
-      <div class="t-title"><span class="t-dot"></span><span>🔑 AI 市场关键词 · 趋势</span></div>
-      <div class="t-tools">
-        <select class="t-sel" data-target="gt-market" aria-label="时间范围">
-          <option value="now 7-d" selected>近 7 天</option>
-          <option value="today 3-m">近 90 天</option>
-          <option value="today 12-m">近 12 个月</option>
-        </select>
-      </div>
-    </div>
-    <div class="t-body">
-      <div id="gt-market" class="t-embed"></div>
-      <div class="t-fallback">加载趋势图…</div>
-    </div>
-  </div>
-</section>
-
-<script>
-/* Google Trends 挂载逻辑 */
-(function mountTrends(){
-  var SCRIPT = 'https://ssl.gstatic.com/trends_nrtr/3528_RC01/embed_loader.js';
-
-  var cfg = {
-    foreign:  { el: 'gt-foreign',  geo: '',   kw: ['ChatGPT','Gemini','Claude','Grok','Llama'] },
-    domestic: { el: 'gt-domestic',  geo: '',   kw: ['DeepSeek','Ernie','Hunyuan','Qwen','Doubao'] },
-    vendors:  { el: 'gt-vendors',   geo: '',   kw: ['Baidu AI Cloud','Huawei Cloud','Tencent Cloud','Alibaba Cloud','Volcengine'] },
-    market:   { el: 'gt-market',    geo: '',   kw: ['LLM','AI Agent','RAG','Vector Database','Prompt Engineering'] }
-  };
-
-  function renderOne(config, time){
-    try{
-      var host = 'https://trends.google.com/trends/embed/';
-      var container = document.getElementById(config.el);
-      if (!container) return;
-
-      var fb = container.parentElement.querySelector('.t-fallback');
-      if (fb) fb.style.display = 'none';
-
-      container.innerHTML = '';
-      var comparisonItem = config.kw.map(function(k) { return { keyword: k, geo: config.geo || '', time: time }; });
-      var query = 'date=' + encodeURIComponent(time)
-                  + '&q=' + encodeURIComponent(config.kw.join(','))
-                  + (config.geo ? '&geo=' + config.geo : '');
-
-      trends.embed.renderExploreWidgetTo(
-        container,
-        'TIMESERIES',
-        { comparisonItem: comparisonItem, category: 0, property: '' },
-        { exploreQuery: query, guestPath: host }
-      );
-    }catch(e){
-      var c = document.getElementById(config.el);
-      if (c) {
-        var fallback = c.parentElement.querySelector('.t-fallback');
-        if (fallback) { 
-          fallback.style.display = 'flex'; 
-          fallback.textContent = '无法显示趋势图（网络受限/被拦截）'; 
-        }
-      }
-      console.error('Trends render error', e);
-    }
-  }
-
-  function boot(){
-    if (!(window.trends && window.trends.embed)) return;
-
-    var defaultTime = 'now 7-d';
-    renderOne(cfg.foreign,  defaultTime);
-    renderOne(cfg.domestic, defaultTime);
-    renderOne(cfg.vendors,  defaultTime);
-    renderOne(cfg.market,   defaultTime);
-
-    document.querySelectorAll('.t-sel').forEach(function(sel){
-      sel.addEventListener('change', function(){
-        var time = sel.value || 'now 7-d';
-        var targetId = sel.getAttribute('data-target');
-        var key = targetId.replace(/^gt-/, '');
-        var conf = cfg[key];
-        if (conf) renderOne(conf, time);
-      });
-    });
-  }
-
-  var s = document.createElement('script');
-  s.src = SCRIPT; 
-  s.async = true; 
-  s.onload = boot;
-  document.head.appendChild(s);
-
-  setTimeout(function() {
-    if (!(window.trends && window.trends.embed)) {
-      document.querySelectorAll('.t-fallback').forEach(function(el){
-        el.style.display = 'flex';
-        el.textContent = '无法加载 Google 趋势（可能被墙/被拦截）';
-      });
-    }
-  }, 5000);
-})();
-</script>
+<div class="t-fallback" style="text-align:center;padding:40px;color:#666;">趋势数据更新中...</div>
 
 <div class="wrap">
   <main id="main">
     <p id="emptyHint" class="hidden">当前筛选无结果，换个关键词试试～</p>
     <div id="today-content" class="date-content active"><section id="一、权威观点/报告" class="sec"><h2 class="sec-hd"><span>一、权威观点/报告</span></h2><div class="grid"><article class="card" data-sec="一、权威观点/报告">
+  <h3 class="title"><a href="https://www.ithome.com/0/899/639.htm" target="_blank" rel="noopener">奥尔特曼内部备忘录预警OpenAI面临经济逆风与竞争压力</a></h3>
+  <div class="meta">（2025-11-24 08:39）</div><p class="recap" title="OpenAI首席执行官奥尔特曼在内部备忘录中承认公司面临谷歌等竞争对手压力及经济逆风，预计2026年营收增速或降至个位数。他表示将聚焦超级智能研发，并透露正开发新语言模型及与富士康合作制造AI数据中心组件。">OpenAI首席执行官奥尔特曼在内部备忘录中承认公司面临谷歌等竞争对手压力及经济逆风，预计2026年营收增速或降至个位数。他表示将聚焦超级智能研发，并透露正开发新语言模型及与富士康合作制造AI数据中心组件。</p>
+  <div class="more"><a href="https://www.ithome.com/0/899/639.htm" target="_blank" rel="noopener">阅读原文 →</a></div>
+  </article><article class="card" data-sec="一、权威观点/报告">
+  <h3 class="title"><a href="http://mp.weixin.qq.com/s?__biz=Mzg4NTUzODcxNg==&mid=2247527693&idx=1&sn=987451fa8feb277cf04c36b6b4e08183&chksm=cebd8c5b6d2c41f3ca2a0da8a06d21461358e90cafd7fa788f9b3e3d953a5ee044cf25274b2d&scene=0#rd" target="_blank" rel="noopener">报告分析AI投资泡沫争议及金融开放前景</a></h3>
+  <div class="meta">CGI（2025-11-24 08:00）</div><p class="recap" title="报告认为当前美国AI相关股票高估值反映投资者过度乐观，泡沫破裂可能体现为芯片产业规模经济作用。报告还指出“十五五”时期金融开放重要性将提升，推进金融开放需保障金融安全。">报告认为当前美国AI相关股票高估值反映投资者过度乐观，泡沫破裂可能体现为芯片产业规模经济作用。报告还指出“十五五”时期金融开放重要性将提升，推进金融开放需保障金融安全。</p>
+  <div class="more"><a href="http://mp.weixin.qq.com/s?__biz=Mzg4NTUzODcxNg==&mid=2247527693&idx=1&sn=987451fa8feb277cf04c36b6b4e08183&chksm=cebd8c5b6d2c41f3ca2a0da8a06d21461358e90cafd7fa788f9b3e3d953a5ee044cf25274b2d&scene=0#rd" target="_blank" rel="noopener">阅读原文 →</a></div>
+  </article><article class="card" data-sec="一、权威观点/报告">
+  <h3 class="title"><a href="https://www.ithome.com/0/899/632.htm" target="_blank" rel="noopener">OpenAI因ChatGPT被指控操控用户导致自杀遭起诉</a></h3>
+  <div class="meta">（2025-11-24 07:45）</div><p class="recap" title="美国社交媒体受害者法律中心对OpenAI提起多起诉讼，指控ChatGPT使用操控性对话技巧，导致用户产生负面心理反应并疏远亲友，已造成四人自杀。诉讼指出AI在收到内部警告后仍发布易过度奉承的GPT-4o版本。OpenAI回应称正在审核文件并改进训练以识别心理困扰。">美国社交媒体受害者法律中心对OpenAI提起多起诉讼，指控ChatGPT使用操控性对话技巧，导致用户产生负面心理反应并疏远亲友，已造成四人自杀。诉讼指出AI在收到内部警告后仍发布易过度奉承的GPT-4o版本。OpenAI回应称正在审核文件并改进训练以识别心理困扰。</p>
+  <div class="more"><a href="https://www.ithome.com/0/899/632.htm" target="_blank" rel="noopener">阅读原文 →</a></div>
+  </article></div></section><section id="二、产品/技术动态" class="sec"><h2 class="sec-hd"><span>二、产品/技术动态</span></h2><div class="grid"><article class="card" data-sec="二、产品/技术动态">
+  <h3 class="title"><a href="http://cn.todayrss.com/t/f56rXXxeDd" target="_blank" rel="noopener">谷歌发布双子座3 Pro模型及Nano Banana Pro多模态图像模型</a></h3>
+  <div class="meta">（2025-11-24 09:06）</div><p class="recap" title="谷歌发布双子座3 Pro模型，在LMArena和WebDev基准测试中表现领先，提供先进推理功能并支持代理工作流。同时推出Nano Banana Pro多模态图像模型，能够生成详细信息图表。">谷歌发布双子座3 Pro模型，在LMArena和WebDev基准测试中表现领先，提供先进推理功能并支持代理工作流。同时推出Nano Banana Pro多模态图像模型，能够生成详细信息图表。</p>
+  <div class="more"><a href="http://cn.todayrss.com/t/f56rXXxeDd" target="_blank" rel="noopener">阅读原文 →</a></div>
+  </article></div></section><section id="三、资本市场动态及企业战略布局" class="sec"><h2 class="sec-hd"><span>三、资本市场动态及企业战略布局</span></h2><div class="grid"><article class="card" data-sec="三、资本市场动态及企业战略布局">
+  <h3 class="title"><a href="http://cn.todayrss.com/t/Q0NSwdZRox" target="_blank" rel="noopener">谷歌放弃双子座3 贝索斯推普罗米修斯计划 萨默斯辞任OpenAI董事</a></h3>
+  <div class="meta">（2025-11-24 09:06）</div><p class="recap" title="谷歌放弃双子座3项目。杰夫·贝索斯推出价值62亿美元的普罗米修斯计划。拉里·萨默斯辞去OpenAI董事会职务。">谷歌放弃双子座3项目。杰夫·贝索斯推出价值62亿美元的普罗米修斯计划。拉里·萨默斯辞去OpenAI董事会职务。</p>
+  <div class="more"><a href="http://cn.todayrss.com/t/Q0NSwdZRox" target="_blank" rel="noopener">阅读原文 →</a></div>
+  </article><article class="card" data-sec="三、资本市场动态及企业战略布局">
+  <h3 class="title"><a href="http://cn.todayrss.com/t/RutG9xNhO6" target="_blank" rel="noopener">微软英伟达与Anthropic达成300亿美元计算协议</a></h3>
+  <div class="meta">（2025-11-24 09:06）</div><p class="recap" title="微软、英伟达和Anthropic宣布达成300亿美元计算协议，Anthropic承诺购买价值300亿美元的Azure计算服务。三方将共同设计人工智能模型和基础架构。">微软、英伟达和Anthropic宣布达成300亿美元计算协议，Anthropic承诺购买价值300亿美元的Azure计算服务。三方将共同设计人工智能模型和基础架构。</p>
+  <div class="more"><a href="http://cn.todayrss.com/t/RutG9xNhO6" target="_blank" rel="noopener">阅读原文 →</a></div>
+  </article></div></section></div>
+    <div id="yesterday-content" class="date-content"><section id="一、权威观点/报告" class="sec"><h2 class="sec-hd"><span>一、权威观点/报告</span></h2><div class="grid"><article class="card" data-sec="一、权威观点/报告">
   <h3 class="title"><a href="https://www.ithome.com/0/899/558.htm" target="_blank" rel="noopener">AMD CEO苏姿丰称不担心AI泡沫并强调投资不足更危险</a></h3>
   <div class="meta">（2025-11-23 15:11）</div><p class="recap" title="AMD CEO苏姿丰表示不担心人工智能泡沫，认为质疑者过于短视。她强调科技公司对AI应用的探索才起步，投资不足比投资过多更危险。AMD为与OpenAI达成芯片协议承诺了认股权证。">AMD CEO苏姿丰表示不担心人工智能泡沫，认为质疑者过于短视。她强调科技公司对AI应用的探索才起步，投资不足比投资过多更危险。AMD为与OpenAI达成芯片协议承诺了认股权证。</p>
   <div class="more"><a href="https://www.ithome.com/0/899/558.htm" target="_blank" rel="noopener">阅读原文 →</a></div>
@@ -404,7 +277,7 @@ footer{ max-width:1180px; margin:22px auto 44px; padding:0 18px; color:var(--sub
   <div class="meta">深思圈（2025-11-23 09:43）</div><p class="recap" title="电话AI公司Beside完成3200万美元融资，由EQT Ventures领投。该公司前身为M1，运营18个月后已拥有2万付费客户，年度经常性收入达400万美元。Beside从底层重建电话系统，为小企业提供AI驱动的电话和短信处理服务。">电话AI公司Beside完成3200万美元融资，由EQT Ventures领投。该公司前身为M1，运营18个月后已拥有2万付费客户，年度经常性收入达400万美元。Beside从底层重建电话系统，为小企业提供AI驱动的电话和短信处理服务。</p>
   <div class="more"><a href="http://mp.weixin.qq.com/s?__biz=Mzg3NDc2MjQxMg==&mid=2247492001&idx=1&sn=ba39f5274e35d530871c04102a1031d7&chksm=cf94e771b61f38aa176612f0b6beda6a707d7e62ab9e674bd5fbd90c8139f771b813defb6182&scene=0#rd" target="_blank" rel="noopener">阅读原文 →</a></div>
   </article></div></section></div>
-    <div id="yesterday-content" class="date-content"><section id="一、权威观点/报告" class="sec"><h2 class="sec-hd"><span>一、权威观点/报告</span></h2><div class="grid"><article class="card" data-sec="一、权威观点/报告">
+    <div id="beforeYesterday-content" class="date-content"><section id="一、权威观点/报告" class="sec"><h2 class="sec-hd"><span>一、权威观点/报告</span></h2><div class="grid"><article class="card" data-sec="一、权威观点/报告">
   <h3 class="title"><a href="https://www.ithome.com/0/899/453.htm" target="_blank" rel="noopener">Karpathy发文阐述大模型与人类智能的本质差异</a></h3>
   <div class="meta">（2025-11-22 18:49）</div><p class="recap" title="Andrej Karpathy在推文中指出大模型是人类首次接触的非生物智能，其进化压力、学习机制和运行方式与人类智能存在根本差异。他强调大模型不是更聪明的人类，而是基于文本统计模拟的全新智能形式。">Andrej Karpathy在推文中指出大模型是人类首次接触的非生物智能，其进化压力、学习机制和运行方式与人类智能存在根本差异。他强调大模型不是更聪明的人类，而是基于文本统计模拟的全新智能形式。</p>
   <div class="more"><a href="https://www.ithome.com/0/899/453.htm" target="_blank" rel="noopener">阅读原文 →</a></div>
@@ -473,7 +346,6 @@ footer{ max-width:1180px; margin:22px auto 44px; padding:0 18px; color:var(--sub
   <div class="meta">The Verge（2025-11-22 08:04）</div><p class="recap" title="谷歌回应社交媒体传闻，否认更改政策以使用Gmail邮件和附件训练AI模型。发言人表示智能功能已存在多年，且未将Gmail内容用于Gemini AI模型训练。">谷歌回应社交媒体传闻，否认更改政策以使用Gmail邮件和附件训练AI模型。发言人表示智能功能已存在多年，且未将Gmail内容用于Gemini AI模型训练。</p>
   <div class="more"><a href="https://www.theverge.com/news/826902/gmail-ai-training-data-opt-out" target="_blank" rel="noopener">阅读原文 →</a></div>
   </article></div></section></div>
-    <div id="beforeYesterday-content" class="date-content"><div class="empty-state">前日暂无数据</div></div>
   </main>
 </div>
 
