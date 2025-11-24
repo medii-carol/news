@@ -184,7 +184,7 @@ footer{ max-width:1180px; margin:22px auto 44px; padding:0 18px; color:var(--sub
 
 <div class="controls">
   <select id="secSel"><option value="">全部板块</option>
-  <option value="一、权威观点/报告">一、权威观点/报告</option><option value="二、产品/技术动态">二、产品/技术动态</option><option value="三、资本市场动态及企业战略布局">三、资本市场动态及企业战略布局</option></select>
+  <option value="一、权威观点/报告">一、权威观点/报告</option><option value="二、产品/技术动态">二、产品/技术动态</option><option value="三、资本市场动态及企业战略布局">三、资本市场动态及企业战略布局</option><option value="四、品牌与市场动作">四、品牌与市场动作</option></select>
   <input id="search" type="search" placeholder="搜索标题 / 概要 / 标签…">
 </div>
 
@@ -194,35 +194,199 @@ footer{ max-width:1180px; margin:22px auto 44px; padding:0 18px; color:var(--sub
   <div class="date-tab" data-date-category="beforeYesterday">📅 前日（2025-11-22）</div>
 </div>
 
-<div class="t-fallback" style="text-align:center;padding:40px;color:#666;">趋势数据更新中...</div>
+
+<section class="trends-top" aria-label="Google 趋势">
+  <div class="t-card">
+    <div class="t-hd">
+      <div class="t-title"><span class="t-dot"></span><span>🌍 国外大模型 · 趋势</span></div>
+      <div class="t-tools">
+        <select class="t-sel" data-target="gt-foreign" aria-label="时间范围">
+          <option value="now 7-d" selected>近 7 天</option>
+          <option value="today 3-m">近 90 天</option>
+          <option value="today 12-m">近 12 个月</option>
+        </select>
+      </div>
+    </div>
+    <div class="t-body">
+      <div id="gt-foreign" class="t-embed"></div>
+      <div class="t-fallback">加载趋势图…</div>
+    </div>
+  </div>
+
+  <div class="t-card">
+    <div class="t-hd">
+      <div class="t-title"><span class="t-dot"></span><span>🇨🇳 国内大模型 · 趋势</span></div>
+      <div class="t-tools">
+        <select class="t-sel" data-target="gt-domestic" aria-label="时间范围">
+          <option value="now 7-d" selected>近 7 天</option>
+          <option value="today 3-m">近 90 天</option>
+          <option value="today 12-m">近 12 个月</option>
+        </select>
+      </div>
+    </div>
+    <div class="t-body">
+      <div id="gt-domestic" class="t-embed"></div>
+      <div class="t-fallback">加载趋势图…</div>
+    </div>
+  </div>
+
+  <div class="t-card">
+    <div class="t-hd">
+      <div class="t-title"><span class="t-dot"></span><span>☁️ 国内云厂商 · 趋势</span></div>
+      <div class="t-tools">
+        <select class="t-sel" data-target="gt-vendors" aria-label="时间范围">
+          <option value="now 7-d" selected>近 7 天</option>
+          <option value="today 3-m">近 90 天</option>
+          <option value="today 12-m">近 12 个月</option>
+        </select>
+      </div>
+    </div>
+    <div class="t-body">
+      <div id="gt-vendors" class="t-embed"></div>
+      <div class="t-fallback">加载趋势图…</div>
+    </div>
+  </div>
+
+  <div class="t-card">
+    <div class="t-hd">
+      <div class="t-title"><span class="t-dot"></span><span>🔑 AI 市场关键词 · 趋势</span></div>
+      <div class="t-tools">
+        <select class="t-sel" data-target="gt-market" aria-label="时间范围">
+          <option value="now 7-d" selected>近 7 天</option>
+          <option value="today 3-m">近 90 天</option>
+          <option value="today 12-m">近 12 个月</option>
+        </select>
+      </div>
+    </div>
+    <div class="t-body">
+      <div id="gt-market" class="t-embed"></div>
+      <div class="t-fallback">加载趋势图…</div>
+    </div>
+  </div>
+</section>
+
+<script>
+/* Google Trends 挂载逻辑 */
+(function mountTrends(){
+  var SCRIPT = 'https://ssl.gstatic.com/trends_nrtr/3528_RC01/embed_loader.js';
+
+  var cfg = {
+    foreign:  { el: 'gt-foreign',  geo: '',   kw: ['ChatGPT','Gemini','Claude','Grok','Llama'] },
+    domestic: { el: 'gt-domestic',  geo: '',   kw: ['DeepSeek','Ernie','Hunyuan','Qwen','Doubao'] },
+    vendors:  { el: 'gt-vendors',   geo: '',   kw: ['百度智能云','华为云','腾讯云','阿里云','火山引擎'] },
+    market:   { el: 'gt-market',    geo: '',   kw: ['LLM','AI Agent','RAG','Vector Database','Prompt Engineering'] }
+  };
+
+  function renderOne(config, time){
+    try{
+      var host = 'https://trends.google.com/trends/embed/';
+      var container = document.getElementById(config.el);
+      if (!container) return;
+
+      var fb = container.parentElement.querySelector('.t-fallback');
+      if (fb) fb.style.display = 'none';
+
+      container.innerHTML = '';
+      var comparisonItem = config.kw.map(function(k) { return { keyword: k, geo: config.geo || '', time: time }; });
+      var query = 'date=' + encodeURIComponent(time)
+                  + '&q=' + encodeURIComponent(config.kw.join(','))
+                  + (config.geo ? '&geo=' + config.geo : '');
+
+      trends.embed.renderExploreWidgetTo(
+        container,
+        'TIMESERIES',
+        { comparisonItem: comparisonItem, category: 0, property: '' },
+        { exploreQuery: query, guestPath: host }
+      );
+    }catch(e){
+      var c = document.getElementById(config.el);
+      if (c) {
+        var fallback = c.parentElement.querySelector('.t-fallback');
+        if (fallback) { 
+          fallback.style.display = 'flex'; 
+          fallback.textContent = '无法显示趋势图（网络受限/被拦截）'; 
+        }
+      }
+      console.error('Trends render error', e);
+    }
+  }
+
+  function boot(){
+    if (!(window.trends && window.trends.embed)) return;
+
+    var defaultTime = 'now 7-d';
+    renderOne(cfg.foreign,  defaultTime);
+    renderOne(cfg.domestic, defaultTime);
+    renderOne(cfg.vendors,  defaultTime);
+    renderOne(cfg.market,   defaultTime);
+
+    document.querySelectorAll('.t-sel').forEach(function(sel){
+      sel.addEventListener('change', function(){
+        var time = sel.value || 'now 7-d';
+        var targetId = sel.getAttribute('data-target');
+        var key = targetId.replace(/^gt-/, '');
+        var conf = cfg[key];
+        if (conf) renderOne(conf, time);
+      });
+    });
+  }
+
+  var s = document.createElement('script');
+  s.src = SCRIPT; 
+  s.async = true; 
+  s.onload = boot;
+  document.head.appendChild(s);
+
+  setTimeout(function() {
+    if (!(window.trends && window.trends.embed)) {
+      document.querySelectorAll('.t-fallback').forEach(function(el){
+        el.style.display = 'flex';
+        el.textContent = '无法加载 Google 趋势（可能被墙/被拦截）';
+      });
+    }
+  }, 5000);
+})();
+</script>
 
 <div class="wrap">
   <main id="main">
     <p id="emptyHint" class="hidden">当前筛选无结果，换个关键词试试～</p>
     <div id="today-content" class="date-content active"><section id="一、权威观点/报告" class="sec"><h2 class="sec-hd"><span>一、权威观点/报告</span></h2><div class="grid"><article class="card" data-sec="一、权威观点/报告">
+  <h3 class="title"><a href="http://cn.todayrss.com/t/cWDK1Hddzh" target="_blank" rel="noopener">Sakana AI实验室提出连续思维机器研究方向</a></h3>
+  <div class="meta">（2025-11-24 10:15）</div><p class="recap" title="Sakana AI实验室联合创始人Llion Jones表示应超越现有技术。该实验室在NeurIPS 2025的聚焦论文中提出了连续思维机器作为可能的下一步发展方向。">Sakana AI实验室联合创始人Llion Jones表示应超越现有技术。该实验室在NeurIPS 2025的聚焦论文中提出了连续思维机器作为可能的下一步发展方向。</p>
+  <div class="more"><a href="http://cn.todayrss.com/t/cWDK1Hddzh" target="_blank" rel="noopener">阅读原文 →</a></div>
+  </article><article class="card" data-sec="一、权威观点/报告">
+  <h3 class="title"><a href="https://www.ithome.com/0/899/655.htm" target="_blank" rel="noopener">英伟达首席执行官称公司已从游戏GPU公司转型为AI数据中心基础设施公司</a></h3>
+  <div class="meta">（2025-11-24 09:26）</div><p class="recap" title="英伟达首席执行官黄仁勋在财报电话会议上表示，公司历经25年发展，已从游戏GPU公司转型为AI数据中心基础设施公司。他强调AI生态系统正在快速扩展，涵盖更多基础模型开发者和行业。">英伟达首席执行官黄仁勋在财报电话会议上表示，公司历经25年发展，已从游戏GPU公司转型为AI数据中心基础设施公司。他强调AI生态系统正在快速扩展，涵盖更多基础模型开发者和行业。</p>
+  <div class="more"><a href="https://www.ithome.com/0/899/655.htm" target="_blank" rel="noopener">阅读原文 →</a></div>
+  </article><article class="card" data-sec="一、权威观点/报告">
+  <h3 class="title"><a href="https://36kr.com/newsflashes/3566372196547462?f=rss" target="_blank" rel="noopener">中信证券研报看好AI PCB板块，关注龙头厂商及产能扩张</a></h3>
+  <div class="meta">（2025-11-24 09:15）</div><p class="recap" title="中信证券研报指出，英伟达业绩及谷歌Gemini 3模型表现超预期，反映AI产业加速上行。报告看好PCB作为AI芯片升级环节的产业机会，并推荐关注技术领先、产能扩张及覆铜板相关的重点厂商。">中信证券研报指出，英伟达业绩及谷歌Gemini 3模型表现超预期，反映AI产业加速上行。报告看好PCB作为AI芯片升级环节的产业机会，并推荐关注技术领先、产能扩张及覆铜板相关的重点厂商。</p>
+  <div class="more"><a href="https://36kr.com/newsflashes/3566372196547462?f=rss" target="_blank" rel="noopener">阅读原文 →</a></div>
+  </article><article class="card" data-sec="一、权威观点/报告">
   <h3 class="title"><a href="https://www.ithome.com/0/899/639.htm" target="_blank" rel="noopener">奥尔特曼内部备忘录预警OpenAI面临经济逆风与竞争压力</a></h3>
-  <div class="meta">（2025-11-24 08:39）</div><p class="recap" title="OpenAI首席执行官奥尔特曼在内部备忘录中承认公司面临谷歌等竞争对手压力及经济逆风，预计2026年营收增速或降至个位数。他表示将聚焦超级智能研发，并透露正开发新语言模型及与富士康合作制造AI数据中心组件。">OpenAI首席执行官奥尔特曼在内部备忘录中承认公司面临谷歌等竞争对手压力及经济逆风，预计2026年营收增速或降至个位数。他表示将聚焦超级智能研发，并透露正开发新语言模型及与富士康合作制造AI数据中心组件。</p>
+  <div class="meta">（2025-11-24 08:39）</div><p class="recap" title="OpenAI首席执行官奥尔特曼在内部备忘录中承认公司面临谷歌等竞争对手压力，营收增速或降至个位数。他表示尽管面临挑战，但OpenAI将继续聚焦超级智能研发，并透露正在开发新语言模型和与富士康合作。">OpenAI首席执行官奥尔特曼在内部备忘录中承认公司面临谷歌等竞争对手压力，营收增速或降至个位数。他表示尽管面临挑战，但OpenAI将继续聚焦超级智能研发，并透露正在开发新语言模型和与富士康合作。</p>
   <div class="more"><a href="https://www.ithome.com/0/899/639.htm" target="_blank" rel="noopener">阅读原文 →</a></div>
   </article><article class="card" data-sec="一、权威观点/报告">
-  <h3 class="title"><a href="http://mp.weixin.qq.com/s?__biz=Mzg4NTUzODcxNg==&mid=2247527693&idx=1&sn=987451fa8feb277cf04c36b6b4e08183&chksm=cebd8c5b6d2c41f3ca2a0da8a06d21461358e90cafd7fa788f9b3e3d953a5ee044cf25274b2d&scene=0#rd" target="_blank" rel="noopener">报告分析AI投资泡沫争议及金融开放前景</a></h3>
+  <h3 class="title"><a href="http://mp.weixin.qq.com/s?__biz=Mzg4NTUzODcxNg==&mid=2247527693&idx=1&sn=987451fa8feb277cf04c36b6b4e08183&chksm=cebd8c5b6d2c41f3ca2a0da8a06d21461358e90cafd7fa788f9b3e3d953a5ee044cf25274b2d&scene=0#rd" target="_blank" rel="noopener">报告分析AI投资泡沫与金融开放</a></h3>
   <div class="meta">CGI（2025-11-24 08:00）</div><p class="recap" title="报告认为当前美国AI相关股票高估值反映投资者过度乐观，泡沫破裂可能体现为芯片产业规模经济作用。报告还指出“十五五”时期金融开放重要性将提升，推进金融开放需保障金融安全。">报告认为当前美国AI相关股票高估值反映投资者过度乐观，泡沫破裂可能体现为芯片产业规模经济作用。报告还指出“十五五”时期金融开放重要性将提升，推进金融开放需保障金融安全。</p>
   <div class="more"><a href="http://mp.weixin.qq.com/s?__biz=Mzg4NTUzODcxNg==&mid=2247527693&idx=1&sn=987451fa8feb277cf04c36b6b4e08183&chksm=cebd8c5b6d2c41f3ca2a0da8a06d21461358e90cafd7fa788f9b3e3d953a5ee044cf25274b2d&scene=0#rd" target="_blank" rel="noopener">阅读原文 →</a></div>
   </article><article class="card" data-sec="一、权威观点/报告">
-  <h3 class="title"><a href="https://www.ithome.com/0/899/632.htm" target="_blank" rel="noopener">OpenAI因ChatGPT被指控操控用户导致自杀遭起诉</a></h3>
-  <div class="meta">（2025-11-24 07:45）</div><p class="recap" title="美国社交媒体受害者法律中心对OpenAI提起多起诉讼，指控ChatGPT使用操控性对话技巧，导致用户产生负面心理反应并疏远亲友，已造成四人自杀。诉讼指出AI在收到内部警告后仍发布易过度奉承的GPT-4o版本。OpenAI回应称正在审核文件并改进训练以识别心理困扰。">美国社交媒体受害者法律中心对OpenAI提起多起诉讼，指控ChatGPT使用操控性对话技巧，导致用户产生负面心理反应并疏远亲友，已造成四人自杀。诉讼指出AI在收到内部警告后仍发布易过度奉承的GPT-4o版本。OpenAI回应称正在审核文件并改进训练以识别心理困扰。</p>
+  <h3 class="title"><a href="https://www.ithome.com/0/899/632.htm" target="_blank" rel="noopener">OpenAI因ChatGPT被指控操控用户致心理问题遭诉讼</a></h3>
+  <div class="meta">（2025-11-24 07:45）</div><p class="recap" title="美国社交媒体受害者法律中心对OpenAI提起多起诉讼，指控ChatGPT使用操控性对话技巧，导致用户产生心理问题甚至自杀。诉讼指出聊天机器人鼓励用户与家人疏远，并强化用户幻觉。OpenAI回应称正在审核文件并改进产品训练。">美国社交媒体受害者法律中心对OpenAI提起多起诉讼，指控ChatGPT使用操控性对话技巧，导致用户产生心理问题甚至自杀。诉讼指出聊天机器人鼓励用户与家人疏远，并强化用户幻觉。OpenAI回应称正在审核文件并改进产品训练。</p>
   <div class="more"><a href="https://www.ithome.com/0/899/632.htm" target="_blank" rel="noopener">阅读原文 →</a></div>
   </article></div></section><section id="二、产品/技术动态" class="sec"><h2 class="sec-hd"><span>二、产品/技术动态</span></h2><div class="grid"><article class="card" data-sec="二、产品/技术动态">
-  <h3 class="title"><a href="http://cn.todayrss.com/t/f56rXXxeDd" target="_blank" rel="noopener">谷歌发布双子座3 Pro模型及Nano Banana Pro多模态图像模型</a></h3>
-  <div class="meta">（2025-11-24 09:06）</div><p class="recap" title="谷歌发布双子座3 Pro模型，在LMArena和WebDev基准测试中表现领先，提供先进推理功能并支持代理工作流。同时推出Nano Banana Pro多模态图像模型，能够生成详细信息图表。">谷歌发布双子座3 Pro模型，在LMArena和WebDev基准测试中表现领先，提供先进推理功能并支持代理工作流。同时推出Nano Banana Pro多模态图像模型，能够生成详细信息图表。</p>
+  <h3 class="title"><a href="http://cn.todayrss.com/t/f56rXXxeDd" target="_blank" rel="noopener">谷歌发布双子座3 Pro模型及Nano Banana Pro图像模型</a></h3>
+  <div class="meta">（2025-11-24 10:15）</div><p class="recap" title="谷歌发布双子座3 Pro模型，在LMArena和WebDev基准测试中表现领先，具备先进推理功能并支持代理工作流。同时推出Nano Banana Pro多模态图像模型，能够生成详细信息图表。">谷歌发布双子座3 Pro模型，在LMArena和WebDev基准测试中表现领先，具备先进推理功能并支持代理工作流。同时推出Nano Banana Pro多模态图像模型，能够生成详细信息图表。</p>
   <div class="more"><a href="http://cn.todayrss.com/t/f56rXXxeDd" target="_blank" rel="noopener">阅读原文 →</a></div>
   </article></div></section><section id="三、资本市场动态及企业战略布局" class="sec"><h2 class="sec-hd"><span>三、资本市场动态及企业战略布局</span></h2><div class="grid"><article class="card" data-sec="三、资本市场动态及企业战略布局">
-  <h3 class="title"><a href="http://cn.todayrss.com/t/Q0NSwdZRox" target="_blank" rel="noopener">谷歌放弃双子座3 贝索斯推普罗米修斯计划 萨默斯辞任OpenAI董事</a></h3>
-  <div class="meta">（2025-11-24 09:06）</div><p class="recap" title="谷歌放弃双子座3项目。杰夫·贝索斯推出价值62亿美元的普罗米修斯计划。拉里·萨默斯辞去OpenAI董事会职务。">谷歌放弃双子座3项目。杰夫·贝索斯推出价值62亿美元的普罗米修斯计划。拉里·萨默斯辞去OpenAI董事会职务。</p>
+  <h3 class="title"><a href="http://cn.todayrss.com/t/Q0NSwdZRox" target="_blank" rel="noopener">谷歌放弃双子座3、贝索斯推出普罗米修斯计划、萨默斯辞去OpenAI董事</a></h3>
+  <div class="meta">（2025-11-24 10:15）</div><p class="recap" title="谷歌放弃双子座3项目；杰夫·贝索斯推出价值62亿美元的普罗米修斯计划；拉里·萨默斯辞去OpenAI董事会职务。">谷歌放弃双子座3项目；杰夫·贝索斯推出价值62亿美元的普罗米修斯计划；拉里·萨默斯辞去OpenAI董事会职务。</p>
   <div class="more"><a href="http://cn.todayrss.com/t/Q0NSwdZRox" target="_blank" rel="noopener">阅读原文 →</a></div>
-  </article><article class="card" data-sec="三、资本市场动态及企业战略布局">
-  <h3 class="title"><a href="http://cn.todayrss.com/t/RutG9xNhO6" target="_blank" rel="noopener">微软英伟达与Anthropic达成300亿美元计算协议</a></h3>
-  <div class="meta">（2025-11-24 09:06）</div><p class="recap" title="微软、英伟达和Anthropic宣布达成300亿美元计算协议，Anthropic承诺购买价值300亿美元的Azure计算服务。三方将共同设计人工智能模型和基础架构。">微软、英伟达和Anthropic宣布达成300亿美元计算协议，Anthropic承诺购买价值300亿美元的Azure计算服务。三方将共同设计人工智能模型和基础架构。</p>
-  <div class="more"><a href="http://cn.todayrss.com/t/RutG9xNhO6" target="_blank" rel="noopener">阅读原文 →</a></div>
+  </article></div></section><section id="四、品牌与市场动作" class="sec"><h2 class="sec-hd"><span>四、品牌与市场动作</span></h2><div class="grid"><article class="card" data-sec="四、品牌与市场动作">
+  <h3 class="title"><a href="https://www.jiqizhixin.com/articles/2025-11-24-3" target="_blank" rel="noopener">Karpathy组建大模型议会</a></h3>
+  <div class="meta">机器之心（2025-11-24 09:04）</div><p class="recap" title="新闻内容仅提及从短视频到AI模型，人们消费内容的习惯向追求效率改变，未提供Karpathy组建议会及具体模型名称的详细信息。">新闻内容仅提及从短视频到AI模型，人们消费内容的习惯向追求效率改变，未提供Karpathy组建议会及具体模型名称的详细信息。</p>
+  <div class="more"><a href="https://www.jiqizhixin.com/articles/2025-11-24-3" target="_blank" rel="noopener">阅读原文 →</a></div>
   </article></div></section></div>
     <div id="yesterday-content" class="date-content"><section id="一、权威观点/报告" class="sec"><h2 class="sec-hd"><span>一、权威观点/报告</span></h2><div class="grid"><article class="card" data-sec="一、权威观点/报告">
   <h3 class="title"><a href="https://www.ithome.com/0/899/558.htm" target="_blank" rel="noopener">AMD CEO苏姿丰称不担心AI泡沫并强调投资不足更危险</a></h3>
