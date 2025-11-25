@@ -1,445 +1,268 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AI 大模型新闻看板（2025-11-25）</title>
 
-<!DOCTYPE html>
-<html lang="zh">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
 
 <style>
-  body {
-    margin: 0;
-    background: #f7f8fb;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter;
-    line-height: 1.6;
-    color: #0f172a;
+:root{
+  --bg:#f7f8fb;
+  --fg:#0f172a;
+  --sub:#64748b;
+  --line:#e5e7eb;
+  --card:#ffffff;
+  --accent:#4f46e5;
+  --radius:16px;
+  --shadow:0 1px 2px rgba(15,23,42,.04),0 10px 24px rgba(15,23,42,.06);
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#0b0f14; --fg:#e5e7eb; --sub:#9aa7b4; --line:#1f2937; --card:#0f1520; --accent:#7c83ff;
+    --shadow:0 1px 2px rgba(0,0,0,.5),0 10px 28px rgba(0,0,0,.55);
   }
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0; background:var(--bg); color:var(--fg);
+  font:16px/1.7 system-ui,-apple-system,Segoe UI,Roboto,Inter,"PingFang SC","Hiragino Sans GB","Microsoft Yahei",Arial;
+  -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
+}
 
-  .container {
-    max-width: 900px;
-    margin: 32px auto;
-    padding: 0 16px;
-  }
+/* 顶部与筛选条 */
+.header-wrap{max-width:1180px;margin:28px auto 8px;padding:0 18px}
+h1{margin:6px 0 2px;font-size:28px;letter-spacing:.3px;font-weight:700}
+.time{color:var(--sub);font-size:13px}
 
-  /* 图表容器 */
-  .chart-block {
-    width: 100%;
-    border-radius: 16px;
-    overflow: hidden;
-    margin-bottom: 40px;
-    box-shadow: 0 4px 18px rgba(0,0,0,0.06);
+.controls{
+  position:sticky; top:0; z-index:30;
+  max-width:1180px; margin:8px auto 18px; padding:10px 18px;
+  display:flex; gap:12px; flex-wrap:wrap; align-items:center;
+  backdrop-filter:saturate(1.2) blur(6px);
+  background:linear-gradient(180deg, rgba(255,255,255,.75), rgba(255,255,255,.55));
+  border-bottom:1px solid var(--line);
+  box-shadow:0 6px 14px rgba(15,23,42,.05);
+}
+@media (prefers-color-scheme: dark){
+  .controls{
+    background:linear-gradient(180deg, rgba(8,12,18,.75), rgba(8,12,18,.55));
+    box-shadow:0 10px 24px rgba(0,0,0,.45);
   }
+}
+select,input[type="search"]{
+  padding:10px 12px;border-radius:12px;border:1px solid var(--line);outline:none;min-width:200px;background:var(--card);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.4);
+}
+input[type="search"]{flex:1 1 320px}
+select:focus-visible,input[type="search"]:focus-visible{
+  border-color:var(--accent);
+  box-shadow:0 0 0 3px rgba(79,70,229,.18);
+}
 
-  /* 新闻卡片 */
-  .news-card {
-    background: #fff;
-    padding: 20px;
-    margin-bottom: 22px;
-    border-radius: 16px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-  }
+/* 日期分类标签 */
+.date-tabs {
+  display: flex;
+  gap: 8px;
+  margin: 20px 0 10px;
+  padding: 0 18px;
+  max-width: 1180px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.date-tab {
+  padding: 8px 16px;
+  border-radius: 8px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+.date-tab.active {
+  background: var(--accent);
+  color: white;
+  border-color: var(--accent);
+}
+.date-tab:hover:not(.active) {
+  background: var(--bg);
+}
 
-  .news-title {
-    font-size: 20px;
-    font-weight: 600;
-    margin-bottom: 10px;
-  }
+/* 主容器 */
+.wrap{max-width:1180px;margin:0 auto;padding:0 14px 42px}
 
-  .news-time {
-    font-size: 14px;
-    color: #64748b;
-    margin-bottom: 8px;
-  }
+/* 板块与卡片 */
+.sec{scroll-margin-top:84px; margin-top:26px}
+.sec-hd{
+  margin:22px 0 14px; font-size:20px; font-weight:700;
+  display:flex; align-items:center; gap:10px;
+}
+.sec-hd span{
+  padding-left:10px;
+  border-left:5px solid var(--accent);
+  background:linear-gradient(90deg,rgba(79,70,229,.12),transparent);
+  border-radius:6px 999px 999px 6px;
+}
 
-  .news-desc {
-    font-size: 16px;
-    color: #334155;
-  }
+.grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:16px }
+
+/* 卡片 */
+.card{
+  background:var(--card); border-radius:var(--radius); padding:16px 16px 12px;
+  border:1px solid rgba(0,0,0,.04);
+  box-shadow:var(--shadow);
+  transition:transform .14s ease, box-shadow .14s ease, border-color .14s ease;
+}
+.card:hover{ transform:translateY(-3px); box-shadow:0 2px 6px rgba(15,23,42,.08),0 16px 34px rgba(15,23,42,.10) }
+.title{ margin:0 0 8px; font-size:17px; line-height:1.45 }
+.title a{ color:var(--fg); text-decoration:none; }
+.title a:hover{ color:var(--accent); text-decoration:underline }
+.title a:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; border-radius:6px }
+.title a{ display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+
+.meta{ color:var(--sub); font-size:12px; margin-bottom:6px }
+.recap{ margin:.45em 0 .25em; line-height:1.7 }
+.recap{ display:-webkit-box; -webkit-line-clamp:4; -webkit-box-orient:vertical; overflow:hidden; }
+
+.more{ margin-top:6px }
+.more a{ color:var(--accent); text-decoration:none; font-weight:600; }
+.more a:hover{ text-decoration:underline }
+
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--sub);
+  font-size: 16px;
+}
+#emptyHint{
+  color:var(--sub); text-align:center; margin:22px 0 26px; font-size:14px;
+  background:rgba(79,70,229,.06); border:1px dashed rgba(79,70,229,.28);
+  padding:10px 12px; border-radius:12px;
+}
+.hidden{display:none!important}
+
+.date-content { display:none; }
+.date-content.active { display:block; }
+
+footer{ max-width:1180px; margin:22px auto 44px; padding:0 18px; color:var(--sub); font-size:12px }
+
+.trends-top{
+  max-width:1180px; margin:6px auto 16px; padding:0 14px;
+  display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px;
+}
+@media (max-width:1024px){ .trends-top{ grid-template-columns:1fr; } }
+
+.t-card{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:20px;
+  box-shadow:var(--shadow);
+  overflow:hidden;
+  transition:transform .22s ease, box-shadow .22s ease;
+}
+.t-card:hover{ transform:translateY(-4px); box-shadow:0 12px 28px rgba(16,18,19,.10); }
+
+.t-hd{
+  display:flex; align-items:center; justify-content:space-between;
+  padding:12px 14px; font-weight:650; font-size:15px;
+  background:linear-gradient(90deg,#fff, #fafbff);
+  border-bottom:1px solid var(--line);
+}
+@media (prefers-color-scheme: dark){
+  .t-hd{ background:linear-gradient(90deg,#0f1520,#0c121b) }
+}
+.t-body{ height:340px; position:relative; }
+.t-embed{ position:absolute; inset:10px 12px; border-radius:14px; background:#fff; overflow:hidden; }
+.t-embed iframe{ width:100%; height:100%; border:0; border-radius:12px; }
 </style>
-</head>
 
-<body>
-  <div class="container">
 
-    <!-- ===== 图表区域（来自图表生成节点） ===== -->
-    <div class="chart-block">
-      
-    </div>
+<div class="header-wrap">
+  <h1>AI 大模型新闻看板</h1>
+  <div class="time">2025-11-25</div>
+</div>
 
-    <!-- ===== 新闻列表 ===== -->
-    
-        <div class="news-card">
-          <div class="news-title">奥特曼称OpenAI将推出比iPhone更平和的人工智能设备</div>
-          <div class="news-time"></div>
-          <div class="news-desc"></div>
-        </div>
-      
-        <div class="news-card">
-          <div class="news-title">与爱为舞公司完成四轮融资估值近10亿美元，推出AI家教产品爱学</div>
-          <div class="news-time"></div>
-          <div class="news-desc"></div>
-        </div>
-      
-        <div class="news-card">
-          <div class="news-title">腾讯混元OCR模型开源，参数1B并在多项基准测试中领先</div>
-          <div class="news-time"></div>
-          <div class="news-desc"></div>
-        </div>
-      
-        <div class="news-card">
-          <div class="news-title">芬兰阿尔托大学团队演示并行光学计算架构POMMM</div>
-          <div class="news-time"></div>
-          <div class="news-desc"></div>
-        </div>
-      
-        <div class="news-card">
-          <div class="news-title">Nano Banana Pro生成无限递归图像引发关注</div>
-          <div class="news-time"></div>
-          <div class="news-desc"></div>
-        </div>
-      
-        <div class="news-card">
-          <div class="news-title">Anthropic研究证实AI训练可能催生目标错位模型</div>
-          <div class="news-time"></div>
-          <div class="news-desc"></div>
-        </div>
-      
-        <div class="news-card">
-          <div class="news-title">2025年11月免费AI编程工具清单发布</div>
-          <div class="news-time"></div>
-          <div class="news-desc"></div>
-        </div>
-      
-        <div class="news-card">
-          <div class="news-title">Hugging Face TRL库集成RapidFire AI实现单GPU并发微调实验</div>
-          <div class="news-time"></div>
-          <div class="news-desc"></div>
-        </div>
-      
-        <div class="news-card">
-          <div class="news-title">苹果开源Embedding Atlas工具，实现本地嵌入向量可视化分析</div>
-          <div class="news-time"></div>
-          <div class="news-desc"></div>
-        </div>
-      
-        <div class="news-card">
-          <div class="news-title">Infinite Reality公司融资疑云与股票回购四次爽约</div>
-          <div class="news-time"></div>
-          <div class="news-desc"></div>
-        </div>
-      
-        <div class="news-card">
-          <div class="news-title">中科天算完成数千万元天使轮融资，推进太空超算技术研发</div>
-          <div class="news-time"></div>
-          <div class="news-desc"></div>
-        </div>
-      
-        <div class="news-card">
-          <div class="news-title">Meta与谷歌洽谈在自有数据中心部署TPU芯片</div>
-          <div class="news-time"></div>
-          <div class="news-desc"></div>
-        </div>
-      
-        <div class="news-card">
-          <div class="news-title">xLLM社区将于12月6日在北京举办线下Meetup</div>
-          <div class="news-time"></div>
-          <div class="news-desc"></div>
-        </div>
-      
-        <div class="news-card">
-          <div class="news-title">华尔街精英加入AI公司训练金融模型</div>
-          <div class="news-time"></div>
-          <div class="news-desc"></div>
-        </div>
-      
-        <div class="news-card">
-          <div class="news-title">Neuxnet公司AI业务占营收过半，预计2025年突破3000万美元</div>
-          <div class="news-time"></div>
-          <div class="news-desc"></div>
-        </div>
-      
-        <div class="news-card">
-          <div class="news-title">法院对OpenAI发布临时禁令禁止在Sora应用中使用Cameo一词</div>
-          <div class="news-time"></div>
-          <div class="news-desc"></div>
-        </div>
-      
-        <div class="news-card">
-          <div class="news-title">OpenAI推出ChatGPT购物研究功能</div>
-          <div class="news-time"></div>
-          <div class="news-desc"></div>
-        </div>
-      
-        <div class="news-card">
-          <div class="news-title">Anthropic发布新版AI模型提升编码与办公任务处理能力</div>
-          <div class="news-time"></div>
-          <div class="news-desc"></div>
-        </div>
-      
-        <div class="news-card">
-          <div class="news-title">Anthropic发布Claude Opus 4.5模型并推出Excel集成功能</div>
-          <div class="news-time"></div>
-          <div class="news-desc"></div>
-        </div>
-      
-        <div class="news-card">
-          <div class="news-title">OpenAI为ChatGPT推出购物研究功能</div>
-          <div class="news-time"></div>
-          <div class="news-desc"></div>
-        </div>
-      
-        <div class="news-card">
-          <div class="news-title">DeepMind诺贝尔奖得主谈AlphaFold发展历程</div>
-          <div class="news-time"></div>
-          <div class="news-desc"></div>
-        </div>
-      
-        <div class="news-card">
-          <div class="news-title">新型AI模型PopEVE提升罕见疾病诊断能力</div>
-          <div class="news-time"></div>
-          <div class="news-desc"></div>
-        </div>
-      
-        <div class="news-card">
-          <div class="news-title">谷歌放弃双子座3 贝索斯推普罗米修斯计划 萨默斯辞任OpenAI董事</div>
-          <div class="news-time"></div>
-          <div class="news-desc"></div>
-        </div>
-      
-        <div class="news-card">
-          <div class="news-title">谷歌发布双子座3 Pro模型及Nano Banana Pro图像模型</div>
-          <div class="news-time"></div>
-          <div class="news-desc"></div>
-        </div>
-      
-        <div class="news-card">
-          <div class="news-title">微软英伟达Anthropic达成300亿美元计算协议</div>
-          <div class="news-time"></div>
-          <div class="news-desc"></div>
-        </div>
-      
-        <div class="news-card">
-          <div class="news-title">谷歌将于2026年3月停用Assistant语音助手并全面转向Gemini</div>
-          <div class="news-time"></div>
-          <div class="news-desc"></div>
-        </div>
-      
-        <div class="news-card">
-          <div class="news-title">亚马逊在全球50多国拥有900多处数据中心设施</div>
-          <div class="news-time"></div>
-          <div class="news-desc"></div>
-        </div>
-      
-        <div class="news-card">
-          <div class="news-title">美国七起诉讼指控ChatGPT对话放大用户脆弱致悲剧</div>
-          <div class="news-time"></div>
-          <div class="news-desc"></div>
-        </div>
-      
-        <div class="news-card">
-          <div class="news-title">阿里千问启用新域名并开放更多模型</div>
-          <div class="news-time"></div>
-          <div class="news-desc"></div>
-        </div>
-      
-        <div class="news-card">
-          <div class="news-title">国家能源集团发布发电行业大模型擎源并构建高质量数据集</div>
-          <div class="news-time"></div>
-          <div class="news-desc"></div>
-        </div>
-      
-        <div class="news-card">
-          <div class="news-title">华为云盘古CV大模型团队多目标跟踪研究成果被AAAI 2026收录</div>
-          <div class="news-time"></div>
-          <div class="news-desc"></div>
-        </div>
-      
-        <div class="news-card">
-          <div class="news-title">三星或与Perplexity合作在Galaxy S26系列手机中为Bixby引入AI大模型</div>
-          <div class="news-time"></div>
-          <div class="news-desc"></div>
-        </div>
-      
-        <div class="news-card">
-          <div class="news-title">港科大团队发布全球首个真实场景篮球机器人演示</div>
-          <div class="news-time"></div>
-          <div class="news-desc"></div>
-        </div>
-      
-        <div class="news-card">
-          <div class="news-title">波士顿动力前CTO加盟DeepMind任硬件工程副总裁</div>
-          <div class="news-time"></div>
-          <div class="news-desc"></div>
-        </div>
-      
-        <div class="news-card">
-          <div class="news-title">地瓜机器人发布一站式开发平台及S600算力平台</div>
-          <div class="news-time"></div>
-          <div class="news-desc"></div>
-        </div>
-      
-        <div class="news-card">
-          <div class="news-title">富士康AI服务器收入超iPhone，刘扬伟推动业务转型</div>
-          <div class="news-time"></div>
-          <div class="news-desc"></div>
-        </div>
-      
-        <div class="news-card">
-          <div class="news-title">OpenAI发布GPT-5早期科学实验报告</div>
-          <div class="news-time"></div>
-          <div class="news-desc"></div>
-        </div>
-      
-        <div class="news-card">
-          <div class="news-title">奥尔特曼承认谷歌AI进展带来经济压力，OpenAI将推出新模型Shallotpeat</div>
-          <div class="news-time"></div>
-          <div class="news-desc"></div>
-        </div>
-      
-        <div class="news-card">
-          <div class="news-title">清华吴翼团队与蚂蚁开源异步强化学习框架AReaL-lite</div>
-          <div class="news-time"></div>
-          <div class="news-desc"></div>
-        </div>
-      
-        <div class="news-card">
-          <div class="news-title">奥特曼内部备忘录承认谷歌AI进展带来经济压力</div>
-          <div class="news-time"></div>
-          <div class="news-desc"></div>
-        </div>
-      
-        <div class="news-card">
-          <div class="news-title">陶哲轩使用Gemini辅助解决数学难题</div>
-          <div class="news-time"></div>
-          <div class="news-desc"></div>
-        </div>
-      
-        <div class="news-card">
-          <div class="news-title">奥特曼承认谷歌威胁OpenAI并预告新模型</div>
-          <div class="news-time"></div>
-          <div class="news-desc"></div>
-        </div>
-      
-        <div class="news-card">
-          <div class="news-title">阿里云赵庆杰将在AICon分享多智能体智能诊断系统技术实践</div>
-          <div class="news-time"></div>
-          <div class="news-desc"></div>
-        </div>
-      
-        <div class="news-card">
-          <div class="news-title">英伟达公布2025年Q3财报，Blackwell芯片全面量产</div>
-          <div class="news-time"></div>
-          <div class="news-desc"></div>
-        </div>
-      
-        <div class="news-card">
-          <div class="news-title">SuperMe完成680万美元种子轮融资，用AI创建可对话职业档案</div>
-          <div class="news-time"></div>
-          <div class="news-desc"></div>
-        </div>
-      
-        <div class="news-card">
-          <div class="news-title">阿里云在Gartner生成式AI报告四大维度均位列新兴领导者象限</div>
-          <div class="news-time"></div>
-          <div class="news-desc"></div>
-        </div>
-      
-        <div class="news-card">
-          <div class="news-title">主流开源大模型生态解析</div>
-          <div class="news-time"></div>
-          <div class="news-desc"></div>
-        </div>
-      
-        <div class="news-card">
-          <div class="news-title">Anthropic研究揭示AI奖励黑客行为可导致系统性错位</div>
-          <div class="news-time"></div>
-          <div class="news-desc"></div>
-        </div>
-      
-        <div class="news-card">
-          <div class="news-title">研报分析AI投资泡沫与金融开放</div>
-          <div class="news-time"></div>
-          <div class="news-desc"></div>
-        </div>
-      
-        <div class="news-card">
-          <div class="news-title">星尘智能完成数亿元A++轮融资</div>
-          <div class="news-time"></div>
-          <div class="news-desc"></div>
-        </div>
-      
-        <div class="news-card">
-          <div class="news-title">谷歌Gemini 3在数学和物理基准测试中创纪录</div>
-          <div class="news-time"></div>
-          <div class="news-desc"></div>
-        </div>
-      
-        <div class="news-card">
-          <div class="news-title">甲骨文股价下跌致埃里森财富缩水滑落至富豪榜第三</div>
-          <div class="news-time"></div>
-          <div class="news-desc"></div>
-        </div>
-      
-        <div class="news-card">
-          <div class="news-title">AMD将超分辨率技术FidelityFX Super Resolution正式更名为FSR</div>
-          <div class="news-time"></div>
-          <div class="news-desc"></div>
-        </div>
-      
-        <div class="news-card">
-          <div class="news-title">Karpathy开源大模型议会应用llm-council</div>
-          <div class="news-time"></div>
-          <div class="news-desc"></div>
-        </div>
-      
-        <div class="news-card">
-          <div class="news-title">AMD CEO苏姿丰称不担心AI泡沫并强调投资不足更危险</div>
-          <div class="news-time"></div>
-          <div class="news-desc"></div>
-        </div>
-      
-        <div class="news-card">
-          <div class="news-title">卡帕西发布大模型匿名评测方法</div>
-          <div class="news-time"></div>
-          <div class="news-desc"></div>
-        </div>
-      
-        <div class="news-card">
-          <div class="news-title">英伟达称不保证与OpenAI达成千亿美元投资协议</div>
-          <div class="news-time"></div>
-          <div class="news-desc"></div>
-        </div>
-      
-        <div class="news-card">
-          <div class="news-title">银行业语义缓存优化实验降低误报率</div>
-          <div class="news-time"></div>
-          <div class="news-desc"></div>
-        </div>
-      
-        <div class="news-card">
-          <div class="news-title">谷歌预览AI代码文档生成工具Code Wiki</div>
-          <div class="news-time"></div>
-          <div class="news-desc"></div>
-        </div>
-      
-        <div class="news-card">
-          <div class="news-title">Fireflies AI会议助手估值达10亿美元，创始人曾人工冒充AI服务</div>
-          <div class="news-time"></div>
-          <div class="news-desc"></div>
-        </div>
-      
-        <div class="news-card">
-          <div class="news-title">电话AI公司Beside完成3200万美元融资</div>
-          <div class="news-time"></div>
-          <div class="news-desc"></div>
-        </div>
-      
-        <div class="news-card">
-          <div class="news-title">Lean4定理证明器提升AI可靠性并获行业采用</div>
-          <div class="news-time"></div>
-          <div class="news-desc"></div>
-        </div>
-      
+<div class="controls">
+  <select id="secSel"><option value="">全部板块</option>
+  </select>
+  <input id="search" type="search" placeholder="搜索标题 / 概要 / 标签…">
+</div>
 
-  </div>
-</body>
-</html>
+<div class="date-tabs">
+  <div class="date-tab active" data-date-category="today">📌 今日（2025-11-25）</div>
+  <div class="date-tab" data-date-category="yesterday">🗓️ 昨日（2025-11-24）</div>
+  <div class="date-tab" data-date-category="beforeYesterday">📅 前日（2025-11-23）</div>
+</div>
+
+<!-- ⭐⭐ 图表插入在这里 ⭐⭐ -->
+<div class="t-fallback" style="text-align:center;padding:40px;color:#666;">
+  趋势数据更新中...
+</div>
+<!-- ⭐⭐ 完整保留原位置 ⭐⭐ -->
+
+<div class="wrap">
+  <main id="main">
+    <p id="emptyHint" class="hidden">当前筛选无结果，换个关键词试试～</p>
+    <div id="today-content" class="date-content active"><div class="empty-state">今日暂无数据</div></div>
+    <div id="yesterday-content" class="date-content"><div class="empty-state">昨日暂无数据</div></div>
+    <div id="beforeYesterday-content" class="date-content"><div class="empty-state">前日暂无数据</div></div>
+  </main>
+</div>
+
+<footer>生成自 n8n · 本页仅作资讯聚合导航，版权归原文方所有</footer>
+
+<script>
+const secSel=document.getElementById('secSel');
+const search=document.getElementById('search');
+const emptyEl=document.getElementById('emptyHint');
+const dateTabs=document.querySelectorAll('.date-tab');
+const dateContents=document.querySelectorAll('.date-content');
+
+dateTabs.forEach(tab=>{
+  tab.addEventListener('click',()=>{
+    dateTabs.forEach(t=>t.classList.remove('active'));
+    tab.classList.add('active');
+    const target=tab.dataset.dateCategory;
+    dateContents.forEach(c=>c.classList.remove('active'));
+    document.getElementById(target+'-content').classList.add('active');
+    filter();
+  });
+});
+
+function debounce(fn,wait){let t;return(...a)=>{clearTimeout(t);t=setTimeout(()=>fn(...a),wait||180)};}
+function filter(){
+  const kw=(search.value||'').trim().toLowerCase();
+  const sec=secSel.value;
+  const active=document.querySelector('.date-content.active');
+  let total=0;
+  if(!active)return;
+  active.querySelectorAll('section').forEach(secEl=>{
+    let visible=0;
+    secEl.querySelectorAll('.card').forEach(card=>{
+      const inSec=!sec||card.dataset.sec===sec;
+      const hit=!kw||card.textContent.toLowerCase().includes(kw);
+      const show=inSec&&hit;
+      card.classList.toggle('hidden',!show);
+      if(show){visible++;total++;}
+    });
+    secEl.classList.toggle('hidden',visible===0);
+  });
+  emptyEl.classList.toggle('hidden',total!==0);
+}
+search.addEventListener('input',debounce(filter,180));
+secSel.addEventListener('change',filter);
+filter();
+
+document.addEventListener('DOMContentLoaded',()=>{
+  document.querySelectorAll('.t-sel').forEach(sel=>{
+    sel.addEventListener('change',function(){
+      const target=this.dataset.target;
+      const time=this.value;
+      const el=document.getElementById(target);
+      if(!el)return;
+      const iframe=el.querySelector('iframe');
+      if(iframe){iframe.src=iframe.src.replace(/(time=)[^&]+/,'$1'+encodeURIComponent(time));}
+    });
+  });
+});
+</script>
