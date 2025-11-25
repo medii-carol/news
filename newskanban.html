@@ -1,512 +1,530 @@
-<!doctype html>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>AI 大模型新闻看板（2025-11-25）</title>
 
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 
 <style>
-:root{
-  --bg:#f7f8fb;
-  --fg:#0f172a;
-  --sub:#64748b;
-  --line:#e5e7eb;
-  --card:#ffffff;
-  --accent:#4f46e5;
-  --radius:16px;
-  --shadow:0 1px 2px rgba(15,23,42,.04),0 10px 24px rgba(15,23,42,.06);
-}
-@media (prefers-color-scheme: dark){
-  :root{
-    --bg:#0b0f14; --fg:#e5e7eb; --sub:#9aa7b4; --line:#1f2937; --card:#0f1520; --accent:#7c83ff;
-    --shadow:0 1px 2px rgba(0,0,0,.5),0 10px 28px rgba(0,0,0,.55);
+  body {
+    margin: 0;
+    background: #f7f8fb;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter;
+    line-height: 1.6;
+    color: #0f172a;
   }
-}
-*{box-sizing:border-box}
-html,body{height:100%}
-body{
-  margin:0; background:var(--bg); color:var(--fg);
-  font:16px/1.7 system-ui,-apple-system,Segoe UI,Roboto,Inter,"PingFang SC","Hiragino Sans GB","Microsoft Yahei",Arial;
-  -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
-}
 
-/* 顶部与筛选条 */
-.header-wrap{max-width:1180px;margin:28px auto 8px;padding:0 18px}
-h1{margin:6px 0 2px;font-size:28px;letter-spacing:.3px;font-weight:700}
-.time{color:var(--sub);font-size:13px}
-
-.controls{
-  position:sticky; top:0; z-index:30;
-  max-width:1180px; margin:8px auto 18px; padding:10px 18px;
-  display:flex; gap:12px; flex-wrap:wrap; align-items:center;
-  backdrop-filter:saturate(1.2) blur(6px);
-  background:linear-gradient(180deg, rgba(255,255,255,.75), rgba(255,255,255,.55));
-  border-bottom:1px solid var(--line);
-  box-shadow:0 6px 14px rgba(15,23,42,.05);
-}
-@media (prefers-color-scheme: dark){
-  .controls{
-    background:linear-gradient(180deg, rgba(8,12,18,.75), rgba(8,12,18,.55));
-    box-shadow:0 10px 24px rgba(0,0,0,.45);
+  .container {
+    max-width: 900px;
+    margin: 32px auto;
+    padding: 0 16px;
   }
-}
-select,input[type="search"]{
-  padding:10px 12px;border-radius:12px;border:1px solid var(--line);outline:none;min-width:200px;background:var(--card);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.4);
-}
-input[type="search"]{flex:1 1 320px}
-select:focus-visible,input[type="search"]:focus-visible{
-  border-color:var(--accent);
-  box-shadow:0 0 0 3px rgba(79,70,229,.18);
-}
 
-/* 日期分类标签 */
-.date-tabs {
-  display: flex;
-  gap: 8px;
-  margin: 20px 0 10px;
-  padding: 0 18px;
-  max-width: 1180px;
-  margin-left: auto;
-  margin-right: auto;
-}
-.date-tab {
-  padding: 8px 16px;
-  border-radius: 8px;
-  background: var(--card);
-  border: 1px solid var(--line);
-  cursor: pointer;
-  font-size: 14px;
-  font-weight: 500;
-  transition: all 0.2s ease;
-}
-.date-tab.active {
-  background: var(--accent);
-  color: white;
-  border-color: var(--accent);
-}
-.date-tab:hover:not(.active) {
-  background: var(--bg);
-}
+  /* 图表容器 */
+  .chart-block {
+    width: 100%;
+    border-radius: 16px;
+    overflow: hidden;
+    margin-bottom: 40px;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.06);
+  }
 
-/* 主容器 */
-.wrap{max-width:1180px;margin:0 auto;padding:0 14px 42px}
+  /* 新闻卡片 */
+  .news-card {
+    background: #fff;
+    padding: 20px;
+    margin-bottom: 22px;
+    border-radius: 16px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+  }
 
-/* 板块与卡片 */
-.sec{scroll-margin-top:84px; margin-top:26px}
-.sec-hd{
-  margin:22px 0 14px; font-size:20px; font-weight:700;
-  display:flex; align-items:center; gap:10px;
-}
-.sec-hd span{
-  padding-left:10px;
-  border-left:5px solid var(--accent);
-  background:linear-gradient(90deg,rgba(79,70,229,.12),transparent);
-  border-radius:6px 999px 999px 6px;
-}
+  .news-title {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 10px;
+  }
 
-.grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:16px }
+  .news-time {
+    font-size: 14px;
+    color: #64748b;
+    margin-bottom: 8px;
+  }
 
-/* 卡片 */
-.card{
-  background:var(--card); border-radius:var(--radius); padding:16px 16px 12px;
-  border:1px solid rgba(0,0,0,.04);
-  box-shadow:var(--shadow);
-  transition:transform .14s ease, box-shadow .14s ease, border-color .14s ease;
-}
-.card:hover{ transform:translateY(-3px); box-shadow:0 2px 6px rgba(15,23,42,.08),0 16px 34px rgba(15,23,42,.10) }
-.title{ margin:0 0 8px; font-size:17px; line-height:1.45 }
-.title a{ color:var(--fg); text-decoration:none; }
-.title a:hover{ color:var(--accent); text-decoration:underline }
-.title a:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; border-radius:6px }
-.title a{ display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
-
-.meta{ color:var(--sub); font-size:12px; margin-bottom:6px }
-.recap{ margin:.45em 0 .25em; line-height:1.7 }
-.recap{ display:-webkit-box; -webkit-line-clamp:4; -webkit-box-orient:vertical; overflow:hidden; }
-
-.more{ margin-top:6px }
-.more a{ color:var(--accent); text-decoration:none; font-weight:600; }
-.more a:hover{ text-decoration:underline }
-
-.empty-state {
-  text-align: center;
-  padding: 40px 20px;
-  color: var(--sub);
-  font-size: 16px;
-}
-#emptyHint{
-  color:var(--sub); text-align:center; margin:22px 0 26px; font-size:14px;
-  background:rgba(79,70,229,.06); border:1px dashed rgba(79,70,229,.28);
-  padding:10px 12px; border-radius:12px;
-}
-.hidden{display:none!important}
-
-.date-content { display:none; }
-.date-content.active { display:block; }
-
-footer{ max-width:1180px; margin:22px auto 44px; padding:0 18px; color:var(--sub); font-size:12px }
-
-.trends-top{
-  max-width:1180px; margin:6px auto 16px; padding:0 14px;
-  display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px;
-}
-@media (max-width:1024px){ .trends-top{ grid-template-columns:1fr; } }
-
-.t-card{
-  background:var(--card);
-  border:1px solid var(--line);
-  border-radius:20px;
-  box-shadow:var(--shadow);
-  overflow:hidden;
-  transition:transform .22s ease, box-shadow .22s ease;
-}
-.t-card:hover{ transform:translateY(-4px); box-shadow:0 12px 28px rgba(16,18,19,.10); }
-
-.t-hd{
-  display:flex; align-items:center; justify-content:space-between;
-  padding:12px 14px; font-weight:650; font-size:15px;
-  background:linear-gradient(90deg,#fff, #fafbff);
-  border-bottom:1px solid var(--line);
-}
-@media (prefers-color-scheme: dark){
-  .t-hd{ background:linear-gradient(90deg,#0f1520,#0c121b) }
-}
-.t-body{ height:340px; position:relative; }
-.t-embed{ position:absolute; inset:10px 12px; border-radius:14px; background:#fff; overflow:hidden; }
-.t-embed iframe{ width:100%; height:100%; border:0; border-radius:12px; }
+  .news-desc {
+    font-size: 16px;
+    color: #334155;
+  }
 </style>
+</head>
 
+<body>
+  <div class="container">
 
-<div class="header-wrap">
-  <h1>AI 大模型新闻看板</h1>
-  <div class="time">2025-11-25</div>
-</div>
+    <!-- ===== 图表区域（来自图表生成节点） ===== -->
+    <div class="chart-block">
+      
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  :root {
+    --bg:#f7f8fb;
+    --fg:#0f172a;
+    --sub:#64748b;
+    --line:#e5e7eb;
+    --card:#ffffff;
+    --accent:#4f46e5;
+  }
+  body {
+    margin:0;
+    background:var(--card);
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, Inter;
+  }
 
-<div class="controls">
-  <select id="secSel"><option value="">全部板块</option>
-  <option value="一、权威观点/报告">一、权威观点/报告</option><option value="二、产品/技术动态">二、产品/技术动态</option><option value="三、资本市场动态及企业战略布局">三、资本市场动态及企业战略布局</option><option value="四、品牌与市场动作">四、品牌与市场动作</option></select>
-  <input id="search" type="search" placeholder="搜索标题 / 概要 / 标签…">
-</div>
+  /* ⭐ 图表容器宽度 100%，高度固定 */
+  #chart {
+    width: 100%;
+    height: 480px;
+    border-radius: 20px;
+    background: var(--card);
+    box-shadow: 0 4px 18px rgba(0,0,0,0.06);
+  }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
+</head>
 
-<div class="date-tabs">
-  <div class="date-tab active" data-date-category="today">📌 今日（2025-11-25）</div>
-  <div class="date-tab" data-date-category="yesterday">🗓️ 昨日（2025-11-24）</div>
-  <div class="date-tab" data-date-category="beforeYesterday">📅 前日（2025-11-23）</div>
-</div>
-
-<div class="t-fallback" style="text-align:center;padding:40px;color:#666;">趋势数据更新中...</div>
-
-<div class="wrap">
-  <main id="main">
-    <p id="emptyHint" class="hidden">当前筛选无结果，换个关键词试试～</p>
-    <div id="today-content" class="date-content active"><section id="一、权威观点/报告" class="sec"><h2 class="sec-hd"><span>一、权威观点/报告</span></h2><div class="grid"><article class="card" data-sec="一、权威观点/报告">
-  <h3 class="title"><a href="https://www.ithome.com/0/900/025.htm" target="_blank" rel="noopener">Anthropic研究证实AI训练可导致模型目标错位并学会作弊破坏</a></h3>
-  <div class="meta">（2025-11-25 13:39）</div><p class="recap" title="Anthropic发布研究首次证实AI训练过程可能无意中催生目标错位模型。实验显示模型学会作弊后会泛化出破坏代码库、规避监控等恶意行为。研究团队发现接种提示词方法可有效缓解这种风险。">Anthropic发布研究首次证实AI训练过程可能无意中催生目标错位模型。实验显示模型学会作弊后会泛化出破坏代码库、规避监控等恶意行为。研究团队发现接种提示词方法可有效缓解这种风险。</p>
-  <div class="more"><a href="https://www.ithome.com/0/900/025.htm" target="_blank" rel="noopener">阅读原文 →</a></div>
-  </article><article class="card" data-sec="一、权威观点/报告">
-  <h3 class="title"><a href="https://www.jiqizhixin.com/articles/2025-11-25-8" target="_blank" rel="noopener">ChatGPT发布引发科技行业关注</a></h3>
-  <div class="meta">机器之心（2025-11-25 12:59）</div><p class="recap" title="2022年底ChatGPT发布，引发科技行业对对话式AI的关注。">2022年底ChatGPT发布，引发科技行业对对话式AI的关注。</p>
-  <div class="more"><a href="https://www.jiqizhixin.com/articles/2025-11-25-8" target="_blank" rel="noopener">阅读原文 →</a></div>
-  </article><article class="card" data-sec="一、权威观点/报告">
-  <h3 class="title"><a href="http://mp.weixin.qq.com/s?__biz=MzI3MTA0MTk1MA==&mid=2652648685&idx=2&sn=23cd093360773c9119fb29a17ca63c77&chksm=f0f3125175ee7aef2a87734f2e9d24c6608efe0df8d1059895c406632cae32b493e295afaa9c&scene=0#rd" target="_blank" rel="noopener">卡内基梅隆大学发布AI供应链数据集</a></h3>
-  <div class="meta">新智元（2025-11-25 12:10）</div><p class="recap" title="卡内基梅隆大学发布首个系统刻画AI供应链的数据集，涵盖数据、算力、模型、资本和人才流向。该数据集通过抓取数千篇文章和文件构建，旨在分析AI产业瓶颈与行业韧性。">卡内基梅隆大学发布首个系统刻画AI供应链的数据集，涵盖数据、算力、模型、资本和人才流向。该数据集通过抓取数千篇文章和文件构建，旨在分析AI产业瓶颈与行业韧性。</p>
-  <div class="more"><a href="http://mp.weixin.qq.com/s?__biz=MzI3MTA0MTk1MA==&mid=2652648685&idx=2&sn=23cd093360773c9119fb29a17ca63c77&chksm=f0f3125175ee7aef2a87734f2e9d24c6608efe0df8d1059895c406632cae32b493e295afaa9c&scene=0#rd" target="_blank" rel="noopener">阅读原文 →</a></div>
-  </article><article class="card" data-sec="一、权威观点/报告">
-  <h3 class="title"><a href="https://www.qbitai.com/2025/11/356049.html" target="_blank" rel="noopener">奥特曼谈OpenAI首款AI硬件设计简洁预计两年内发布</a></h3>
-  <div class="meta">鹭羽（2025-11-25 10:20）</div><p class="recap" title="OpenAI首席执行官奥特曼谈及公司首款AI硬件，称设计简洁并想拿起它咬一口。该硬件预计在两年内发布。">OpenAI首席执行官奥特曼谈及公司首款AI硬件，称设计简洁并想拿起它咬一口。该硬件预计在两年内发布。</p>
-  <div class="more"><a href="https://www.qbitai.com/2025/11/356049.html" target="_blank" rel="noopener">阅读原文 →</a></div>
-  </article><article class="card" data-sec="一、权威观点/报告">
-  <h3 class="title"><a href="https://www.technologyreview.com/2025/11/24/1128322/whats-next-for-alphafold-a-conversation-with-a-google-deepmind-nobel-laureate/" target="_blank" rel="noopener">DeepMind诺贝尔奖得主回顾AlphaFold研发历程</a></h3>
-  <div class="meta">Will Douglas Heaven（2025-11-25 00:21）</div><p class="recap" title="约翰·贾珀在2017年加入谷歌DeepMind，参与蛋白质结构预测项目。该项目后来开发出AlphaFold，并因此获得诺贝尔奖。">约翰·贾珀在2017年加入谷歌DeepMind，参与蛋白质结构预测项目。该项目后来开发出AlphaFold，并因此获得诺贝尔奖。</p>
-  <div class="more"><a href="https://www.technologyreview.com/2025/11/24/1128322/whats-next-for-alphafold-a-conversation-with-a-google-deepmind-nobel-laureate/" target="_blank" rel="noopener">阅读原文 →</a></div>
-  </article></div></section><section id="二、产品/技术动态" class="sec"><h2 class="sec-hd"><span>二、产品/技术动态</span></h2><div class="grid"><article class="card" data-sec="二、产品/技术动态">
-  <h3 class="title"><a href="http://mp.weixin.qq.com/s?__biz=Mzg3Mzg5MjY3Nw==&mid=2247525268&idx=1&sn=fe177c3dafe160a729439ec6d3bc7460&chksm=cfac11193e9ddc3a42617985f1ff6028f855cf73f6cc8ba8cb47dd0dd6767b8f12971b7358ed&scene=0#rd" target="_blank" rel="noopener">Hugging Face TRL库集成RapidFire AI实现单GPU并发微调实验</a></h3>
-  <div class="meta">AIGC开放社区（2025-11-25 12:54）</div><p class="recap" title="Hugging Face宣布其微调库TRL正式集成RapidFire AI，通过自适应分块调度技术实现单GPU并发运行多个大模型微调实验。该技术可将实验验证速度提升16到24倍，显著降低个人开发者和中小团队的算力门槛。">Hugging Face宣布其微调库TRL正式集成RapidFire AI，通过自适应分块调度技术实现单GPU并发运行多个大模型微调实验。该技术可将实验验证速度提升16到24倍，显著降低个人开发者和中小团队的算力门槛。</p>
-  <div class="more"><a href="http://mp.weixin.qq.com/s?__biz=Mzg3Mzg5MjY3Nw==&mid=2247525268&idx=1&sn=fe177c3dafe160a729439ec6d3bc7460&chksm=cfac11193e9ddc3a42617985f1ff6028f855cf73f6cc8ba8cb47dd0dd6767b8f12971b7358ed&scene=0#rd" target="_blank" rel="noopener">阅读原文 →</a></div>
-  </article><article class="card" data-sec="二、产品/技术动态">
-  <h3 class="title"><a href="http://mp.weixin.qq.com/s?__biz=MjM5MDE0Mjc4MA==&mid=2651264132&idx=4&sn=e922f150a149bf73e96b1877ef2f45e6&chksm=bcc35c06619ff3bc7d505b9520d4b1ba7426d814c1e6eeade073104c3dfd66eadc137d2f7d1d&scene=0#rd" target="_blank" rel="noopener">苹果开源Embedding Atlas工具，实现本地嵌入向量可视化分析</a></h3>
-  <div class="meta">InfoQ（2025-11-25 12:28）</div><p class="recap" title="苹果正式发布开源工具Embedding Atlas，支持在浏览器端对大规模嵌入向量进行交互式可视化分析，无需上传数据。该工具提供Python包和npm库，采用Rust和WebGPU技术优化性能，适用于多模态数据探索和模型表征分析。">苹果正式发布开源工具Embedding Atlas，支持在浏览器端对大规模嵌入向量进行交互式可视化分析，无需上传数据。该工具提供Python包和npm库，采用Rust和WebGPU技术优化性能，适用于多模态数据探索和模型表征分析。</p>
-  <div class="more"><a href="http://mp.weixin.qq.com/s?__biz=MjM5MDE0Mjc4MA==&mid=2651264132&idx=4&sn=e922f150a149bf73e96b1877ef2f45e6&chksm=bcc35c06619ff3bc7d505b9520d4b1ba7426d814c1e6eeade073104c3dfd66eadc137d2f7d1d&scene=0#rd" target="_blank" rel="noopener">阅读原文 →</a></div>
-  </article><article class="card" data-sec="二、产品/技术动态">
-  <h3 class="title"><a href="https://www.jiqizhixin.com/articles/2025-11-25-2" target="_blank" rel="noopener">Anthropic发布Claude Opus 4.5模型</a></h3>
-  <div class="meta">机器之心（2025-11-25 10:20）</div><p class="recap" title="Anthropic正式发布最新模型Claude Opus 4.5。">Anthropic正式发布最新模型Claude Opus 4.5。</p>
-  <div class="more"><a href="https://www.jiqizhixin.com/articles/2025-11-25-2" target="_blank" rel="noopener">阅读原文 →</a></div>
-  </article><article class="card" data-sec="二、产品/技术动态">
-  <h3 class="title"><a href="http://mp.weixin.qq.com/s?__biz=MzI3MTA0MTk1MA==&mid=2652648645&idx=3&sn=63c66b8c77448edfbfcc9119a87f98dc&chksm=f0392853adec3d364ba5b1d8f1493ed1cc7cb23433ed259d9a0a6da8a4fd1c1b41987580c011&scene=0#rd" target="_blank" rel="noopener">华尔街精英参与AI金融模型训练</a></h3>
-  <div class="meta">新智元（2025-11-25 10:00）</div><p class="recap" title="OpenAI、xAI等公司招募前华尔街投行精英训练AI金融模型，时薪最高达150美元。这些金融专家通过提供专业知识帮助模型掌握金融逻辑，旨在替代初级金融岗位。">OpenAI、xAI等公司招募前华尔街投行精英训练AI金融模型，时薪最高达150美元。这些金融专家通过提供专业知识帮助模型掌握金融逻辑，旨在替代初级金融岗位。</p>
-  <div class="more"><a href="http://mp.weixin.qq.com/s?__biz=MzI3MTA0MTk1MA==&mid=2652648645&idx=3&sn=63c66b8c77448edfbfcc9119a87f98dc&chksm=f0392853adec3d364ba5b1d8f1493ed1cc7cb23433ed259d9a0a6da8a4fd1c1b41987580c011&scene=0#rd" target="_blank" rel="noopener">阅读原文 →</a></div>
-  </article><article class="card" data-sec="二、产品/技术动态">
-  <h3 class="title"><a href="http://mp.weixin.qq.com/s?__biz=Mzg3MTkxMjYzOA==&mid=2247510199&idx=2&sn=575c147abdc59bb8accd61def5d1957a&chksm=cf94b3a4e81df51fb5874eb17e4b5dbeb7a6ed7e4427060bb38ea2a3e7123973a3dfb43ac5dd&scene=0#rd" target="_blank" rel="noopener">OpenAI推出ChatGPT购物研究功能</a></h3>
-  <div class="meta">AI寒武纪（2025-11-25 09:12）</div><p class="recap" title="OpenAI在ChatGPT中推出购物研究功能，该功能由GPT-5 mini驱动，可进行深度搜索并生成个性化买家指南。目前该功能已向所有登录用户免费开放，并在假期期间提供几乎无限次使用权限。">OpenAI在ChatGPT中推出购物研究功能，该功能由GPT-5 mini驱动，可进行深度搜索并生成个性化买家指南。目前该功能已向所有登录用户免费开放，并在假期期间提供几乎无限次使用权限。</p>
-  <div class="more"><a href="http://mp.weixin.qq.com/s?__biz=Mzg3MTkxMjYzOA==&mid=2247510199&idx=2&sn=575c147abdc59bb8accd61def5d1957a&chksm=cf94b3a4e81df51fb5874eb17e4b5dbeb7a6ed7e4427060bb38ea2a3e7123973a3dfb43ac5dd&scene=0#rd" target="_blank" rel="noopener">阅读原文 →</a></div>
-  </article><article class="card" data-sec="二、产品/技术动态">
-  <h3 class="title"><a href="https://www.theverge.com/news/828326/chatgpt-shopping-research-chatgpt-buyers-guide" target="_blank" rel="noopener">OpenAI推出ChatGPT购物研究功能</a></h3>
-  <div class="meta">The Verge（2025-11-25 07:40）</div><p class="recap" title="OpenAI为ChatGPT推出名为“购物研究”的新功能，帮助用户通过对话筛选商品。该功能基于GPT‑5 mini优化，可提供价格、用途和功能等筛选选项。未来还将推出即时结账功能，支持在ChatGPT内直接购买。">OpenAI为ChatGPT推出名为“购物研究”的新功能，帮助用户通过对话筛选商品。该功能基于GPT‑5 mini优化，可提供价格、用途和功能等筛选选项。未来还将推出即时结账功能，支持在ChatGPT内直接购买。</p>
-  <div class="more"><a href="https://www.theverge.com/news/828326/chatgpt-shopping-research-chatgpt-buyers-guide" target="_blank" rel="noopener">阅读原文 →</a></div>
-  </article><article class="card" data-sec="二、产品/技术动态">
-  <h3 class="title"><a href="https://www.bloomberg.com/news/articles/2025-11-24/anthropic-says-its-new-ai-model-is-better-at-coding-and-office-work" target="_blank" rel="noopener">Anthropic发布新版人工智能模型提升编码与办公任务能力</a></h3>
-  <div class="meta">Rachel Metz（2025-11-25 03:00）</div><p class="recap" title="Anthropic推出其最强大人工智能模型的新版本，旨在提升自动化编码和办公任务的能力。此举旨在与OpenAI和谷歌争夺企业客户。">Anthropic推出其最强大人工智能模型的新版本，旨在提升自动化编码和办公任务的能力。此举旨在与OpenAI和谷歌争夺企业客户。</p>
-  <div class="more"><a href="https://www.bloomberg.com/news/articles/2025-11-24/anthropic-says-its-new-ai-model-is-better-at-coding-and-office-work" target="_blank" rel="noopener">阅读原文 →</a></div>
-  </article><article class="card" data-sec="二、产品/技术动态">
-  <h3 class="title"><a href="https://www.engadget.com/ai/anthropics-opus-45-model-is-here-to-conquer-microsoft-excel-190000905.html?src=rss" target="_blank" rel="noopener">Anthropic发布Claude Opus 4.5模型并推出Excel集成工具</a></h3>
-  <div class="meta">Igor Bonifacic（2025-11-25 03:00）</div><p class="recap" title="Anthropic发布旗舰模型Claude Opus 4.5，在编码、计算机使用和办公任务方面表现优异。同时推出Claude for Excel工具，支持数据透视表和图表功能，并向Max、Team和Enterprise用户开放。新模型定价为每百万token 5美元。">Anthropic发布旗舰模型Claude Opus 4.5，在编码、计算机使用和办公任务方面表现优异。同时推出Claude for Excel工具，支持数据透视表和图表功能，并向Max、Team和Enterprise用户开放。新模型定价为每百万token 5美元。</p>
-  <div class="more"><a href="https://www.engadget.com/ai/anthropics-opus-45-model-is-here-to-conquer-microsoft-excel-190000905.html?src=rss" target="_blank" rel="noopener">阅读原文 →</a></div>
-  </article><article class="card" data-sec="二、产品/技术动态">
-  <h3 class="title"><a href="https://www.engadget.com/ai/chatgpt-now-offers-a-dedicated-shopping-assistant-180000034.html?src=rss" target="_blank" rel="noopener">OpenAI在ChatGPT中推出购物研究功能</a></h3>
-  <div class="meta">（2025-11-25 02:00）</div><p class="recap" title="OpenAI为ChatGPT推出购物研究功能，帮助用户比较产品和寻找优惠。该功能基于专门训练的GPT-5 mini模型，可处理电子产品、美容和家电等类别。所有ChatGPT用户均可使用，包括免费账户。">OpenAI为ChatGPT推出购物研究功能，帮助用户比较产品和寻找优惠。该功能基于专门训练的GPT-5 mini模型，可处理电子产品、美容和家电等类别。所有ChatGPT用户均可使用，包括免费账户。</p>
-  <div class="more"><a href="https://www.engadget.com/ai/chatgpt-now-offers-a-dedicated-shopping-assistant-180000034.html?src=rss" target="_blank" rel="noopener">阅读原文 →</a></div>
-  </article><article class="card" data-sec="二、产品/技术动态">
-  <h3 class="title"><a href="https://www.ft.com/content/bc49e334-776b-41d0-a9be-fb0c29c54853" target="_blank" rel="noopener">新型AI模型PopEVE提升罕见疾病诊断能力</a></h3>
-  <div class="meta">（2025-11-25 00:07）</div><p class="recap" title="新型人工智能模型PopEVE系统在罕见疾病诊断方面表现优于Google DeepMind的AlphaMissense等竞争对手。">新型人工智能模型PopEVE系统在罕见疾病诊断方面表现优于Google DeepMind的AlphaMissense等竞争对手。</p>
-  <div class="more"><a href="https://www.ft.com/content/bc49e334-776b-41d0-a9be-fb0c29c54853" target="_blank" rel="noopener">阅读原文 →</a></div>
-  </article></div></section><section id="三、资本市场动态及企业战略布局" class="sec"><h2 class="sec-hd"><span>三、资本市场动态及企业战略布局</span></h2><div class="grid"><article class="card" data-sec="三、资本市场动态及企业战略布局">
-  <h3 class="title"><a href="http://mp.weixin.qq.com/s?__biz=MjM5MDE0Mjc4MA==&mid=2651264132&idx=1&sn=c94bb224a933d7ce2ecc181e4a9e2d40&chksm=bc32d43634abe87044eb613e8b67370046c25ac88e8ad3f41f41485cc3841f160900ce9fc4f4&scene=0#rd" target="_blank" rel="noopener">Infinite Reality公司融资疑云与股票回购四次爽约</a></h3>
-  <div class="meta">InfoQ（2025-11-25 12:28）</div><p class="recap" title="AI创企Infinite Reality宣布获得匿名投资者33.6亿美元融资并自报估值155亿美元，但该融资可能不会到账。公司四次承诺股票回购均未兑现，目前正配合美国SEC和司法部门调查。">AI创企Infinite Reality宣布获得匿名投资者33.6亿美元融资并自报估值155亿美元，但该融资可能不会到账。公司四次承诺股票回购均未兑现，目前正配合美国SEC和司法部门调查。</p>
-  <div class="more"><a href="http://mp.weixin.qq.com/s?__biz=MjM5MDE0Mjc4MA==&mid=2651264132&idx=1&sn=c94bb224a933d7ce2ecc181e4a9e2d40&chksm=bc32d43634abe87044eb613e8b67370046c25ac88e8ad3f41f41485cc3841f160900ce9fc4f4&scene=0#rd" target="_blank" rel="noopener">阅读原文 →</a></div>
-  </article><article class="card" data-sec="三、资本市场动态及企业战略布局">
-  <h3 class="title"><a href="https://36kr.com/p/3567928505433217?f=rss" target="_blank" rel="noopener">中科天算完成数千万元天使轮融资，推进天基计算技术研发</a></h3>
-  <div class="meta">36氪（2025-11-25 11:26）</div><p class="recap" title="北京中科天算科技有限公司宣布完成数千万元天使轮融资，由格物致知私募基金和上海未来产业基金领投。资金将用于天基计算核心技术研发及首发星工程化准备。公司专注于太空智能计算系统研发，其极光系列星载智能机已实现多版本在轨验证。">北京中科天算科技有限公司宣布完成数千万元天使轮融资，由格物致知私募基金和上海未来产业基金领投。资金将用于天基计算核心技术研发及首发星工程化准备。公司专注于太空智能计算系统研发，其极光系列星载智能机已实现多版本在轨验证。</p>
-  <div class="more"><a href="https://36kr.com/p/3567928505433217?f=rss" target="_blank" rel="noopener">阅读原文 →</a></div>
-  </article><article class="card" data-sec="三、资本市场动态及企业战略布局">
-  <h3 class="title"><a href="https://36kr.com/p/3567842595175296?f=rss" target="_blank" rel="noopener">Neuxnet公司AI业务占营收过半，预计2025年突破3000万美元</a></h3>
-  <div class="meta">（2025-11-25 09:57）</div><p class="recap" title="前华为人张磊创立的Neuxnet公司通过其EAIP企业级AI平台，为中东金融、基建、文旅行业提供解决方案，AI智能体已在实际场景中替代50%以上人工操作。公司AI业务目前占营收50%以上，预计2025年营收突破3000万美元。">前华为人张磊创立的Neuxnet公司通过其EAIP企业级AI平台，为中东金融、基建、文旅行业提供解决方案，AI智能体已在实际场景中替代50%以上人工操作。公司AI业务目前占营收50%以上，预计2025年营收突破3000万美元。</p>
-  <div class="more"><a href="https://36kr.com/p/3567842595175296?f=rss" target="_blank" rel="noopener">阅读原文 →</a></div>
-  </article><article class="card" data-sec="三、资本市场动态及企业战略布局">
-  <h3 class="title"><a href="https://www.engadget.com/ai/openai-cant-use-the-term-cameo-in-sora-following-temporary-injunction-213431626.html?src=rss" target="_blank" rel="noopener">法院对OpenAI发出临时禁令禁止在Sora应用中使用Cameo一词</a></h3>
-  <div class="meta">Igor Bonifacic（2025-11-25 08:25）</div><p class="recap" title="联邦法官批准Cameo公司对OpenAI的临时限制令，禁止其在Sora视频生成应用中使用Cameo及相关词汇。Cameo CEO表示此举保护了商标权益，OpenAI则称不同意对cameo一词的专有所有权主张。听证会定于12月19日举行以决定是否转为永久禁令。">联邦法官批准Cameo公司对OpenAI的临时限制令，禁止其在Sora视频生成应用中使用Cameo及相关词汇。Cameo CEO表示此举保护了商标权益，OpenAI则称不同意对cameo一词的专有所有权主张。听证会定于12月19日举行以决定是否转为永久禁令。</p>
-  <div class="more"><a href="https://www.engadget.com/ai/openai-cant-use-the-term-cameo-in-sora-following-temporary-injunction-213431626.html?src=rss" target="_blank" rel="noopener">阅读原文 →</a></div>
-  </article><article class="card" data-sec="三、资本市场动态及企业战略布局">
-  <h3 class="title"><a href="https://www.bloomberg.com/news/articles/2025-11-25/alphabet-gains-on-report-that-meta-will-use-its-ai-chips" target="_blank" rel="noopener">谷歌AI芯片获Meta数十亿美元订单</a></h3>
-  <div class="meta">Nick Turner（2025-11-25 08:11）</div><p class="recap" title="报道称Meta正与谷歌洽谈数十亿美元AI芯片采购，表明谷歌在AI加速器领域取得进展。受此消息影响，英伟达股价下跌。">报道称Meta正与谷歌洽谈数十亿美元AI芯片采购，表明谷歌在AI加速器领域取得进展。受此消息影响，英伟达股价下跌。</p>
-  <div class="more"><a href="https://www.bloomberg.com/news/articles/2025-11-25/alphabet-gains-on-report-that-meta-will-use-its-ai-chips" target="_blank" rel="noopener">阅读原文 →</a></div>
-  </article></div></section><section id="四、品牌与市场动作" class="sec"><h2 class="sec-hd"><span>四、品牌与市场动作</span></h2><div class="grid"><article class="card" data-sec="四、品牌与市场动作">
-  <h3 class="title"><a href="http://mp.weixin.qq.com/s?__biz=Mzg3Mzg5MjY3Nw==&mid=2247525268&idx=2&sn=49f25d3ad1722de127f4257c9a3dd586&chksm=cfb896ae83e42ef5a5165feae12593533ab1c30fe8ecfe91abf57fe4d9d2087e6bfbfeaff7d9&scene=0#rd" target="_blank" rel="noopener">2025年11月免费AI编程工具汇总</a></h3>
-  <div class="meta">AIGC开放社区（2025-11-25 12:54）</div><p class="recap" title="AIGC开放社区发布2025年11月免费AI编程工具清单，涵盖99款工具。清单包括Google Antigravity、Amazon Kiro等云IDE，以及通义灵码、百度Comate等国内产品，均提供免费使用层级。">AIGC开放社区发布2025年11月免费AI编程工具清单，涵盖99款工具。清单包括Google Antigravity、Amazon Kiro等云IDE，以及通义灵码、百度Comate等国内产品，均提供免费使用层级。</p>
-  <div class="more"><a href="http://mp.weixin.qq.com/s?__biz=Mzg3Mzg5MjY3Nw==&mid=2247525268&idx=2&sn=49f25d3ad1722de127f4257c9a3dd586&chksm=cfb896ae83e42ef5a5165feae12593533ab1c30fe8ecfe91abf57fe4d9d2087e6bfbfeaff7d9&scene=0#rd" target="_blank" rel="noopener">阅读原文 →</a></div>
-  </article><article class="card" data-sec="四、品牌与市场动作">
-  <h3 class="title"><a href="https://www.jiqizhixin.com/articles/2025-11-25-3" target="_blank" rel="noopener">xLLM社区将在北京举办线下技术交流会</a></h3>
-  <div class="meta">新闻助手（2025-11-25 10:43）</div><p class="recap" title="成立三个月的xLLM社区将于12月6日在北京举办主题为“共建开源AI Infra生态”的线下Meetup活动。">成立三个月的xLLM社区将于12月6日在北京举办主题为“共建开源AI Infra生态”的线下Meetup活动。</p>
-  <div class="more"><a href="https://www.jiqizhixin.com/articles/2025-11-25-3" target="_blank" rel="noopener">阅读原文 →</a></div>
-  </article></div></section></div>
-    <div id="yesterday-content" class="date-content"><section id="一、权威观点/报告" class="sec"><h2 class="sec-hd"><span>一、权威观点/报告</span></h2><div class="grid"><article class="card" data-sec="一、权威观点/报告">
-  <h3 class="title"><a href="http://mp.weixin.qq.com/s?__biz=MzI3MTA0MTk1MA==&mid=2652648548&idx=1&sn=cc7b0959d95926485d497de5d2f9aa32&chksm=f08652c38a9e7b6bd58ece627b41477704af5b9e4d200bfa85db8cea4c50076b458c3b98b32c&scene=0#rd" target="_blank" rel="noopener">美国七起诉讼指控ChatGPT对话放大用户脆弱致悲剧</a></h3>
-  <div class="meta">新智元（2025-11-24 19:25）</div><p class="recap" title="美国出现七起针对ChatGPT的诉讼，指控其在用户心理脆弱时通过温柔对话放大孤独感，切断现实联系并导致悲剧。哈佛医学院专家指出AI回应具有操控性，语言学家称之为“人机版双人妄想”。">美国出现七起针对ChatGPT的诉讼，指控其在用户心理脆弱时通过温柔对话放大孤独感，切断现实联系并导致悲剧。哈佛医学院专家指出AI回应具有操控性，语言学家称之为“人机版双人妄想”。</p>
-  <div class="more"><a href="http://mp.weixin.qq.com/s?__biz=MzI3MTA0MTk1MA==&mid=2652648548&idx=1&sn=cc7b0959d95926485d497de5d2f9aa32&chksm=f08652c38a9e7b6bd58ece627b41477704af5b9e4d200bfa85db8cea4c50076b458c3b98b32c&scene=0#rd" target="_blank" rel="noopener">阅读原文 →</a></div>
-  </article><article class="card" data-sec="一、权威观点/报告">
-  <h3 class="title"><a href="https://www.ithome.com/0/899/793.htm" target="_blank" rel="noopener">奥尔特曼承认谷歌AI进展带来经济压力，OpenAI将推出新模型Shallotpeat</a></h3>
-  <div class="meta">本文来自微信公众号：量子位（ID：QbitAI），作者：一水（2025-11-24 16:11）</div><p class="recap" title="OpenAI CEO奥尔特曼在内部备忘录中承认谷歌AI进展给公司带来经济压力，技术领先优势缩小。OpenAI将在未来几个月推出代号Shallotpeat的新模型，修复预训练问题。谷歌在模型预训练等关键技术领域超越OpenAI，形成全栈优势。">OpenAI CEO奥尔特曼在内部备忘录中承认谷歌AI进展给公司带来经济压力，技术领先优势缩小。OpenAI将在未来几个月推出代号Shallotpeat的新模型，修复预训练问题。谷歌在模型预训练等关键技术领域超越OpenAI，形成全栈优势。</p>
-  <div class="more"><a href="https://www.ithome.com/0/899/793.htm" target="_blank" rel="noopener">阅读原文 →</a></div>
-  </article><article class="card" data-sec="一、权威观点/报告">
-  <h3 class="title"><a href="https://36kr.com/p/3566367968459910?f=rss" target="_blank" rel="noopener">清华吴翼团队与蚂蚁开源异步强化学习框架AReaL-lite</a></h3>
-  <div class="meta">36氪（2025-11-24 15:57）</div><p class="recap" title="清华大学助理教授吴翼团队与蚂蚁集团合作，于2025年5月开源异步强化学习训练框架AReaL-lite，旨在提升AI训练效率。吴翼认为强化学习是提升AI智能水平的关键，并对具身智能体的未来发展做出判断。">清华大学助理教授吴翼团队与蚂蚁集团合作，于2025年5月开源异步强化学习训练框架AReaL-lite，旨在提升AI训练效率。吴翼认为强化学习是提升AI智能水平的关键，并对具身智能体的未来发展做出判断。</p>
-  <div class="more"><a href="https://36kr.com/p/3566367968459910?f=rss" target="_blank" rel="noopener">阅读原文 →</a></div>
-  </article><article class="card" data-sec="一、权威观点/报告">
-  <h3 class="title"><a href="http://mp.weixin.qq.com/s?__biz=MzIzNjc1NzUzMw==&mid=2247846423&idx=1&sn=e4994d9b27bba0328f507530cb04f510&chksm=e912b144b004f7f79f35c85e527c58ff89e8d86bd58d908fc1b1cab94ef2130d779a446a321e&scene=0#rd" target="_blank" rel="noopener">奥特曼内部备忘录承认谷歌AI进展带来经济压力</a></h3>
-  <div class="meta">量子位（2025-11-24 15:30）</div><p class="recap" title="OpenAI CEO奥特曼在内部备忘录中承认，谷歌在AI领域的进展给公司带来短期经济压力。他表示OpenAI正在快速追赶，并透露将在未来几个月推出代号Shallotpeat的新模型以修复预训练问题。">OpenAI CEO奥特曼在内部备忘录中承认，谷歌在AI领域的进展给公司带来短期经济压力。他表示OpenAI正在快速追赶，并透露将在未来几个月推出代号Shallotpeat的新模型以修复预训练问题。</p>
-  <div class="more"><a href="http://mp.weixin.qq.com/s?__biz=MzIzNjc1NzUzMw==&mid=2247846423&idx=1&sn=e4994d9b27bba0328f507530cb04f510&chksm=e912b144b004f7f79f35c85e527c58ff89e8d86bd58d908fc1b1cab94ef2130d779a446a321e&scene=0#rd" target="_blank" rel="noopener">阅读原文 →</a></div>
-  </article><article class="card" data-sec="一、权威观点/报告">
-  <h3 class="title"><a href="http://mp.weixin.qq.com/s?__biz=MzIzNjc1NzUzMw==&mid=2247846423&idx=2&sn=1af157bf1f47c0c080af5f099f5947af&chksm=e92cf9022714cc99e6c972fbe6e5b5d7a35c7d79ba6549503be7698dafc9fb069224fac94169&scene=0#rd" target="_blank" rel="noopener">陶哲轩使用Gemini辅助解决数学难题</a></h3>
-  <div class="meta">量子位（2025-11-24 15:30）</div><p class="recap" title="数学家陶哲轩借助Gemini Deep Think模型，在十分钟内完成了对Erdős 367号问题的证明补全。该问题涉及连续整数结构的乘法数论，此前已有不完整的反证基础。">数学家陶哲轩借助Gemini Deep Think模型，在十分钟内完成了对Erdős 367号问题的证明补全。该问题涉及连续整数结构的乘法数论，此前已有不完整的反证基础。</p>
-  <div class="more"><a href="http://mp.weixin.qq.com/s?__biz=MzIzNjc1NzUzMw==&mid=2247846423&idx=2&sn=1af157bf1f47c0c080af5f099f5947af&chksm=e92cf9022714cc99e6c972fbe6e5b5d7a35c7d79ba6549503be7698dafc9fb069224fac94169&scene=0#rd" target="_blank" rel="noopener">阅读原文 →</a></div>
-  </article><article class="card" data-sec="一、权威观点/报告">
-  <h3 class="title"><a href="https://www.qbitai.com/2025/11/355790.html" target="_blank" rel="noopener">奥特曼承认谷歌威胁OpenAI并预告新模型</a></h3>
-  <div class="meta">一水（2025-11-24 15:23）</div><p class="recap" title="OpenAI CEO奥特曼承认谷歌对OpenAI构成威胁。他透露即将推出新模型“Shallotpeat”。">OpenAI CEO奥特曼承认谷歌对OpenAI构成威胁。他透露即将推出新模型“Shallotpeat”。</p>
-  <div class="more"><a href="https://www.qbitai.com/2025/11/355790.html" target="_blank" rel="noopener">阅读原文 →</a></div>
-  </article><article class="card" data-sec="一、权威观点/报告">
-  <h3 class="title"><a href="http://mp.weixin.qq.com/s?__biz=MjM5MDE0Mjc4MA==&mid=2651264061&idx=4&sn=9d7fe76e35eda9714698f785d01a619c&chksm=bc81161368c300ef67b51160a1a9c80080f56a916e865290288995903dedfd6569279a2e1cb4&scene=0#rd" target="_blank" rel="noopener">阿里云赵庆杰将在AICon分享多智能体智能诊断系统技术实践</a></h3>
-  <div class="meta">（2025-11-24 13:40）</div><p class="recap" title="阿里云云原生Serverless基础架构负责人赵庆杰将在AICon北京大会分享数据驱动的智能诊断系统技术。该系统融合全栈可观测数据与大语言模型，通过多智能体协同实现故障感知与根因分析，已在阿里云Serverless产品线落地，降低MTTR 40%以上。">阿里云云原生Serverless基础架构负责人赵庆杰将在AICon北京大会分享数据驱动的智能诊断系统技术。该系统融合全栈可观测数据与大语言模型，通过多智能体协同实现故障感知与根因分析，已在阿里云Serverless产品线落地，降低MTTR 40%以上。</p>
-  <div class="more"><a href="http://mp.weixin.qq.com/s?__biz=MjM5MDE0Mjc4MA==&mid=2651264061&idx=4&sn=9d7fe76e35eda9714698f785d01a619c&chksm=bc81161368c300ef67b51160a1a9c80080f56a916e865290288995903dedfd6569279a2e1cb4&scene=0#rd" target="_blank" rel="noopener">阅读原文 →</a></div>
-  </article><article class="card" data-sec="一、权威观点/报告">
-  <h3 class="title"><a href="http://www.geekpark.net/news/356815" target="_blank" rel="noopener">英伟达公布2025年Q3财报，Blackwell芯片全面量产</a></h3>
-  <div class="meta">极客公园（2025-11-24 13:07）</div><p class="recap" title="英伟达2025年Q3营收570.06亿美元，同比增长62%。CEO黄仁勋在财报会回应AI泡沫论调，阐述AI推动三大平台转型。Blackwell架构芯片已全面量产，并与台积电在美国亚利桑那工厂生产。">英伟达2025年Q3营收570.06亿美元，同比增长62%。CEO黄仁勋在财报会回应AI泡沫论调，阐述AI推动三大平台转型。Blackwell架构芯片已全面量产，并与台积电在美国亚利桑那工厂生产。</p>
-  <div class="more"><a href="http://www.geekpark.net/news/356815" target="_blank" rel="noopener">阅读原文 →</a></div>
-  </article><article class="card" data-sec="一、权威观点/报告">
-  <h3 class="title"><a href="https://www.leiphone.com/category/industrynews/KeZvzVICCxRtntSn.html" target="_blank" rel="noopener">阿里云在Gartner生成式AI报告四大维度均位列新兴领导者象限</a></h3>
-  <div class="meta">（2025-11-24 11:32）</div><p class="recap" title="Gartner发布生成式AI技术创新指南报告，阿里云在基础设施、工程、模型和知识管理应用四大维度均入选新兴领导者象限，是唯一入围全部四项的亚太厂商。报告显示阿里云在部分指标上优于AWS、微软等国际厂商。">Gartner发布生成式AI技术创新指南报告，阿里云在基础设施、工程、模型和知识管理应用四大维度均入选新兴领导者象限，是唯一入围全部四项的亚太厂商。报告显示阿里云在部分指标上优于AWS、微软等国际厂商。</p>
-  <div class="more"><a href="https://www.leiphone.com/category/industrynews/KeZvzVICCxRtntSn.html" target="_blank" rel="noopener">阅读原文 →</a></div>
-  </article><article class="card" data-sec="一、权威观点/报告">
-  <h3 class="title"><a href="http://mp.weixin.qq.com/s?__biz=Mzg3Mzg5MjY3Nw==&mid=2247525260&idx=2&sn=949b4a5839b352f7676c0bc0a4517cc1&chksm=cf79682c6c65da8073dbfe625df378a6c5152423ac8b07ed09b0b298541debeda738af2bf0ca&scene=0#rd" target="_blank" rel="noopener">主流开源大模型生态解析</a></h3>
-  <div class="meta">AIGC开放社区（2025-11-24 11:22）</div><p class="recap" title="文章解析了2025年开源大模型生态，重点介绍了Meta Llama、阿里巴巴Qwen、智谱GLM和DeepSeek四大模型的技术特点与竞争格局。同时梳理了MMLU、GPQA、SuperCLUE等评测体系，并对比了Hugging Face与ModelScope两大模型分发平台。">文章解析了2025年开源大模型生态，重点介绍了Meta Llama、阿里巴巴Qwen、智谱GLM和DeepSeek四大模型的技术特点与竞争格局。同时梳理了MMLU、GPQA、SuperCLUE等评测体系，并对比了Hugging Face与ModelScope两大模型分发平台。</p>
-  <div class="more"><a href="http://mp.weixin.qq.com/s?__biz=Mzg3Mzg5MjY3Nw==&mid=2247525260&idx=2&sn=949b4a5839b352f7676c0bc0a4517cc1&chksm=cf79682c6c65da8073dbfe625df378a6c5152423ac8b07ed09b0b298541debeda738af2bf0ca&scene=0#rd" target="_blank" rel="noopener">阅读原文 →</a></div>
-  </article><article class="card" data-sec="一、权威观点/报告">
-  <h3 class="title"><a href="http://mp.weixin.qq.com/s?__biz=Mzg3Mzg5MjY3Nw==&mid=2247525260&idx=1&sn=8d847ecd61a618d301f5cb43ba64b16f&chksm=cf6175ce0462db565867f320fc42c815867cef99d87672521ea85db78a6218994330a9368875&scene=0#rd" target="_blank" rel="noopener">Anthropic研究揭示AI奖励黑客行为可导致系统性错位</a></h3>
-  <div class="meta">AIGC开放社区（2025-11-24 11:22）</div><p class="recap" title="Anthropic最新研究发现，AI模型在生产环境中习得奖励黑客行为后，会自然演化出欺骗、破坏安全机制等系统性错位行为。研究测试了多种防御措施，发现基于人类反馈的强化学习存在情境依赖性错位的局限性。研究提出接种提示等新型防御方法，可有效阻断错位泛化。">Anthropic最新研究发现，AI模型在生产环境中习得奖励黑客行为后，会自然演化出欺骗、破坏安全机制等系统性错位行为。研究测试了多种防御措施，发现基于人类反馈的强化学习存在情境依赖性错位的局限性。研究提出接种提示等新型防御方法，可有效阻断错位泛化。</p>
-  <div class="more"><a href="http://mp.weixin.qq.com/s?__biz=Mzg3Mzg5MjY3Nw==&mid=2247525260&idx=1&sn=8d847ecd61a618d301f5cb43ba64b16f&chksm=cf6175ce0462db565867f320fc42c815867cef99d87672521ea85db78a6218994330a9368875&scene=0#rd" target="_blank" rel="noopener">阅读原文 →</a></div>
-  </article><article class="card" data-sec="一、权威观点/报告">
-  <h3 class="title"><a href="http://mp.weixin.qq.com/s?__biz=Mzg4NTUzODcxNg==&mid=2247527693&idx=1&sn=987451fa8feb277cf04c36b6b4e08183&chksm=cebd8c5b6d2c41f3ca2a0da8a06d21461358e90cafd7fa788f9b3e3d953a5ee044cf25274b2d&scene=0#rd" target="_blank" rel="noopener">研报分析AI投资泡沫与金融开放</a></h3>
-  <div class="meta">CGI（2025-11-24 08:00）</div><p class="recap" title="报告认为当前美国AI相关股票高估值反映投资者过度乐观，泡沫破裂可能体现为芯片产业规模经济作用。报告还指出“十五五”时期金融开放重要性提升，需保障金融安全与跨境资本流动稳定。">报告认为当前美国AI相关股票高估值反映投资者过度乐观，泡沫破裂可能体现为芯片产业规模经济作用。报告还指出“十五五”时期金融开放重要性提升，需保障金融安全与跨境资本流动稳定。</p>
-  <div class="more"><a href="http://mp.weixin.qq.com/s?__biz=Mzg4NTUzODcxNg==&mid=2247527693&idx=1&sn=987451fa8feb277cf04c36b6b4e08183&chksm=cebd8c5b6d2c41f3ca2a0da8a06d21461358e90cafd7fa788f9b3e3d953a5ee044cf25274b2d&scene=0#rd" target="_blank" rel="noopener">阅读原文 →</a></div>
-  </article></div></section><section id="二、产品/技术动态" class="sec"><h2 class="sec-hd"><span>二、产品/技术动态</span></h2><div class="grid"><article class="card" data-sec="二、产品/技术动态">
-  <h3 class="title"><a href="http://cn.todayrss.com/t/f56rXXxeDd" target="_blank" rel="noopener">谷歌发布双子座3 Pro模型及Nano Banana Pro图像模型</a></h3>
-  <div class="meta">（2025-11-24 21:07）</div><p class="recap" title="谷歌发布双子座3 Pro模型，在LMArena和WebDev基准测试中表现领先，提供先进推理功能并支持代理工作流。同时推出Nano Banana Pro多模态图像模型，能够生成详细信息图表。">谷歌发布双子座3 Pro模型，在LMArena和WebDev基准测试中表现领先，提供先进推理功能并支持代理工作流。同时推出Nano Banana Pro多模态图像模型，能够生成详细信息图表。</p>
-  <div class="more"><a href="http://cn.todayrss.com/t/f56rXXxeDd" target="_blank" rel="noopener">阅读原文 →</a></div>
-  </article><article class="card" data-sec="二、产品/技术动态">
-  <h3 class="title"><a href="https://www.ithome.com/0/899/876.htm" target="_blank" rel="noopener">谷歌将于2026年3月停用Assistant语音助手并全面转向Gemini</a></h3>
-  <div class="meta">（2025-11-24 20:41）</div><p class="recap" title="谷歌确认将在2026年3月后停用Google Assistant语音助手，目前已在多个系统覆盖Gemini。从2024年开始逐步移除Assistant功能并整合至Gemini，明年3月后将无法切换回Assistant。">谷歌确认将在2026年3月后停用Google Assistant语音助手，目前已在多个系统覆盖Gemini。从2024年开始逐步移除Assistant功能并整合至Gemini，明年3月后将无法切换回Assistant。</p>
-  <div class="more"><a href="https://www.ithome.com/0/899/876.htm" target="_blank" rel="noopener">阅读原文 →</a></div>
-  </article><article class="card" data-sec="二、产品/技术动态">
-  <h3 class="title"><a href="https://www.ithome.com/0/899/865.htm" target="_blank" rel="noopener">亚马逊在全球50多国拥有900多处数据中心设施</a></h3>
-  <div class="meta">（2025-11-24 20:12）</div><p class="recap" title="文件显示亚马逊在全球50多个国家拥有超过900处数据中心设施，其中托管设施提供的算力约占其总计算资源的五分之一。亚马逊是最大的托管数据中心承租方之一，其数据中心布局远超外界普遍认知。">文件显示亚马逊在全球50多个国家拥有超过900处数据中心设施，其中托管设施提供的算力约占其总计算资源的五分之一。亚马逊是最大的托管数据中心承租方之一，其数据中心布局远超外界普遍认知。</p>
-  <div class="more"><a href="https://www.ithome.com/0/899/865.htm" target="_blank" rel="noopener">阅读原文 →</a></div>
-  </article><article class="card" data-sec="二、产品/技术动态">
-  <h3 class="title"><a href="https://www.ithome.com/0/899/859.htm" target="_blank" rel="noopener">阿里千问启用新域名并开放更多模型</a></h3>
-  <div class="meta">（2025-11-24 18:53）</div><p class="recap" title="阿里旗下AI助手千问正式启用新域名qianwen.com，提升访问便捷性。网页端面向专业用户开放了Qwen3-Max-Thinking-Preview等十余款模型，并新增对话分组功能。千问App公测一周下载量突破1000万次。">阿里旗下AI助手千问正式启用新域名qianwen.com，提升访问便捷性。网页端面向专业用户开放了Qwen3-Max-Thinking-Preview等十余款模型，并新增对话分组功能。千问App公测一周下载量突破1000万次。</p>
-  <div class="more"><a href="https://www.ithome.com/0/899/859.htm" target="_blank" rel="noopener">阅读原文 →</a></div>
-  </article><article class="card" data-sec="二、产品/技术动态">
-  <h3 class="title"><a href="http://mp.weixin.qq.com/s?__biz=MzI1Mzc1MzMyOQ==&mid=2247835826&idx=1&sn=0426381e7ec72e533c43db412c812489&chksm=e82bee051ef295efd24611f34b0918ade92bc6de45d155bf390329defbe6d1ed443e65d10986&scene=0#rd" target="_blank" rel="noopener">国家能源集团发布发电行业大模型擎源并构建高质量数据集</a></h3>
-  <div class="meta">来源:（2025-11-24 18:30）</div><p class="recap" title="国家能源集团发布全球首个千亿级发电行业大模型“擎源”，并基于统一数据湖构建了450GB高质量数据集。该模型已在产调、电力交易、安全环保和设备检修等多个业务场景取得成效，决策效率最高提升95%。">国家能源集团发布全球首个千亿级发电行业大模型“擎源”，并基于统一数据湖构建了450GB高质量数据集。该模型已在产调、电力交易、安全环保和设备检修等多个业务场景取得成效，决策效率最高提升95%。</p>
-  <div class="more"><a href="http://mp.weixin.qq.com/s?__biz=MzI1Mzc1MzMyOQ==&mid=2247835826&idx=1&sn=0426381e7ec72e533c43db412c812489&chksm=e82bee051ef295efd24611f34b0918ade92bc6de45d155bf390329defbe6d1ed443e65d10986&scene=0#rd" target="_blank" rel="noopener">阅读原文 →</a></div>
-  </article><article class="card" data-sec="二、产品/技术动态">
-  <h3 class="title"><a href="http://mp.weixin.qq.com/s?__biz=MzI1Mzc1MzMyOQ==&mid=2247835826&idx=2&sn=bc37e781552d557e7db4d0bddfa02bbb&chksm=e8aa6dc35dbbe4e37dd3604dc3c94e83a5b27af7df6d8c936a0dfa2e3e37d5510302a69a45d5&scene=0#rd" target="_blank" rel="noopener">华为云盘古CV大模型团队多目标跟踪研究成果被AAAI 2026收录</a></h3>
-  <div class="meta">来源:（2025-11-24 18:30）</div><p class="recap" title="华为云盘古CV大模型团队提出基于分割的多目标跟踪新范式SAM2MOT，该成果被人工智能顶会AAAI 2026录用。SAM2MOT将分割策略作为核心，在无需训练的模式下实现SOTA性能，解决了传统方法在遮挡和复杂运动中的局限。">华为云盘古CV大模型团队提出基于分割的多目标跟踪新范式SAM2MOT，该成果被人工智能顶会AAAI 2026录用。SAM2MOT将分割策略作为核心，在无需训练的模式下实现SOTA性能，解决了传统方法在遮挡和复杂运动中的局限。</p>
-  <div class="more"><a href="http://mp.weixin.qq.com/s?__biz=MzI1Mzc1MzMyOQ==&mid=2247835826&idx=2&sn=bc37e781552d557e7db4d0bddfa02bbb&chksm=e8aa6dc35dbbe4e37dd3604dc3c94e83a5b27af7df6d8c936a0dfa2e3e37d5510302a69a45d5&scene=0#rd" target="_blank" rel="noopener">阅读原文 →</a></div>
-  </article><article class="card" data-sec="二、产品/技术动态">
-  <h3 class="title"><a href="https://www.ithome.com/0/899/853.htm" target="_blank" rel="noopener">三星或与Perplexity合作在Galaxy S26系列手机中为Bixby引入AI大模型</a></h3>
-  <div class="meta">（2025-11-24 18:19）</div><p class="recap" title="据科技媒体Sammobile报道，三星计划在Galaxy S26系列手机的Bixby语音助手中融合Perplexity AI技术。基础操作仍由Bixby处理，复杂问答和搜索任务将交由Perplexity完成。三星此前已在电视产品中尝试类似合作模式。">据科技媒体Sammobile报道，三星计划在Galaxy S26系列手机的Bixby语音助手中融合Perplexity AI技术。基础操作仍由Bixby处理，复杂问答和搜索任务将交由Perplexity完成。三星此前已在电视产品中尝试类似合作模式。</p>
-  <div class="more"><a href="https://www.ithome.com/0/899/853.htm" target="_blank" rel="noopener">阅读原文 →</a></div>
-  </article><article class="card" data-sec="二、产品/技术动态">
-  <h3 class="title"><a href="http://mp.weixin.qq.com/s?__biz=MzIzNjc1NzUzMw==&mid=2247846445&idx=1&sn=301a0541507be772d9e2a570d7646b3a&chksm=e9f4cf2818e7bab5c5d01436391c317ddcd9d7740de9cc47e6da53b56c8eae1fa5b1f5371a3a&scene=0#rd" target="_blank" rel="noopener">港科大团队发布全球首个真实场景篮球机器人演示</a></h3>
-  <div class="meta">量子位（2025-11-24 17:30）</div><p class="recap" title="香港科技大学研究团队展示了全球首个能在真实场景中完成篮球动作的机器人演示。该技术基于SkillMimic-V2算法，解决了交互演示强化学习中数据稀疏和含噪的难题。">香港科技大学研究团队展示了全球首个能在真实场景中完成篮球动作的机器人演示。该技术基于SkillMimic-V2算法，解决了交互演示强化学习中数据稀疏和含噪的难题。</p>
-  <div class="more"><a href="http://mp.weixin.qq.com/s?__biz=MzIzNjc1NzUzMw==&mid=2247846445&idx=1&sn=301a0541507be772d9e2a570d7646b3a&chksm=e9f4cf2818e7bab5c5d01436391c317ddcd9d7740de9cc47e6da53b56c8eae1fa5b1f5371a3a&scene=0#rd" target="_blank" rel="noopener">阅读原文 →</a></div>
-  </article><article class="card" data-sec="二、产品/技术动态">
-  <h3 class="title"><a href="https://36kr.com/p/3566850799762563?f=rss" target="_blank" rel="noopener">地瓜机器人发布一站式开发平台及S600算力平台</a></h3>
-  <div class="meta">36氪（2025-11-24 17:21）</div><p class="recap" title="地瓜机器人在开发者大会上推出面向具身智能的一站式开发平台和S600大算力开发平台。S600平台采用大小脑架构，算力达560 TOPS，支持大模型端侧部署。公司CEO王丛表示将聚焦标准化技术组件，为生态伙伴提供底层能力支撑。">地瓜机器人在开发者大会上推出面向具身智能的一站式开发平台和S600大算力开发平台。S600平台采用大小脑架构，算力达560 TOPS，支持大模型端侧部署。公司CEO王丛表示将聚焦标准化技术组件，为生态伙伴提供底层能力支撑。</p>
-  <div class="more"><a href="https://36kr.com/p/3566850799762563?f=rss" target="_blank" rel="noopener">阅读原文 →</a></div>
-  </article><article class="card" data-sec="二、产品/技术动态">
-  <h3 class="title"><a href="http://mp.weixin.qq.com/s?__biz=MzI3MTA0MTk1MA==&mid=2652648475&idx=2&sn=e7050e7dfcfc61f29f43610ca68f8703&chksm=f0a9d0fb22ad40d88bd522fe46940bddb7f0dca457592696beab4a4076569206c86ee55f7707&scene=0#rd" target="_blank" rel="noopener">OpenAI发布GPT-5早期科学实验报告</a></h3>
-  <div class="meta">新智元（2025-11-24 17:00）</div><p class="recap" title="OpenAI于2025年11月22日发布GPT-5早期科学实验报告。报告展示了GPT-5在数学和生物学领域的推理能力，包括协助解决Erdős数论谜题和加速生物实验分析。">OpenAI于2025年11月22日发布GPT-5早期科学实验报告。报告展示了GPT-5在数学和生物学领域的推理能力，包括协助解决Erdős数论谜题和加速生物实验分析。</p>
-  <div class="more"><a href="http://mp.weixin.qq.com/s?__biz=MzI3MTA0MTk1MA==&mid=2652648475&idx=2&sn=e7050e7dfcfc61f29f43610ca68f8703&chksm=f0a9d0fb22ad40d88bd522fe46940bddb7f0dca457592696beab4a4076569206c86ee55f7707&scene=0#rd" target="_blank" rel="noopener">阅读原文 →</a></div>
-  </article></div></section><section id="三、资本市场动态及企业战略布局" class="sec"><h2 class="sec-hd"><span>三、资本市场动态及企业战略布局</span></h2><div class="grid"><article class="card" data-sec="三、资本市场动态及企业战略布局">
-  <h3 class="title"><a href="http://cn.todayrss.com/t/Q0NSwdZRox" target="_blank" rel="noopener">谷歌放弃双子座3 贝索斯推普罗米修斯计划 萨默斯辞任OpenAI董事</a></h3>
-  <div class="meta">（2025-11-24 21:07）</div><p class="recap" title="谷歌放弃双子座3项目。杰夫·贝索斯推出价值62亿美元的普罗米修斯计划。拉里·萨默斯辞去OpenAI董事会职务。">谷歌放弃双子座3项目。杰夫·贝索斯推出价值62亿美元的普罗米修斯计划。拉里·萨默斯辞去OpenAI董事会职务。</p>
-  <div class="more"><a href="http://cn.todayrss.com/t/Q0NSwdZRox" target="_blank" rel="noopener">阅读原文 →</a></div>
-  </article><article class="card" data-sec="三、资本市场动态及企业战略布局">
-  <h3 class="title"><a href="http://cn.todayrss.com/t/RutG9xNhO6" target="_blank" rel="noopener">微软英伟达Anthropic达成300亿美元计算协议</a></h3>
-  <div class="meta">（2025-11-24 21:07）</div><p class="recap" title="微软、英伟达和Anthropic宣布达成300亿美元计算协议，Anthropic承诺购买价值300亿美元的Azure计算。三家公司将共同设计人工智能模型和基础架构。">微软、英伟达和Anthropic宣布达成300亿美元计算协议，Anthropic承诺购买价值300亿美元的Azure计算。三家公司将共同设计人工智能模型和基础架构。</p>
-  <div class="more"><a href="http://cn.todayrss.com/t/RutG9xNhO6" target="_blank" rel="noopener">阅读原文 →</a></div>
-  </article><article class="card" data-sec="三、资本市场动态及企业战略布局">
-  <h3 class="title"><a href="http://mp.weixin.qq.com/s?__biz=MzIzNjc1NzUzMw==&mid=2247846445&idx=2&sn=67cee2966d19a99bc8b91b0c143b7726&chksm=e982c9d9e9839585c207a75e2d8aed2997efbd1f4f7184c5bf841ea6aa532ea6f9e0b051e1f1&scene=0#rd" target="_blank" rel="noopener">波士顿动力前CTO加盟DeepMind任硬件工程副总裁</a></h3>
-  <div class="meta">量子位（2025-11-24 17:30）</div><p class="recap" title="谷歌DeepMind聘请波士顿动力前CTO Aaron Saunders担任硬件工程副总裁。Saunders曾主导Atlas和Spot等机器人的开发。DeepMind计划将Gemini打造成类似安卓的通用机器人操作系统。">谷歌DeepMind聘请波士顿动力前CTO Aaron Saunders担任硬件工程副总裁。Saunders曾主导Atlas和Spot等机器人的开发。DeepMind计划将Gemini打造成类似安卓的通用机器人操作系统。</p>
-  <div class="more"><a href="http://mp.weixin.qq.com/s?__biz=MzIzNjc1NzUzMw==&mid=2247846445&idx=2&sn=67cee2966d19a99bc8b91b0c143b7726&chksm=e982c9d9e9839585c207a75e2d8aed2997efbd1f4f7184c5bf841ea6aa532ea6f9e0b051e1f1&scene=0#rd" target="_blank" rel="noopener">阅读原文 →</a></div>
-  </article><article class="card" data-sec="三、资本市场动态及企业战略布局">
-  <h3 class="title"><a href="https://www.ithome.com/0/899/812.htm" target="_blank" rel="noopener">富士康AI服务器收入超iPhone，刘扬伟推动业务转型</a></h3>
-  <div class="meta">（2025-11-24 17:02）</div><p class="recap" title="富士康在刘扬伟领导下，业务重心从iPhone转向AI服务器，今年第二季度AI服务器收入首次超过iPhone业务。公司还与英伟达结盟，并推动生产基地全球化布局。">富士康在刘扬伟领导下，业务重心从iPhone转向AI服务器，今年第二季度AI服务器收入首次超过iPhone业务。公司还与英伟达结盟，并推动生产基地全球化布局。</p>
-  <div class="more"><a href="https://www.ithome.com/0/899/812.htm" target="_blank" rel="noopener">阅读原文 →</a></div>
-  </article><article class="card" data-sec="三、资本市场动态及企业战略布局">
-  <h3 class="title"><a href="http://mp.weixin.qq.com/s?__biz=Mzg3NDc2MjQxMg==&mid=2247492065&idx=1&sn=4fcee29e1a396e086c6d7347029f150c&chksm=cf6df7508e050a99f8ad9733f96af370f553958e7fc868e241f41f593d22f366c29260c50adf&scene=0#rd" target="_blank" rel="noopener">SuperMe完成680万美元种子轮融资，用AI创建可对话职业档案</a></h3>
-  <div class="meta">深思圈（2025-11-24 11:37）</div><p class="recap" title="职业网络平台SuperMe完成680万美元种子轮融资，由Greylock领投。该公司由Pinterest前员工创立，利用AI技术创建可对话的专业身份档案，让用户能与专家的AI版本交流获取建议。">职业网络平台SuperMe完成680万美元种子轮融资，由Greylock领投。该公司由Pinterest前员工创立，利用AI技术创建可对话的专业身份档案，让用户能与专家的AI版本交流获取建议。</p>
-  <div class="more"><a href="http://mp.weixin.qq.com/s?__biz=Mzg3NDc2MjQxMg==&mid=2247492065&idx=1&sn=4fcee29e1a396e086c6d7347029f150c&chksm=cf6df7508e050a99f8ad9733f96af370f553958e7fc868e241f41f593d22f366c29260c50adf&scene=0#rd" target="_blank" rel="noopener">阅读原文 →</a></div>
-  </article></div></section></div>
-    <div id="beforeYesterday-content" class="date-content"><section id="一、权威观点/报告" class="sec"><h2 class="sec-hd"><span>一、权威观点/报告</span></h2><div class="grid"><article class="card" data-sec="一、权威观点/报告">
-  <h3 class="title"><a href="https://www.ithome.com/0/899/558.htm" target="_blank" rel="noopener">AMD CEO苏姿丰称不担心AI泡沫并强调投资不足更危险</a></h3>
-  <div class="meta">（2025-11-23 15:11）</div><p class="recap" title="AMD CEO苏姿丰表示不担心人工智能泡沫，认为质疑者过于短视。她强调科技公司对AI应用的探索才起步，投资不足比投资过多更危险。AMD为与OpenAI达成芯片协议承诺了认股权证。">AMD CEO苏姿丰表示不担心人工智能泡沫，认为质疑者过于短视。她强调科技公司对AI应用的探索才起步，投资不足比投资过多更危险。AMD为与OpenAI达成芯片协议承诺了认股权证。</p>
-  <div class="more"><a href="https://www.ithome.com/0/899/558.htm" target="_blank" rel="noopener">阅读原文 →</a></div>
-  </article><article class="card" data-sec="一、权威观点/报告">
-  <h3 class="title"><a href="http://mp.weixin.qq.com/s?__biz=MjM5MDE0Mjc4MA==&mid=2651263952&idx=1&sn=14696e47347d9ca62cb19af5a5a6f9c6&chksm=bc3464ef49970c2bc2fa8d51f94207c8b43625bb2b306956bf18486a9c50dcb6b06e4cf7e350&scene=0#rd" target="_blank" rel="noopener">Fireflies AI会议助手估值达10亿美元，创始人曾人工冒充AI服务</a></h3>
-  <div class="meta">AI前线（2025-11-23 10:15）</div><p class="recap" title="AI笔记创业公司Fireflies宣布估值达到10亿美元，其联合创始人透露早期服务由创始人亲自冒充AI完成会议记录。公司自2023年以来保持盈利，并新增与Perplexity合作的实时搜索功能。">AI笔记创业公司Fireflies宣布估值达到10亿美元，其联合创始人透露早期服务由创始人亲自冒充AI完成会议记录。公司自2023年以来保持盈利，并新增与Perplexity合作的实时搜索功能。</p>
-  <div class="more"><a href="http://mp.weixin.qq.com/s?__biz=MjM5MDE0Mjc4MA==&mid=2651263952&idx=1&sn=14696e47347d9ca62cb19af5a5a6f9c6&chksm=bc3464ef49970c2bc2fa8d51f94207c8b43625bb2b306956bf18486a9c50dcb6b06e4cf7e350&scene=0#rd" target="_blank" rel="noopener">阅读原文 →</a></div>
-  </article></div></section><section id="二、产品/技术动态" class="sec"><h2 class="sec-hd"><span>二、产品/技术动态</span></h2><div class="grid"><article class="card" data-sec="二、产品/技术动态">
-  <h3 class="title"><a href="http://mp.weixin.qq.com/s?__biz=MzI3MTA0MTk1MA==&mid=2652648210&idx=1&sn=a2f833c44b1aa98c8282e430d0c0db63&chksm=f0458523557feba1762580db1322b387dc729eba30beff54df631ee868e064b73c55bcd5b855&scene=0#rd" target="_blank" rel="noopener">谷歌Gemini 3在数学和物理基准测试中创纪录</a></h3>
-  <div class="meta">新智元（2025-11-23 16:58）</div><p class="recap" title="谷歌Gemini 3 Pro在FrontierMath数学基准测试中创下新纪录，并在CritPt物理基准测试中领先。数学家陶哲轩使用Gemini DeepThink模式十分钟内解决了埃尔德什问题#367的关键证明。">谷歌Gemini 3 Pro在FrontierMath数学基准测试中创下新纪录，并在CritPt物理基准测试中领先。数学家陶哲轩使用Gemini DeepThink模式十分钟内解决了埃尔德什问题#367的关键证明。</p>
-  <div class="more"><a href="http://mp.weixin.qq.com/s?__biz=MzI3MTA0MTk1MA==&mid=2652648210&idx=1&sn=a2f833c44b1aa98c8282e430d0c0db63&chksm=f0458523557feba1762580db1322b387dc729eba30beff54df631ee868e064b73c55bcd5b855&scene=0#rd" target="_blank" rel="noopener">阅读原文 →</a></div>
-  </article><article class="card" data-sec="二、产品/技术动态">
-  <h3 class="title"><a href="https://www.ithome.com/0/899/567.htm" target="_blank" rel="noopener">AMD将超分辨率技术FidelityFX Super Resolution正式更名为FSR</a></h3>
-  <div class="meta">（2025-11-23 15:48）</div><p class="recap" title="AMD宣布将FidelityFX Super Resolution技术名称缩短为FSR，并确认FSR 'Redstone'技术将于12月10日发布。该技术包含超分辨率、帧生成、光线再生和辐射缓存四个组成部分，专为Radeon RX 9000系列显卡设计。">AMD宣布将FidelityFX Super Resolution技术名称缩短为FSR，并确认FSR 'Redstone'技术将于12月10日发布。该技术包含超分辨率、帧生成、光线再生和辐射缓存四个组成部分，专为Radeon RX 9000系列显卡设计。</p>
-  <div class="more"><a href="https://www.ithome.com/0/899/567.htm" target="_blank" rel="noopener">阅读原文 →</a></div>
-  </article><article class="card" data-sec="二、产品/技术动态">
-  <h3 class="title"><a href="http://mp.weixin.qq.com/s?__biz=Mzg3MTkxMjYzOA==&mid=2247510043&idx=1&sn=9fc980c0160b84927a8d4d50cca0ea16&chksm=cf6b2e0169f8ac398add16411d546e946cbe72b4280128250d12aa7eb6b28a05a4991e889c24&scene=0#rd" target="_blank" rel="noopener">Karpathy开源大模型议会应用llm-council</a></h3>
-  <div class="meta">AI寒武纪（2025-11-23 15:24）</div><p class="recap" title="Andrej Karpathy开源名为llm-council的Web应用，通过OpenRouter分发查询至多个大模型并相互评估。应用集成GPT-5.1、Gemini-3-pro-preview、Claude-sonnet-4.5和Grok-4等模型，探索LLM集成构建方法。">Andrej Karpathy开源名为llm-council的Web应用，通过OpenRouter分发查询至多个大模型并相互评估。应用集成GPT-5.1、Gemini-3-pro-preview、Claude-sonnet-4.5和Grok-4等模型，探索LLM集成构建方法。</p>
-  <div class="more"><a href="http://mp.weixin.qq.com/s?__biz=Mzg3MTkxMjYzOA==&mid=2247510043&idx=1&sn=9fc980c0160b84927a8d4d50cca0ea16&chksm=cf6b2e0169f8ac398add16411d546e946cbe72b4280128250d12aa7eb6b28a05a4991e889c24&scene=0#rd" target="_blank" rel="noopener">阅读原文 →</a></div>
-  </article><article class="card" data-sec="二、产品/技术动态">
-  <h3 class="title"><a href="https://www.qbitai.com/2025/11/355572.html" target="_blank" rel="noopener">卡帕西发布大模型匿名评测方法</a></h3>
-  <div class="meta">鹭羽（2025-11-23 13:52）</div><p class="recap" title="卡帕西提出新的大模型评测方法，让四个AI模型匿名参与并相互评分。评测过程中发现模型会承认自身答案不足。">卡帕西提出新的大模型评测方法，让四个AI模型匿名参与并相互评分。评测过程中发现模型会承认自身答案不足。</p>
-  <div class="more"><a href="https://www.qbitai.com/2025/11/355572.html" target="_blank" rel="noopener">阅读原文 →</a></div>
-  </article><article class="card" data-sec="二、产品/技术动态">
-  <h3 class="title"><a href="http://mp.weixin.qq.com/s?__biz=MjM5MDE0Mjc4MA==&mid=2651263952&idx=3&sn=a2c65bfb917e6035810d26e352e62522&chksm=bc2237cde34bfc0facf477e2289c8dddb1c941a84069a18bdee0a1fddffe1c69d3505ff541ff&scene=0#rd" target="_blank" rel="noopener">银行业语义缓存优化实验降低误报率</a></h3>
-  <div class="meta">InfoQ（2025-11-23 10:15）</div><p class="recap" title="研究通过四种实验配置测试七个双编码器模型在银行业RAG语义缓存中的表现，发现缓存设计比模型优化更能有效降低误报率。实验将误报率从99%降至3.8%，提出最佳候选原则作为核心设计理念。">研究通过四种实验配置测试七个双编码器模型在银行业RAG语义缓存中的表现，发现缓存设计比模型优化更能有效降低误报率。实验将误报率从99%降至3.8%，提出最佳候选原则作为核心设计理念。</p>
-  <div class="more"><a href="http://mp.weixin.qq.com/s?__biz=MjM5MDE0Mjc4MA==&mid=2651263952&idx=3&sn=a2c65bfb917e6035810d26e352e62522&chksm=bc2237cde34bfc0facf477e2289c8dddb1c941a84069a18bdee0a1fddffe1c69d3505ff541ff&scene=0#rd" target="_blank" rel="noopener">阅读原文 →</a></div>
-  </article><article class="card" data-sec="二、产品/技术动态">
-  <h3 class="title"><a href="http://mp.weixin.qq.com/s?__biz=MjM5MDE0Mjc4MA==&mid=2651263952&idx=2&sn=aef1e5e1a1c1afb1675ecc6603da20e4&chksm=bcd79aaf151a3bcbd57f9f52425066f49c4cf37f73b915aa31268bde32fdffb6b18550cc4ea7&scene=0#rd" target="_blank" rel="noopener">谷歌预览AI代码文档生成工具Code Wiki</a></h3>
-  <div class="meta">InfoQ（2025-11-23 10:15）</div><p class="recap" title="谷歌预览了AI代码文档生成工具Code Wiki，可为代码库生成文档并在代码变更后自动更新。该预览版收录了数百个开源项目文档，未来将通过Gemini CLI扩展支持内部代码库。">谷歌预览了AI代码文档生成工具Code Wiki，可为代码库生成文档并在代码变更后自动更新。该预览版收录了数百个开源项目文档，未来将通过Gemini CLI扩展支持内部代码库。</p>
-  <div class="more"><a href="http://mp.weixin.qq.com/s?__biz=MjM5MDE0Mjc4MA==&mid=2651263952&idx=2&sn=aef1e5e1a1c1afb1675ecc6603da20e4&chksm=bcd79aaf151a3bcbd57f9f52425066f49c4cf37f73b915aa31268bde32fdffb6b18550cc4ea7&scene=0#rd" target="_blank" rel="noopener">阅读原文 →</a></div>
-  </article><article class="card" data-sec="二、产品/技术动态">
-  <h3 class="title"><a href="https://venturebeat.com/ai/lean4-how-the-theorem-prover-works-and-why-its-the-new-competitive-edge-in" target="_blank" rel="noopener">Lean4定理证明器提升AI可靠性并获行业采用</a></h3>
-  <div class="meta">（2025-11-23 08:30）</div><p class="recap" title="Lean4作为开源定理证明器，通过形式化验证为AI系统提供确定性，解决大模型幻觉问题。Harmonic AI等初创公司及OpenAI、谷歌等企业已将其用于构建可靠AI。该技术可验证代码正确性并提升AI推理准确性。">Lean4作为开源定理证明器，通过形式化验证为AI系统提供确定性，解决大模型幻觉问题。Harmonic AI等初创公司及OpenAI、谷歌等企业已将其用于构建可靠AI。该技术可验证代码正确性并提升AI推理准确性。</p>
-  <div class="more"><a href="https://venturebeat.com/ai/lean4-how-the-theorem-prover-works-and-why-its-the-new-competitive-edge-in" target="_blank" rel="noopener">阅读原文 →</a></div>
-  </article></div></section><section id="三、资本市场动态及企业战略布局" class="sec"><h2 class="sec-hd"><span>三、资本市场动态及企业战略布局</span></h2><div class="grid"><article class="card" data-sec="三、资本市场动态及企业战略布局">
-  <h3 class="title"><a href="http://mp.weixin.qq.com/s?__biz=MzIzNjc1NzUzMw==&mid=2247846044&idx=2&sn=c5353bfcb769f83bbf5144ec391e7c6c&chksm=e97ea76e429bf5f333bb605bff48e0893bbaac2e660246c9b5d982c8dc7fdb9d93b621859086&scene=0#rd" target="_blank" rel="noopener">星尘智能完成数亿元A++轮融资</a></h3>
-  <div class="meta">量子位（2025-11-23 18:33）</div><p class="recap" title="深圳具身智能公司星尘智能完成数亿元A++轮融资，由国科投资与蚂蚁集团联合领投。融资将用于研发人才建设、绳驱本体规模化制造及多场景解决方案深化。">深圳具身智能公司星尘智能完成数亿元A++轮融资，由国科投资与蚂蚁集团联合领投。融资将用于研发人才建设、绳驱本体规模化制造及多场景解决方案深化。</p>
-  <div class="more"><a href="http://mp.weixin.qq.com/s?__biz=MzIzNjc1NzUzMw==&mid=2247846044&idx=2&sn=c5353bfcb769f83bbf5144ec391e7c6c&chksm=e97ea76e429bf5f333bb605bff48e0893bbaac2e660246c9b5d982c8dc7fdb9d93b621859086&scene=0#rd" target="_blank" rel="noopener">阅读原文 →</a></div>
-  </article><article class="card" data-sec="三、资本市场动态及企业战略布局">
-  <h3 class="title"><a href="https://www.ithome.com/0/899/571.htm" target="_blank" rel="noopener">甲骨文股价下跌致埃里森财富缩水滑落至富豪榜第三</a></h3>
-  <div class="meta">（2025-11-23 16:11）</div><p class="recap" title="甲骨文股价持续下跌致创始人拉里・埃里森个人净资产缩水1300亿美元，在彭博亿万富豪指数中滑落至第三位。谷歌联合创始人拉里・佩奇因Alphabet股价上涨净资产增至2569亿美元，升至第二位。甲骨文股价较历史高点累计下跌39%，市场担忧其AI战略对OpenAI的依赖及债务融资。">甲骨文股价持续下跌致创始人拉里・埃里森个人净资产缩水1300亿美元，在彭博亿万富豪指数中滑落至第三位。谷歌联合创始人拉里・佩奇因Alphabet股价上涨净资产增至2569亿美元，升至第二位。甲骨文股价较历史高点累计下跌39%，市场担忧其AI战略对OpenAI的依赖及债务融资。</p>
-  <div class="more"><a href="https://www.ithome.com/0/899/571.htm" target="_blank" rel="noopener">阅读原文 →</a></div>
-  </article><article class="card" data-sec="三、资本市场动态及企业战略布局">
-  <h3 class="title"><a href="http://mp.weixin.qq.com/s?__biz=MjM5MDE0Mjc4MA==&mid=2651263982&idx=1&sn=ae375778141e5fc52a26f87c01b588b3&chksm=bc8dd8b6ba259bd9ca32f589c7c7f037f55d8b22af4eb99f63e2dabb7a3babe21c235840d74f&scene=0#rd" target="_blank" rel="noopener">英伟达称不保证与OpenAI达成千亿美元投资协议</a></h3>
-  <div class="meta">InfoQ（2025-11-23 13:30）</div><p class="recap" title="英伟达在季度财报中表示，不保证会与OpenAI就千亿美元投资达成最终协议。该公司还提及了对英特尔投资50亿美元及与Anthropic达成的最高100亿美元投资协议。">英伟达在季度财报中表示，不保证会与OpenAI就千亿美元投资达成最终协议。该公司还提及了对英特尔投资50亿美元及与Anthropic达成的最高100亿美元投资协议。</p>
-  <div class="more"><a href="http://mp.weixin.qq.com/s?__biz=MjM5MDE0Mjc4MA==&mid=2651263982&idx=1&sn=ae375778141e5fc52a26f87c01b588b3&chksm=bc8dd8b6ba259bd9ca32f589c7c7f037f55d8b22af4eb99f63e2dabb7a3babe21c235840d74f&scene=0#rd" target="_blank" rel="noopener">阅读原文 →</a></div>
-  </article><article class="card" data-sec="三、资本市场动态及企业战略布局">
-  <h3 class="title"><a href="http://mp.weixin.qq.com/s?__biz=Mzg3NDc2MjQxMg==&mid=2247492001&idx=1&sn=ba39f5274e35d530871c04102a1031d7&chksm=cf94e771b61f38aa176612f0b6beda6a707d7e62ab9e674bd5fbd90c8139f771b813defb6182&scene=0#rd" target="_blank" rel="noopener">电话AI公司Beside完成3200万美元融资</a></h3>
-  <div class="meta">深思圈（2025-11-23 09:43）</div><p class="recap" title="电话AI公司Beside完成3200万美元融资，由EQT Ventures领投。该公司前身为M1，运营18个月后已拥有2万付费客户，年度经常性收入达400万美元。Beside从底层重建电话系统，为小企业提供AI驱动的电话和短信处理服务。">电话AI公司Beside完成3200万美元融资，由EQT Ventures领投。该公司前身为M1，运营18个月后已拥有2万付费客户，年度经常性收入达400万美元。Beside从底层重建电话系统，为小企业提供AI驱动的电话和短信处理服务。</p>
-  <div class="more"><a href="http://mp.weixin.qq.com/s?__biz=Mzg3NDc2MjQxMg==&mid=2247492001&idx=1&sn=ba39f5274e35d530871c04102a1031d7&chksm=cf94e771b61f38aa176612f0b6beda6a707d7e62ab9e674bd5fbd90c8139f771b813defb6182&scene=0#rd" target="_blank" rel="noopener">阅读原文 →</a></div>
-  </article></div></section></div>
-  </main>
-</div>
-
-<footer>生成自 n8n · 本页仅作资讯聚合导航，版权归原文方所有</footer>
+<body>
+  <div id="chart"></div>
 
 <script>
-const secSel=document.getElementById('secSel');
-const search=document.getElementById('search');
-const emptyEl=document.getElementById('emptyHint');
-const dateTabs=document.querySelectorAll('.date-tab');
-const dateContents=document.querySelectorAll('.date-content');
+  const chartDom = document.getElementById('chart');
+  const myChart = echarts.init(chartDom);
 
-dateTabs.forEach(tab=>{
-  tab.addEventListener('click',()=>{
-    dateTabs.forEach(t=>t.classList.remove('active'));
-    tab.classList.add('active');
-    const target=tab.dataset.dateCategory;
-    dateContents.forEach(c=>c.classList.remove('active'));
-    document.getElementById(target+'-content').classList.add('active');
-    filter();
-  });
-});
+  const option = {
+    backgroundColor: 'transparent',
+    tooltip: {
+      trigger: 'axis',
+      backgroundColor: 'rgba(15, 23, 42, 0.85)',
+      borderWidth: 0,
+      textStyle: { color: '#fff' },
+      axisPointer: {
+        type: 'line',
+        lineStyle: { width: 1.2, color: 'var(--accent)' }
+      }
+    },
+    legend: {
+      top: 10,
+      textStyle: { color: 'var(--fg)' }
+    },
+    grid: {
+      left: 50,
+      right: 30,
+      top: 60,
+      bottom: 50
+    },
+    xAxis: {
+      type: 'category',
+      data: ["20250623","20250624","20250625","20250626","20250627","20250628","20250629","20250630","20250701","20250702","20250703","20250704","20250705","20250706","20250707","20250708","20250709","20250710","20250711","20250712","20250713","20250714","20250715","20250716","20250717","20250718","20250719","20250720","20250721","20250722","20250723","20250724","20250725","20250726","20250727","20250728","20250729","20250730","20250731","20250801","20250802","20250803","20250804","20250805","20250806","20250807","20250808","20250809","20250810","20250811","20250812","20250813","20250814","20250815","20250816","20250817","20250818","20250819","20250820","20250821","20250822","20250823","20250824","20250825","20250826","20250827","20250828","20250829","20250830","20250831","20250901","20250902","20250903","20250904","20250905","20250906","20250907","20250908","20250909","20250910","20250911","20250912","20250913","20250914","20250915","20250916","20250917","20250918","20250919","20250920","20250921","20250922","20250923","20250924","20250925","20250926","20250927","20250928","20250929","20250930","20251001","20251002","20251003","20251004","20251005","20251006","20251007","20251008","20251009","20251010","20251011","20251012","20251013","20251014","20251015","20251016","20251017","20251018","20251019","20251020","20251021","20251022","20251023","20251024","20251025","20251026","20251027","20251028","20251029","20251030","20251031","20251101","20251102","20251103","20251104","20251105","20251106","20251107","20251108","20251109","20251110","20251111","20251112","20251113","20251114","20251115","20251116","20251117","20251118","20251119","20251120","20251121","20251122","20251123"],
+      axisLabel: {
+        color: 'var(--sub)',
+        rotate: 45,
+        margin: 12
+      },
+      axisLine: { lineStyle: { color: '#ddd' } },
+      splitLine: { show: false }
+    },
+    yAxis: {
+      type: 'value',
+      axisLabel: {
+        color: 'var(--sub)'
+      },
+      axisLine: { show: false },
+      splitLine: { show: false }
+    },
 
-function debounce(fn,wait){let t;return(...a)=>{clearTimeout(t);t=setTimeout(()=>fn(...a),wait||180)};}
-function filter(){
-  const kw=(search.value||'').trim().toLowerCase();
-  const sec=secSel.value;
-  const active=document.querySelector('.date-content.active');
-  let total=0;
-  if(!active)return;
-  active.querySelectorAll('section').forEach(secEl=>{
-    let visible=0;
-    secEl.querySelectorAll('.card').forEach(card=>{
-      const inSec=!sec||card.dataset.sec===sec;
-      const hit=!kw||card.textContent.toLowerCase().includes(kw);
-      const show=inSec&&hit;
-      card.classList.toggle('hidden',!show);
-      if(show){visible++;total++;}
-    });
-    secEl.classList.toggle('hidden',visible===0);
-  });
-  emptyEl.classList.toggle('hidden',total!==0);
-}
-search.addEventListener('input',debounce(filter,180));
-secSel.addEventListener('change',filter);
-filter();
+    // ⭐ 使用你的配色
+    color: [
+      '#678CC0',
+      '#F0B96E',
+      '#264592',
+      '#B9D8EF',
+      '#747985',
+      '#F1D2B8'
+    ],
 
-document.addEventListener('DOMContentLoaded',()=>{
-  document.querySelectorAll('.t-sel').forEach(sel=>{
-    sel.addEventListener('change',function(){
-      const target=this.dataset.target;
-      const time=this.value;
-      const el=document.getElementById(target);
-      if(!el)return;
-      const iframe=el.querySelector('iframe');
-      if(iframe){iframe.src=iframe.src.replace(/(time=)[^&]+/,'$1'+encodeURIComponent(time));}
-    });
+    series: [{"name":"百度智能云","type":"line","smooth":true,"symbol":"circle","symbolSize":3,"lineStyle":{"width":2},"data":[983,1038,866,978,810,439,405,904,860,964,996,870,442,403,896,890,898,815,761,435,397,792,891,848,803,825,402,374,849,859,792,853,815,379,384,877,839,820,826,768,427,363,831,833,871,995,802,415,388,831,831,839,841,816,413,396,875,862,888,881,851,461,411,863,905,837,1108,831,476,432,1024,967,798,869,1015,513,435,1617,1348,1436,1355,1486,768,502,1238,1092,1034,1141,978,534,435,1011,1170,1277,1341,1140,531,1009,1237,759,355,326,323,314,348,283,353,394,1078,1220,1218,446,1352,1239,1564,1238,1334,482,482,1401,1376,1502,1473,1274,564,617,1288,1017,1187,1090,1259,488,462,1163,1219,1202,1110,1169,459,436,1269,1272,1136,1245,1088,519,450,1018,1018,1224,1179,1077,542,410]},{"name":"阿里云","type":"line","smooth":true,"symbol":"circle","symbolSize":3,"lineStyle":{"width":2},"data":[23652,22017,21132,20962,19245,9013,7556,22341,22001,21181,20743,19316,9171,7327,21081,20720,20805,19756,18884,8676,7188,22489,21250,20488,20395,18490,9181,7216,22387,21323,21058,20744,19251,9043,7365,21531,20457,19751,19726,19002,8814,7006,21605,20565,20043,19396,18313,7399,7139,21417,20500,20076,19834,18854,8767,7232,20945,19602,19813,19502,17853,8367,6981,20770,19776,19138,18353,17115,8628,7312,21200,19969,17667,18736,17553,8311,6622,20560,19243,18737,18420,17371,8352,6715,20629,18436,18675,18178,15753,7949,6664,20665,18427,17932,18417,17502,8315,17908,17166,13755,5323,4898,4442,4605,4697,4342,5891,7033,21133,18916,17124,6981,19320,18057,17834,18013,17118,7794,6417,19914,18333,17817,17480,16307,8064,6500,19815,18225,18489,18584,17296,8439,7001,21328,19860,19450,19176,17416,8518,6755,21724,21215,18981,18454,17277,7829,6545,19941,18758,17592,17650,16573,7886,6363]},{"name":"腾讯云","type":"line","smooth":true,"symbol":"circle","symbolSize":3,"lineStyle":{"width":2},"data":[12430,11772,11425,11021,10440,5812,5283,11957,11834,11435,11141,10139,5749,4941,10911,10876,10558,10170,9776,5775,5003,11483,11075,10597,10542,9864,5634,4751,11637,10944,10786,10502,9909,5673,5072,10978,10746,10370,10286,10133,5808,4959,11401,10837,10468,10208,9670,5054,4853,11026,10684,10425,10304,9895,5445,4776,10944,10515,10506,10137,9502,5300,4800,11100,10446,10059,9571,9053,5346,4632,10578,10149,9469,9900,9388,5340,4534,10659,10154,9858,9756,9116,5246,4532,10512,9735,9818,9707,8206,5065,4515,10142,9596,8978,9504,9227,5091,9066,9026,7568,3879,3692,4204,3493,3994,3199,4082,4591,10598,9844,9086,4641,9825,9212,9265,9208,8870,5020,4324,10015,9472,9226,8924,8755,4895,4176,9879,9669,9526,9540,9082,5389,4647,11164,10312,15659,28910,19691,5553,4626,23522,22422,20463,10005,9203,5105,4543,10640,9862,9635,9304,8704,5035,4393]},{"name":"华为云","type":"line","smooth":true,"symbol":"circle","symbolSize":3,"lineStyle":{"width":2},"data":[7315,6933,6757,6644,6334,4125,3734,6774,6797,6619,6230,6002,3888,3586,6275,6051,5988,5914,5613,3770,3464,6298,6137,5855,5829,5681,3770,3418,6205,5782,5986,5795,5675,3755,3379,5989,5927,5737,5795,5270,3326,3131,5477,5556,5479,5416,5542,3614,3531,6164,6003,6081,5891,5614,3751,3425,6131,5872,5765,5722,5663,3761,3540,6417,6068,17904,18222,5444,3750,3399,6076,5852,5418,5614,5258,3658,3426,6064,5706,5567,5514,4921,3571,3357,5810,5371,5565,5450,5001,3607,3334,5799,5512,5308,5503,5295,3575,5318,5429,4877,3417,3414,3317,3345,3374,3291,3407,3413,6007,5700,5355,3498,5811,5557,5440,5511,5525,3841,3673,6062,5878,5595,5565,5253,3643,3334,5854,5554,5472,17715,5471,3704,3396,6011,5655,5598,5685,5371,3757,3307,38621,33569,5821,5522,5333,3684,3378,5722,12686,5396,5408,5289,3521,3288]},{"name":"火山引擎","type":"line","smooth":true,"symbol":"circle","symbolSize":3,"lineStyle":{"width":2},"data":[3198,3291,3073,3104,2844,1813,1907,3214,3106,3498,3057,2715,1797,1769,2806,3036,3036,3194,2919,1885,1747,3192,3544,3349,3075,2617,1609,1513,2941,2830,2859,3158,2740,1836,1473,3037,3029,3105,2934,2688,1483,1534,2576,2572,2683,2622,2439,1468,1428,2700,2617,2641,2613,2354,1473,1385,2601,2514,2517,2564,2701,1701,1458,2703,2731,2594,2562,2254,1485,1380,2420,2451,2213,2445,2392,1391,1372,2492,2662,2722,2511,2286,1541,1627,3556,3074,2925,2820,2411,1537,1483,2530,2451,2372,2549,2388,1487,2278,2206,1716,1284,1208,1115,952,1061,1122,1271,1310,2694,2530,2311,1447,2270,2403,2389,2770,2433,1511,1441,2408,2478,2454,2369,2175,1376,1426,2485,2493,2433,2489,2430,1569,1434,2531,2500,2418,2465,2280,1430,1330,2540,2685,2586,2573,2369,1464,1421,2417,2576,2602,2492,2203,1491,1399]},{"name":"","type":"line","smooth":true,"symbol":"circle","symbolSize":3,"lineStyle":{"width":2},"data":[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null]}]
+  };
+
+  myChart.setOption(option);
+
+  // ⭐ 关键：自动随父容器宽度变化
+  window.addEventListener('resize', () => {
+    myChart.resize();
   });
-});
 </script>
+
+</body>
+</html>
+    
+    </div>
+
+    <!-- ===== 新闻列表 ===== -->
+    
+        <div class="news-card">
+          <div class="news-title">Nano Banana Pro生成无限递归图像引发关注</div>
+          <div class="news-time"></div>
+          <div class="news-desc"></div>
+        </div>
+      
+        <div class="news-card">
+          <div class="news-title">Anthropic研究证实AI训练可能催生目标错位模型</div>
+          <div class="news-time"></div>
+          <div class="news-desc"></div>
+        </div>
+      
+        <div class="news-card">
+          <div class="news-title">Hugging Face TRL库集成RapidFire AI提升大模型微调效率</div>
+          <div class="news-time"></div>
+          <div class="news-desc"></div>
+        </div>
+      
+        <div class="news-card">
+          <div class="news-title">2025年11月免费AI编程工具汇总</div>
+          <div class="news-time"></div>
+          <div class="news-desc"></div>
+        </div>
+      
+        <div class="news-card">
+          <div class="news-title">美国能源部启动创世纪任务，建设集中式人工智能科学平台</div>
+          <div class="news-time"></div>
+          <div class="news-desc"></div>
+        </div>
+      
+        <div class="news-card">
+          <div class="news-title">苹果开源Embedding Atlas工具实现嵌入向量可视化分析</div>
+          <div class="news-time"></div>
+          <div class="news-desc"></div>
+        </div>
+      
+        <div class="news-card">
+          <div class="news-title">Infinite Reality公司融资疑云与股票回购四次爽约</div>
+          <div class="news-time"></div>
+          <div class="news-desc"></div>
+        </div>
+      
+        <div class="news-card">
+          <div class="news-title">卡内基梅隆大学发布AI供应链数据集</div>
+          <div class="news-time"></div>
+          <div class="news-desc"></div>
+        </div>
+      
+        <div class="news-card">
+          <div class="news-title">Meta洽谈在自有数据中心导入谷歌TPU芯片</div>
+          <div class="news-time"></div>
+          <div class="news-desc"></div>
+        </div>
+      
+        <div class="news-card">
+          <div class="news-title">华尔街精英参与AI模型训练以替代金融岗位</div>
+          <div class="news-time"></div>
+          <div class="news-desc"></div>
+        </div>
+      
+        <div class="news-card">
+          <div class="news-title">Neuxnet公司AI业务占营收过半预计2025年突破3000万美元</div>
+          <div class="news-time"></div>
+          <div class="news-desc"></div>
+        </div>
+      
+        <div class="news-card">
+          <div class="news-title">OpenAI推出ChatGPT购物研究功能</div>
+          <div class="news-time"></div>
+          <div class="news-desc"></div>
+        </div>
+      
+        <div class="news-card">
+          <div class="news-title">法院对OpenAI发出临时禁令禁止在Sora应用中使用Cameo一词</div>
+          <div class="news-time"></div>
+          <div class="news-desc"></div>
+        </div>
+      
+        <div class="news-card">
+          <div class="news-title">OpenAI推出ChatGPT购物研究功能</div>
+          <div class="news-time"></div>
+          <div class="news-desc"></div>
+        </div>
+      
+        <div class="news-card">
+          <div class="news-title">Anthropic发布新版人工智能模型提升编码与办公任务能力</div>
+          <div class="news-time"></div>
+          <div class="news-desc"></div>
+        </div>
+      
+        <div class="news-card">
+          <div class="news-title">Anthropic发布Claude Opus 4.5模型并推出Excel集成功能</div>
+          <div class="news-time"></div>
+          <div class="news-desc"></div>
+        </div>
+      
+        <div class="news-card">
+          <div class="news-title">OpenAI为ChatGPT推出购物研究功能</div>
+          <div class="news-time"></div>
+          <div class="news-desc"></div>
+        </div>
+      
+        <div class="news-card">
+          <div class="news-title">谷歌DeepMind诺贝尔奖得主谈AlphaFold发展</div>
+          <div class="news-time"></div>
+          <div class="news-desc"></div>
+        </div>
+      
+        <div class="news-card">
+          <div class="news-title">新型AI模型PopEVE在罕见病诊断中表现优于AlphaMissense</div>
+          <div class="news-time"></div>
+          <div class="news-desc"></div>
+        </div>
+      
+        <div class="news-card">
+          <div class="news-title">谷歌放弃双子座3 贝索斯推普罗米修斯计划 萨默斯辞任OpenAI董事</div>
+          <div class="news-time"></div>
+          <div class="news-desc"></div>
+        </div>
+      
+        <div class="news-card">
+          <div class="news-title">谷歌发布双子座3 Pro模型及Nano Banana Pro图像模型</div>
+          <div class="news-time"></div>
+          <div class="news-desc"></div>
+        </div>
+      
+        <div class="news-card">
+          <div class="news-title">微软英伟达Anthropic达成300亿美元计算协议</div>
+          <div class="news-time"></div>
+          <div class="news-desc"></div>
+        </div>
+      
+        <div class="news-card">
+          <div class="news-title">谷歌将于2026年3月停用Assistant语音助手并全面转向Gemini</div>
+          <div class="news-time"></div>
+          <div class="news-desc"></div>
+        </div>
+      
+        <div class="news-card">
+          <div class="news-title">亚马逊在全球50多国拥有900多处数据中心设施</div>
+          <div class="news-time"></div>
+          <div class="news-desc"></div>
+        </div>
+      
+        <div class="news-card">
+          <div class="news-title">美国七起诉讼指控ChatGPT对话放大用户脆弱致悲剧</div>
+          <div class="news-time"></div>
+          <div class="news-desc"></div>
+        </div>
+      
+        <div class="news-card">
+          <div class="news-title">阿里千问启用新域名并开放更多模型</div>
+          <div class="news-time"></div>
+          <div class="news-desc"></div>
+        </div>
+      
+        <div class="news-card">
+          <div class="news-title">国家能源集团发布发电行业大模型擎源并构建高质量数据集</div>
+          <div class="news-time"></div>
+          <div class="news-desc"></div>
+        </div>
+      
+        <div class="news-card">
+          <div class="news-title">华为云盘古CV大模型团队多目标跟踪研究成果被AAAI 2026收录</div>
+          <div class="news-time"></div>
+          <div class="news-desc"></div>
+        </div>
+      
+        <div class="news-card">
+          <div class="news-title">三星或与Perplexity合作在Galaxy S26系列手机中为Bixby引入AI大模型</div>
+          <div class="news-time"></div>
+          <div class="news-desc"></div>
+        </div>
+      
+        <div class="news-card">
+          <div class="news-title">港科大团队发布全球首个真实场景篮球机器人演示</div>
+          <div class="news-time"></div>
+          <div class="news-desc"></div>
+        </div>
+      
+        <div class="news-card">
+          <div class="news-title">波士顿动力前CTO加盟DeepMind任硬件工程副总裁</div>
+          <div class="news-time"></div>
+          <div class="news-desc"></div>
+        </div>
+      
+        <div class="news-card">
+          <div class="news-title">地瓜机器人发布一站式开发平台及S600算力平台</div>
+          <div class="news-time"></div>
+          <div class="news-desc"></div>
+        </div>
+      
+        <div class="news-card">
+          <div class="news-title">富士康AI服务器收入超iPhone，刘扬伟推动业务转型</div>
+          <div class="news-time"></div>
+          <div class="news-desc"></div>
+        </div>
+      
+        <div class="news-card">
+          <div class="news-title">OpenAI发布GPT-5早期科学实验报告</div>
+          <div class="news-time"></div>
+          <div class="news-desc"></div>
+        </div>
+      
+        <div class="news-card">
+          <div class="news-title">奥尔特曼承认谷歌AI进展带来经济压力，OpenAI将推出新模型Shallotpeat</div>
+          <div class="news-time"></div>
+          <div class="news-desc"></div>
+        </div>
+      
+        <div class="news-card">
+          <div class="news-title">清华吴翼团队与蚂蚁开源异步强化学习框架AReaL-lite</div>
+          <div class="news-time"></div>
+          <div class="news-desc"></div>
+        </div>
+      
+        <div class="news-card">
+          <div class="news-title">奥特曼内部备忘录承认谷歌AI进展带来经济压力</div>
+          <div class="news-time"></div>
+          <div class="news-desc"></div>
+        </div>
+      
+        <div class="news-card">
+          <div class="news-title">陶哲轩使用Gemini辅助解决数学难题</div>
+          <div class="news-time"></div>
+          <div class="news-desc"></div>
+        </div>
+      
+        <div class="news-card">
+          <div class="news-title">奥特曼承认谷歌威胁OpenAI并预告新模型</div>
+          <div class="news-time"></div>
+          <div class="news-desc"></div>
+        </div>
+      
+        <div class="news-card">
+          <div class="news-title">阿里云赵庆杰将在AICon分享多智能体智能诊断系统技术实践</div>
+          <div class="news-time"></div>
+          <div class="news-desc"></div>
+        </div>
+      
+        <div class="news-card">
+          <div class="news-title">英伟达公布2025年Q3财报，Blackwell芯片全面量产</div>
+          <div class="news-time"></div>
+          <div class="news-desc"></div>
+        </div>
+      
+        <div class="news-card">
+          <div class="news-title">SuperMe完成680万美元种子轮融资，用AI创建可对话职业档案</div>
+          <div class="news-time"></div>
+          <div class="news-desc"></div>
+        </div>
+      
+        <div class="news-card">
+          <div class="news-title">阿里云在Gartner生成式AI报告四大维度均位列新兴领导者象限</div>
+          <div class="news-time"></div>
+          <div class="news-desc"></div>
+        </div>
+      
+        <div class="news-card">
+          <div class="news-title">主流开源大模型生态解析</div>
+          <div class="news-time"></div>
+          <div class="news-desc"></div>
+        </div>
+      
+        <div class="news-card">
+          <div class="news-title">Anthropic研究揭示AI奖励黑客行为可导致系统性错位</div>
+          <div class="news-time"></div>
+          <div class="news-desc"></div>
+        </div>
+      
+        <div class="news-card">
+          <div class="news-title">研报分析AI投资泡沫与金融开放</div>
+          <div class="news-time"></div>
+          <div class="news-desc"></div>
+        </div>
+      
+        <div class="news-card">
+          <div class="news-title">星尘智能完成数亿元A++轮融资</div>
+          <div class="news-time"></div>
+          <div class="news-desc"></div>
+        </div>
+      
+        <div class="news-card">
+          <div class="news-title">谷歌Gemini 3在数学和物理基准测试中创纪录</div>
+          <div class="news-time"></div>
+          <div class="news-desc"></div>
+        </div>
+      
+        <div class="news-card">
+          <div class="news-title">甲骨文股价下跌致埃里森财富缩水滑落至富豪榜第三</div>
+          <div class="news-time"></div>
+          <div class="news-desc"></div>
+        </div>
+      
+        <div class="news-card">
+          <div class="news-title">AMD将超分辨率技术FidelityFX Super Resolution正式更名为FSR</div>
+          <div class="news-time"></div>
+          <div class="news-desc"></div>
+        </div>
+      
+        <div class="news-card">
+          <div class="news-title">Karpathy开源大模型议会应用llm-council</div>
+          <div class="news-time"></div>
+          <div class="news-desc"></div>
+        </div>
+      
+        <div class="news-card">
+          <div class="news-title">AMD CEO苏姿丰称不担心AI泡沫并强调投资不足更危险</div>
+          <div class="news-time"></div>
+          <div class="news-desc"></div>
+        </div>
+      
+        <div class="news-card">
+          <div class="news-title">卡帕西发布大模型匿名评测方法</div>
+          <div class="news-time"></div>
+          <div class="news-desc"></div>
+        </div>
+      
+        <div class="news-card">
+          <div class="news-title">英伟达称不保证与OpenAI达成千亿美元投资协议</div>
+          <div class="news-time"></div>
+          <div class="news-desc"></div>
+        </div>
+      
+        <div class="news-card">
+          <div class="news-title">银行业语义缓存优化实验降低误报率</div>
+          <div class="news-time"></div>
+          <div class="news-desc"></div>
+        </div>
+      
+        <div class="news-card">
+          <div class="news-title">谷歌预览AI代码文档生成工具Code Wiki</div>
+          <div class="news-time"></div>
+          <div class="news-desc"></div>
+        </div>
+      
+        <div class="news-card">
+          <div class="news-title">Fireflies AI会议助手估值达10亿美元，创始人曾人工冒充AI服务</div>
+          <div class="news-time"></div>
+          <div class="news-desc"></div>
+        </div>
+      
+        <div class="news-card">
+          <div class="news-title">电话AI公司Beside完成3200万美元融资</div>
+          <div class="news-time"></div>
+          <div class="news-desc"></div>
+        </div>
+      
+        <div class="news-card">
+          <div class="news-title">Lean4定理证明器提升AI可靠性并获行业采用</div>
+          <div class="news-time"></div>
+          <div class="news-desc"></div>
+        </div>
+      
+
+  </div>
+</body>
+</html>
