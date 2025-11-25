@@ -63,115 +63,18 @@
     <!-- ===== 图表区域（来自图表生成节点） ===== -->
     <div class="chart-block">
       
-<html>
-<head>
-<meta charset="utf-8">
-<style>
-  :root {
-    --bg:#f7f8fb;
-    --fg:#0f172a;
-    --sub:#64748b;
-    --line:#e5e7eb;
-    --card:#ffffff;
-    --accent:#4f46e5;
-  }
-  body {
-    margin:0;
-    background:var(--card);
-    font-family: system-ui, -apple-system, Segoe UI, Roboto, Inter;
-  }
-
-  /* ⭐ 图表容器宽度 100%，高度固定 */
-  #chart {
-    width: 100%;
-    height: 480px;
-    border-radius: 20px;
-    background: var(--card);
-    box-shadow: 0 4px 18px rgba(0,0,0,0.06);
-  }
-</style>
-<script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
-</head>
-
-<body>
-  <div id="chart"></div>
-
-<script>
-  const chartDom = document.getElementById('chart');
-  const myChart = echarts.init(chartDom);
-
-  const option = {
-    backgroundColor: 'transparent',
-    tooltip: {
-      trigger: 'axis',
-      backgroundColor: 'rgba(15, 23, 42, 0.85)',
-      borderWidth: 0,
-      textStyle: { color: '#fff' },
-      axisPointer: {
-        type: 'line',
-        lineStyle: { width: 1.2, color: 'var(--accent)' }
-      }
-    },
-    legend: {
-      top: 10,
-      textStyle: { color: 'var(--fg)' }
-    },
-    grid: {
-      left: 50,
-      right: 30,
-      top: 60,
-      bottom: 50
-    },
-    xAxis: {
-      type: 'category',
-      data: ["20250623","20250624","20250625","20250626","20250627","20250628","20250629","20250630","20250701","20250702","20250703","20250704","20250705","20250706","20250707","20250708","20250709","20250710","20250711","20250712","20250713","20250714","20250715","20250716","20250717","20250718","20250719","20250720","20250721","20250722","20250723","20250724","20250725","20250726","20250727","20250728","20250729","20250730","20250731","20250801","20250802","20250803","20250804","20250805","20250806","20250807","20250808","20250809","20250810","20250811","20250812","20250813","20250814","20250815","20250816","20250817","20250818","20250819","20250820","20250821","20250822","20250823","20250824","20250825","20250826","20250827","20250828","20250829","20250830","20250831","20250901","20250902","20250903","20250904","20250905","20250906","20250907","20250908","20250909","20250910","20250911","20250912","20250913","20250914","20250915","20250916","20250917","20250918","20250919","20250920","20250921","20250922","20250923","20250924","20250925","20250926","20250927","20250928","20250929","20250930","20251001","20251002","20251003","20251004","20251005","20251006","20251007","20251008","20251009","20251010","20251011","20251012","20251013","20251014","20251015","20251016","20251017","20251018","20251019","20251020","20251021","20251022","20251023","20251024","20251025","20251026","20251027","20251028","20251029","20251030","20251031","20251101","20251102","20251103","20251104","20251105","20251106","20251107","20251108","20251109","20251110","20251111","20251112","20251113","20251114","20251115","20251116","20251117","20251118","20251119","20251120","20251121","20251122","20251123"],
-      axisLabel: {
-        color: 'var(--sub)',
-        rotate: 45,
-        margin: 12
-      },
-      axisLine: { lineStyle: { color: '#ddd' } },
-      splitLine: { show: false }
-    },
-    yAxis: {
-      type: 'value',
-      axisLabel: {
-        color: 'var(--sub)'
-      },
-      axisLine: { show: false },
-      splitLine: { show: false }
-    },
-
-    // ⭐ 使用你的配色
-    color: [
-      '#678CC0',
-      '#F0B96E',
-      '#264592',
-      '#B9D8EF',
-      '#747985',
-      '#F1D2B8'
-    ],
-
-    series: [{"name":"百度智能云","type":"line","smooth":true,"symbol":"circle","symbolSize":3,"lineStyle":{"width":2},"data":[983,1038,866,978,810,439,405,904,860,964,996,870,442,403,896,890,898,815,761,435,397,792,891,848,803,825,402,374,849,859,792,853,815,379,384,877,839,820,826,768,427,363,831,833,871,995,802,415,388,831,831,839,841,816,413,396,875,862,888,881,851,461,411,863,905,837,1108,831,476,432,1024,967,798,869,1015,513,435,1617,1348,1436,1355,1486,768,502,1238,1092,1034,1141,978,534,435,1011,1170,1277,1341,1140,531,1009,1237,759,355,326,323,314,348,283,353,394,1078,1220,1218,446,1352,1239,1564,1238,1334,482,482,1401,1376,1502,1473,1274,564,617,1288,1017,1187,1090,1259,488,462,1163,1219,1202,1110,1169,459,436,1269,1272,1136,1245,1088,519,450,1018,1018,1224,1179,1077,542,410]},{"name":"阿里云","type":"line","smooth":true,"symbol":"circle","symbolSize":3,"lineStyle":{"width":2},"data":[23652,22017,21132,20962,19245,9013,7556,22341,22001,21181,20743,19316,9171,7327,21081,20720,20805,19756,18884,8676,7188,22489,21250,20488,20395,18490,9181,7216,22387,21323,21058,20744,19251,9043,7365,21531,20457,19751,19726,19002,8814,7006,21605,20565,20043,19396,18313,7399,7139,21417,20500,20076,19834,18854,8767,7232,20945,19602,19813,19502,17853,8367,6981,20770,19776,19138,18353,17115,8628,7312,21200,19969,17667,18736,17553,8311,6622,20560,19243,18737,18420,17371,8352,6715,20629,18436,18675,18178,15753,7949,6664,20665,18427,17932,18417,17502,8315,17908,17166,13755,5323,4898,4442,4605,4697,4342,5891,7033,21133,18916,17124,6981,19320,18057,17834,18013,17118,7794,6417,19914,18333,17817,17480,16307,8064,6500,19815,18225,18489,18584,17296,8439,7001,21328,19860,19450,19176,17416,8518,6755,21724,21215,18981,18454,17277,7829,6545,19941,18758,17592,17650,16573,7886,6363]},{"name":"腾讯云","type":"line","smooth":true,"symbol":"circle","symbolSize":3,"lineStyle":{"width":2},"data":[12430,11772,11425,11021,10440,5812,5283,11957,11834,11435,11141,10139,5749,4941,10911,10876,10558,10170,9776,5775,5003,11483,11075,10597,10542,9864,5634,4751,11637,10944,10786,10502,9909,5673,5072,10978,10746,10370,10286,10133,5808,4959,11401,10837,10468,10208,9670,5054,4853,11026,10684,10425,10304,9895,5445,4776,10944,10515,10506,10137,9502,5300,4800,11100,10446,10059,9571,9053,5346,4632,10578,10149,9469,9900,9388,5340,4534,10659,10154,9858,9756,9116,5246,4532,10512,9735,9818,9707,8206,5065,4515,10142,9596,8978,9504,9227,5091,9066,9026,7568,3879,3692,4204,3493,3994,3199,4082,4591,10598,9844,9086,4641,9825,9212,9265,9208,8870,5020,4324,10015,9472,9226,8924,8755,4895,4176,9879,9669,9526,9540,9082,5389,4647,11164,10312,15659,28910,19691,5553,4626,23522,22422,20463,10005,9203,5105,4543,10640,9862,9635,9304,8704,5035,4393]},{"name":"华为云","type":"line","smooth":true,"symbol":"circle","symbolSize":3,"lineStyle":{"width":2},"data":[7315,6933,6757,6644,6334,4125,3734,6774,6797,6619,6230,6002,3888,3586,6275,6051,5988,5914,5613,3770,3464,6298,6137,5855,5829,5681,3770,3418,6205,5782,5986,5795,5675,3755,3379,5989,5927,5737,5795,5270,3326,3131,5477,5556,5479,5416,5542,3614,3531,6164,6003,6081,5891,5614,3751,3425,6131,5872,5765,5722,5663,3761,3540,6417,6068,17904,18222,5444,3750,3399,6076,5852,5418,5614,5258,3658,3426,6064,5706,5567,5514,4921,3571,3357,5810,5371,5565,5450,5001,3607,3334,5799,5512,5308,5503,5295,3575,5318,5429,4877,3417,3414,3317,3345,3374,3291,3407,3413,6007,5700,5355,3498,5811,5557,5440,5511,5525,3841,3673,6062,5878,5595,5565,5253,3643,3334,5854,5554,5472,17715,5471,3704,3396,6011,5655,5598,5685,5371,3757,3307,38621,33569,5821,5522,5333,3684,3378,5722,12686,5396,5408,5289,3521,3288]},{"name":"火山引擎","type":"line","smooth":true,"symbol":"circle","symbolSize":3,"lineStyle":{"width":2},"data":[3198,3291,3073,3104,2844,1813,1907,3214,3106,3498,3057,2715,1797,1769,2806,3036,3036,3194,2919,1885,1747,3192,3544,3349,3075,2617,1609,1513,2941,2830,2859,3158,2740,1836,1473,3037,3029,3105,2934,2688,1483,1534,2576,2572,2683,2622,2439,1468,1428,2700,2617,2641,2613,2354,1473,1385,2601,2514,2517,2564,2701,1701,1458,2703,2731,2594,2562,2254,1485,1380,2420,2451,2213,2445,2392,1391,1372,2492,2662,2722,2511,2286,1541,1627,3556,3074,2925,2820,2411,1537,1483,2530,2451,2372,2549,2388,1487,2278,2206,1716,1284,1208,1115,952,1061,1122,1271,1310,2694,2530,2311,1447,2270,2403,2389,2770,2433,1511,1441,2408,2478,2454,2369,2175,1376,1426,2485,2493,2433,2489,2430,1569,1434,2531,2500,2418,2465,2280,1430,1330,2540,2685,2586,2573,2369,1464,1421,2417,2576,2602,2492,2203,1491,1399]},{"name":"","type":"line","smooth":true,"symbol":"circle","symbolSize":3,"lineStyle":{"width":2},"data":[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null]}]
-  };
-
-  myChart.setOption(option);
-
-  // ⭐ 关键：自动随父容器宽度变化
-  window.addEventListener('resize', () => {
-    myChart.resize();
-  });
-</script>
-
-</body>
-</html>
-    
     </div>
 
     <!-- ===== 新闻列表 ===== -->
     
         <div class="news-card">
-          <div class="news-title">Nano Banana Pro生成无限递归图像引发关注</div>
+          <div class="news-title">腾讯混元开源1B参数OCR模型HunyuanOCR，多项能力达SOTA水平</div>
+          <div class="news-time"></div>
+          <div class="news-desc"></div>
+        </div>
+      
+        <div class="news-card">
+          <div class="news-title">Nano Banana Pro生成递归图像引发关注</div>
           <div class="news-time"></div>
           <div class="news-desc"></div>
         </div>
@@ -183,31 +86,7 @@
         </div>
       
         <div class="news-card">
-          <div class="news-title">Hugging Face TRL库集成RapidFire AI提升大模型微调效率</div>
-          <div class="news-time"></div>
-          <div class="news-desc"></div>
-        </div>
-      
-        <div class="news-card">
-          <div class="news-title">2025年11月免费AI编程工具汇总</div>
-          <div class="news-time"></div>
-          <div class="news-desc"></div>
-        </div>
-      
-        <div class="news-card">
-          <div class="news-title">美国能源部启动创世纪任务，建设集中式人工智能科学平台</div>
-          <div class="news-time"></div>
-          <div class="news-desc"></div>
-        </div>
-      
-        <div class="news-card">
-          <div class="news-title">苹果开源Embedding Atlas工具实现嵌入向量可视化分析</div>
-          <div class="news-time"></div>
-          <div class="news-desc"></div>
-        </div>
-      
-        <div class="news-card">
-          <div class="news-title">Infinite Reality公司融资疑云与股票回购四次爽约</div>
+          <div class="news-title">美国能源部启动创世纪任务建设集中式AI平台</div>
           <div class="news-time"></div>
           <div class="news-desc"></div>
         </div>
@@ -219,19 +98,37 @@
         </div>
       
         <div class="news-card">
-          <div class="news-title">Meta洽谈在自有数据中心导入谷歌TPU芯片</div>
+          <div class="news-title">中科天算完成数千万元天使轮融资，推进天基计算技术研发</div>
           <div class="news-time"></div>
           <div class="news-desc"></div>
         </div>
       
         <div class="news-card">
-          <div class="news-title">华尔街精英参与AI模型训练以替代金融岗位</div>
+          <div class="news-title">Nano Banana Pro生成递归图像引发用户讨论</div>
           <div class="news-time"></div>
           <div class="news-desc"></div>
         </div>
       
         <div class="news-card">
-          <div class="news-title">Neuxnet公司AI业务占营收过半预计2025年突破3000万美元</div>
+          <div class="news-title">xLLM社区将于12月6日在北京举办线下Meetup</div>
+          <div class="news-time"></div>
+          <div class="news-desc"></div>
+        </div>
+      
+        <div class="news-card">
+          <div class="news-title">奥特曼谈OpenAI首款AI硬件设计简洁预计两年内发布</div>
+          <div class="news-time"></div>
+          <div class="news-desc"></div>
+        </div>
+      
+        <div class="news-card">
+          <div class="news-title">华尔街精英参与AI金融模型训练</div>
+          <div class="news-time"></div>
+          <div class="news-desc"></div>
+        </div>
+      
+        <div class="news-card">
+          <div class="news-title">Neuxnet公司AI业务占营收过半，预计2025年突破3000万美元</div>
           <div class="news-time"></div>
           <div class="news-desc"></div>
         </div>
@@ -249,19 +146,7 @@
         </div>
       
         <div class="news-card">
-          <div class="news-title">OpenAI推出ChatGPT购物研究功能</div>
-          <div class="news-time"></div>
-          <div class="news-desc"></div>
-        </div>
-      
-        <div class="news-card">
-          <div class="news-title">Anthropic发布新版人工智能模型提升编码与办公任务能力</div>
-          <div class="news-time"></div>
-          <div class="news-desc"></div>
-        </div>
-      
-        <div class="news-card">
-          <div class="news-title">Anthropic发布Claude Opus 4.5模型并推出Excel集成功能</div>
+          <div class="news-title">谷歌AI芯片获Meta数十亿美元订单，英伟达股价下跌</div>
           <div class="news-time"></div>
           <div class="news-desc"></div>
         </div>
@@ -273,7 +158,25 @@
         </div>
       
         <div class="news-card">
-          <div class="news-title">谷歌DeepMind诺贝尔奖得主谈AlphaFold发展</div>
+          <div class="news-title">Anthropic推出新版人工智能模型提升编码与办公任务能力</div>
+          <div class="news-time"></div>
+          <div class="news-desc"></div>
+        </div>
+      
+        <div class="news-card">
+          <div class="news-title">Anthropic发布Claude Opus 4.5模型并扩展工具功能</div>
+          <div class="news-time"></div>
+          <div class="news-desc"></div>
+        </div>
+      
+        <div class="news-card">
+          <div class="news-title">OpenAI为ChatGPT推出购物研究功能</div>
+          <div class="news-time"></div>
+          <div class="news-desc"></div>
+        </div>
+      
+        <div class="news-card">
+          <div class="news-title">DeepMind诺贝尔奖得主谈AlphaFold发展历程</div>
           <div class="news-time"></div>
           <div class="news-desc"></div>
         </div>
